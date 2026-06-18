@@ -125,12 +125,13 @@ Website ini ter-integrasi dengan **Directus** untuk konten dinamis. Saat ini yan
 
 - [`docs/directus-cms-setup.md`](./docs/directus-cms-setup.md) — Setup Directus collection, fields, permissions, dan seed data
 - [`docs/hero-slides-content.md`](./docs/hero-slides-content.md) — Konten siap-paste untuk 6 slide hero_slides
+- [`docs/netlify-deploy.md`](./docs/netlify-deploy.md) — Panduan deploy native Netlify untuk Astro SSR
 
 ---
 
 ## 📝 Catatan
 
 - Astro v6, Tailwind v4 (CSS-based config, `@theme` directive)
-- SSR mode via `@astrojs/node` adapter
+- SSR mode via `@astrojs/netlify` adapter (native Netlify Functions)
 - Animations: Framer Motion (tapi sedang di-minimalisir ke editorial style)
 - Icons: `lucide-astro` (saat ini sebagian diganti ke letter initial di moss circle)

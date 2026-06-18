@@ -1,27 +1,19 @@
 // @ts-check
-import { defineConfig } from "astro/config";
-import node from "@astrojs/node";
-import react from "@astrojs/react";
-import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from 'astro/config';
+import netlify from '@astrojs/netlify';
+import react from '@astrojs/react';
+import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-	output: "server",
+  // SSR output — Netlify adapter will deploy server routes as Netlify Functions.
+  output: 'server',
 
-	adapter: node({
-		mode: "standalone",
-	}),
+  adapter: netlify(),
 
-	integrations: [react()],
+  integrations: [react()],
 
-	vite: {
-		plugins: [tailwindcss()],
-	},
-
-	server: {
-    host: '0.0.0.0',
-    port: 4321
+  vite: {
+    plugins: [tailwindcss()],
   },
-
-	base: `${import.meta.env.BASE_URL}`
 });
