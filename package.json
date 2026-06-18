@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@astrojs/netlify": "^7.0.13",
+    "@astrojs/node": "^10.1.4",
     "@astrojs/react": "^5.0.7",
     "@directus/sdk": "^22.0.0",
     "@fontsource-variable/merriweather-sans": "^5.2.7",

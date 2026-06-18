@@ -5,6 +5,7 @@ publish = "dist"
 [build.environment]
 NODE_VERSION = "22.12.0"
 NPM_FLAGS = "--legacy-peer-deps"
+DEPLOY_TARGET = "netlify"
 
 # Directus URL is intentionally configured in Netlify dashboard too.
 # Add it in Netlify: Site configuration → Environment variables

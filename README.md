@@ -126,6 +126,7 @@ Website ini ter-integrasi dengan **Directus** untuk konten dinamis. Saat ini yan
 - [`docs/directus-cms-setup.md`](./docs/directus-cms-setup.md) — Setup Directus collection, fields, permissions, dan seed data
 - [`docs/hero-slides-content.md`](./docs/hero-slides-content.md) — Konten siap-paste untuk 6 slide hero_slides
 - [`docs/netlify-deploy.md`](./docs/netlify-deploy.md) — Panduan deploy native Netlify untuk Astro SSR
+- [`docs/coolify-docker-deploy.md`](./docs/coolify-docker-deploy.md) — Panduan deploy Coolify dengan Dockerfile
 
 ---
 
