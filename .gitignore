@@ -26,5 +26,6 @@ pnpm-debug.log*
 # file zip
 *.zip
 
-# preview design by huashu design
+# pi code
 design-demos/
+docs/

@@ -1,23 +1,23 @@
 ---
-const logoysim = "/logo-ysim.png";
+const logoJurnalOcean = "/logo-jurnalocean.png";
 
-// Tier 1: YSIM (top, full-width moss card)
+// Tier 1: JOC (top, full-width moss card)
 const tier1 = {
-  code: "YSIM",
-  name: "Yayasan Sawiyan Ibnu Mukhlisin",
-  desc: "Badan pengelola tertinggi yayasan",
+  code: "JOC",
+  name: "Jurnal Ocean",
+  desc: "Badan pengelola tertinggi organisasi",
 };
 
 // Tier 2: Pembina + Pengawas
 const tier2 = [
   {
     code: "PEMBINA",
-    name: "Pembina Yayasan",
+    name: "Pembina Jurnal Ocean",
     desc: "Memberikan arahan strategis",
   },
   {
     code: "PENGAWAS",
-    name: "Pengawas Yayasan",
+    name: "Pengawas Jurnal Ocean",
     desc: "Mengawasi jalannya organisasi",
   },
 ];
@@ -26,18 +26,18 @@ const tier2 = [
 const tier3 = [
   {
     code: "KETUA",
-    name: "Ketua Yayasan",
+    name: "Ketua Jurnal Ocean",
     desc: "Memimpin operasional harian",
   },
   {
     code: "SEKRETARIS",
-    name: "Sekretaris Yayasan",
+    name: "Sekretaris Jurnal Ocean",
     desc: "Mengelola administrasi",
   },
   {
     code: "BENDAHARA",
-    name: "Bendahara Yayasan",
-    desc: "Mengelola keuangan yayasan",
+    name: "Bendahara Jurnal Ocean",
+    desc: "Mengelola keuangan organisasi",
   },
 ];
 ---
@@ -54,15 +54,15 @@ const tier3 = [
         <h2 id="struktur-title" class="struktur-title">
           Organisasi yang <em>solid</em> dan profesional.
         </h2>
-        <p class="struktur-intro">Tata kelola yayasan yang transparan dan terstruktur untuk memastikan setiap program berjalan dengan integritas dan akuntabilitas.</p>
+        <p class="struktur-intro">Tata kelola organisasi yang transparan dan terstruktur untuk memastikan setiap program berjalan dengan integritas dan akuntabilitas.</p>
       </div>
     </header>
 
-    <!-- Tier 1: YSIM (top, full-width featured) -->
+    <!-- Tier 1: JOC (top, full-width featured) -->
     <div class="struktur-tier-1">
       <div class="struktur-card-featured">
         <div class="struktur-card-featured-mark">
-          <img src={logoysim} alt="YSIM Logo" class="struktur-card-featured-logo" loading="lazy" onerror="this.style.display='none'" />
+          <img src={logoJurnalOcean} alt="JOC Logo" class="struktur-card-featured-logo" loading="lazy" onerror="this.style.display='none'" />
           <div class="struktur-card-featured-code">{tier1.code}</div>
         </div>
         <div class="struktur-card-featured-meta">
@@ -85,7 +85,7 @@ const tier3 = [
           <div class="struktur-card">
             <div class="struktur-card-num">0{idx + 2}</div>
             <div class="struktur-card-mark">
-              <img src={logoysim} alt="Logo" class="struktur-card-logo" loading="lazy" onerror="this.style.display='none'" />
+              <img src={logoJurnalOcean} alt="Logo" class="struktur-card-logo" loading="lazy" onerror="this.style.display='none'" />
               <div class="struktur-card-code">{item.code}</div>
             </div>
             <div class="struktur-card-name">{item.name}</div>
@@ -107,7 +107,7 @@ const tier3 = [
           <div class="struktur-card">
             <div class="struktur-card-num">0{idx + 4}</div>
             <div class="struktur-card-mark">
-              <img src={logoysim} alt="Logo" class="struktur-card-logo" loading="lazy" onerror="this.style.display='none'" />
+              <img src={logoJurnalOcean} alt="Logo" class="struktur-card-logo" loading="lazy" onerror="this.style.display='none'" />
               <div class="struktur-card-code">{item.code}</div>
             </div>
             <div class="struktur-card-name">{item.name}</div>
@@ -184,7 +184,7 @@ const tier3 = [
     margin: 0 0 0 auto;
   }
 
-  /* Tier 1: featured YSIM */
+  /* Tier 1: featured JOC */
   .struktur-tier-1 {
     margin-bottom: 0;
   }

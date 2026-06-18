@@ -1,53 +1,16 @@
 ---
-// 1. Tipe data slide
-export interface Slide {
-  gambar: string;
-  num: string;
-  label: string;
-  quote: string;
-}
+import { getHeroSlidesWithFallback, directusAssetUrl } from "../../../lib/directus";
+import type { HeroSlide } from "../../../lib/directus";
 
-// 2. Data slide hardcoded (6 nilai utama Sawiyan)
-const slides: Slide[] = [
-  {
-    gambar: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1920&h=1080&fit=crop",
-    num: "01",
-    label: "Menjunjung tinggi <em>kejujuran, amanah, dan tanggung jawab</em> dalam setiap langkah.",
-    quote: "“Integritas adalah napas dari setiap pengabdian yang kami lakukan.”"
-  },
-  {
-    gambar: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1920&h=1080&fit=crop",
-    num: "02",
-    label: "Mengembangkan <em>ilmu pengetahuan</em> secara berkelanjutan dan berbasis Islam.",
-    quote: "“Ilmu yang bermanfaat adalah cahaya yang tak pernah padam.”"
-  },
-  {
-    gambar: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1920&h=1080&fit=crop",
-    num: "03",
-    label: "Menjadikan <em>Al-Qur'an dan Hadis</em> sebagai landasan berpikir dan bertindak.",
-    quote: "“Al-Qur'an adalah kompas abadi yang menuntun langkah kami.”"
-  },
-  {
-    gambar: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&h=1080&fit=crop",
-    num: "04",
-    label: "Mendorong <em>kreativitas dan pembaruan</em> dalam pendidikan dan pengabdian.",
-    quote: "“Inovasi adalah cara kami menjawab tantangan zaman.”"
-  },
-  {
-    gambar: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1920&h=1080&fit=crop",
-    num: "05",
-    label: "Mengedepankan <em>kebermanfaatan dan keadilan sosial</em> bagi masyarakat luas.",
-    quote: "“Kepedulian sosial adalah ibadah yang paling dekat.”"
-  },
-  {
-    gambar: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&h=1080&fit=crop",
-    num: "06",
-    label: "Mengembangkan <em>kerja sama</em> untuk dampak yang berkelanjutan.",
-    quote: "“Kolaborasi adalah kekuatan yang tak tergantikan.”"
-  }
-];
+export type Slide = HeroSlide;
 
+const slides: Slide[] = await getHeroSlidesWithFallback();
 const totalSlides = slides.length;
+
+const resolvedSlides = slides.map((s) => ({
+  ...s,
+  image: directusAssetUrl(s.image) || s.image,
+}));
 ---
 
 <section
@@ -58,7 +21,7 @@ const totalSlides = slides.length;
   <!-- Track (semua slide disusun flex) -->
   <div class="hero-track" id="heroTrack">
     {
-      slides.map((slide) => (
+      resolvedSlides.map((slide) => (
         <div
           class="hero-slide min-w-full h-full shrink-0 relative flex items-center"
           role="group"
@@ -66,20 +29,20 @@ const totalSlides = slides.length;
         >
           <div
             class="hero-img absolute inset-0 bg-cover bg-center"
-            style={`background-image: url('${slide.gambar}');`}
+            style={`background-image: url('${slide.image}');`}
           ></div>
           <div class="hero-overlay absolute inset-0 pointer-events-none"></div>
 
           <div class="hero-content relative z-2 w-full">
             <div>
-              <div class="hero-num">{slide.num}</div>
+              <div class="hero-num">{slide.number}</div>
               <div class="hero-tag">Nilai Utama</div>
-              <h1 class="hero-headline" set:html={slide.label}></h1>
+              <h1 class="hero-headline" set:html={slide.headline}></h1>
             </div>
 
             <div class="hero-side">
               <p class="hero-side-quote">{slide.quote}</p>
-              <p class="hero-side-attr">— Yayasan Sawiyan</p>
+              <p class="hero-side-attr">— {slide.quote_attr ?? "Jurnal Ocean"}</p>
             </div>
           </div>
         </div>
@@ -89,7 +52,7 @@ const totalSlides = slides.length;
 
   <!-- Bottom progress bar -->
   <div class="hero-bottom">
-    <span class="hero-counter" id="heroCounter">01 / 06</span>
+    <span class="hero-counter" id="heroCounter">01 / {String(totalSlides).padStart(2, "0")}</span>
     <div class="hero-progress" id="heroProgress"></div>
   </div>
 </section>
