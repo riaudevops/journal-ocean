@@ -42,7 +42,7 @@ DIRECTUS_TOKEN='...'   # opsional, hanya kalau perlu write access
 │   ├── layouts/
 │   │   └── Layout.astro        # Root layout
 │   ├── lib/
-│   │   └── directus.ts         # Directus SDK client + fetchers + fallback
+│   │   └── directus.ts         # Directus SDK client + CMS fetchers
 │   ├── pages/                  # Astro routes
 │   │   ├── index.astro
 │   │   ├── profil.astro
@@ -92,19 +92,17 @@ Website ini ter-integrasi dengan **Directus** untuk konten dinamis. Saat ini yan
 
 - `output: "server"` di `astro.config.mjs` → setiap request fetch ulang dari CMS
 - `src/lib/directus.ts` punya:
-  - `getHeroSlides()` — fetch published, sort by `sort` asc
-  - `getHeroSlidesWithFallback()` — auto-fallback ke hardcoded kalau CMS down/kosong
+  - `getHeroSlides()` — fetch `hero_slides` dari CMS, sort by `id` asc
   - `directusAssetUrl()` — convert UUID asset ke full URL
   - 60s in-memory cache per request
-- **Zero downtime**: kalau CMS down, slider tetap render pakai data hardcoded
+- Slider sekarang bergantung pada data CMS `hero_slides` dan tidak memakai fallback hardcoded.
 
 ### Menambah collection baru
 
 1. Create collection di Directus admin (`/admin`)
 2. Set public read permission
 3. Tambah fetcher di `src/lib/directus.ts` (mirip `getHeroSlides`)
-4. Tambah fallback data
-5. Pakai di `.astro` component: `const data = await getXxxWithFallback()`
+4. Pakai di `.astro` component: `const data = await getXxx()`
 
 ---
 

@@ -1,14 +1,22 @@
 ---
-import { getHeroSlidesWithFallback, directusAssetUrl } from "../../../lib/directus";
+import { getHeroSlides, directusAssetUrl, normalizeSiteLanguage } from "../../../lib/directus";
 import type { HeroSlide } from "../../../lib/directus";
 
 export type Slide = HeroSlide;
 
-const slides: Slide[] = await getHeroSlidesWithFallback();
+const language = normalizeSiteLanguage(Astro.url.searchParams.get("lang"));
+const slides: Slide[] = await getHeroSlides(language);
 const totalSlides = slides.length;
+const heroTag = language === "en" ? "Core Value" : "Nilai Utama";
 
-const resolvedSlides = slides.map((s) => ({
+const formatSlideNumber = (value: string | number | undefined, index: number) => {
+  const raw = String(value ?? index + 1).trim();
+  return raw.padStart(2, "0");
+};
+
+const resolvedSlides = slides.map((s, index) => ({
   ...s,
+  number: formatSlideNumber(s.number, index),
   image: directusAssetUrl(s.image) || s.image,
 }));
 ---
@@ -36,7 +44,7 @@ const resolvedSlides = slides.map((s) => ({
           <div class="hero-content relative z-2 w-full">
             <div>
               <div class="hero-num">{slide.number}</div>
-              <div class="hero-tag">Nilai Utama</div>
+              <div class="hero-tag">{heroTag}</div>
               <h1 class="hero-headline" set:html={slide.headline}></h1>
             </div>
 
@@ -251,6 +259,7 @@ const resolvedSlides = slides.map((s) => ({
 
     const slides = track.querySelectorAll('.hero-slide');
     const total  = slides.length || totalSlides;
+    if (total <= 0) return;
 
     // Build progress bars
     for (let i = 0; i < total; i++) {

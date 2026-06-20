@@ -1,46 +1,58 @@
 ---
 import { ChevronRight } from "@lucide/astro";
+import { getNavbarContentWithFallback, normalizeSiteLanguage } from "../../lib/directus";
 
 export interface SubSubItem {
   name: string;
   href: string;
+  langKey: string;
 }
 
 export interface SubItem {
   name: string;
   href: string;
+  langKey: string;
   subSubItems?: SubSubItem[];
 }
 
 export interface MenuItem {
   name: string;
   href: string;
+  langKey: string;
   subItems?: SubItem[];
 }
 
+const language = normalizeSiteLanguage(Astro.url.searchParams.get("lang"));
+const navbarContent = await getNavbarContentWithFallback(language);
+const logoText = navbarContent.text_icon ?? "Journal Ocean";
+const logoSubText = navbarContent.text_sub_icon ?? "Jurnal";
+
 const menuItems: MenuItem[] = [
-  { name: "BERANDA", href: "/" },
+  { name: navbarContent.item_1 ?? "Home", href: "/", langKey: "nav.home" },
   {
-    name: "TENTANG KAMI",
+    name: navbarContent.item_2 ?? "Tentang Kami",
     href: "/profil",
+    langKey: "nav.about",
     subItems: [
-      { name: "Profil Journal Ocean", href: "/profil" },
-      { name: "Visi & Misi", href: "/profil#visi-misi" },
-      { name: "Struktur Organisasi", href: "/profil#struktur-organisasi" },
+      { name: navbarContent.subitem2_1 ?? "Profil", href: "/profil", langKey: "nav.profile" },
+      { name: navbarContent.subitem2_2 ?? "Visi & Misi", href: "/profil#visi-misi", langKey: "nav.vision" },
+      { name: navbarContent.subitem2_3 ?? "Struktur Organisasi", href: "/profil#struktur-organisasi", langKey: "nav.structure" },
     ],
   },
   {
-    name: "PROGRAM",
+    name: navbarContent.item_3 ?? "Program",
     href: "/program",
+    langKey: "nav.programs",
     subItems: [
-      { name: "Program Sosial", href: "/program#sosial" },
-      { name: "Program Kemanusiaan", href: "/program#kemanusiaan" },
-      { name: "Program Keagamaan", href: "/program#keagamaan" },
+      { name: navbarContent.subitem3_1 ?? "Program Sosial", href: "/program#sosial", langKey: "nav.social" },
+      { name: navbarContent.subitem3_2 ?? "Program Kemanusiaan", href: "/program#kemanusiaan", langKey: "nav.humanitarian" },
+      { name: navbarContent.subitem3_3 ?? "Program Keagamaan", href: "/program#keagamaan", langKey: "nav.religious" },
     ],
   },
   {
-    name: "BERITA",
+    name: navbarContent.item_4 ?? "Berita",
     href: "/berita",
+    langKey: "nav.news",
   },
 ];
 ---
@@ -50,8 +62,8 @@ const menuItems: MenuItem[] = [
     <div class="w-full max-w-7xl mx-auto flex justify-between items-center px-6 2xl:px-8 py-4">
       <a href="/" class="flex items-baseline gap-3 cursor-pointer hover:opacity-90 transition-opacity duration-200 shrink-0">
         <span class="logo-mark">S</span>
-        <span class="logo-name">Journal Ocean</span>
-        <span class="logo-sub">Jurnal</span>
+        <span class="logo-name">{logoText}</span>
+        <span class="logo-sub">{logoSubText}</span>
       </a>
 
       <div class="hidden xl:flex items-center gap-8">
@@ -60,7 +72,7 @@ const menuItems: MenuItem[] = [
             menuItems.map((item) => (
               <li class={`relative group ${item.subItems && "cursor-pointer"}`}>
                 <a href={item.href} class={`hover:text-brand-primary-lighter transition-colors duration-200 ${!item.subItems && "cursor-pointer"} nav-link`}>
-                  {item.name}
+                  <span data-i18n={item.langKey}>{item.name}</span>
                   {item.subItems && (
                     <svg class="inline w-4 h-4 ml-1 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -73,7 +85,7 @@ const menuItems: MenuItem[] = [
                       {item.subItems.map((subItem) => (
                         <div class="relative group/sub">
                           <a href={subItem.href} class="w-full flex justify-between items-center px-4 py-2 hover:bg-white/10 hover:text-brand-primary-lighter transition-all duration-200">
-                            {subItem.name}
+                            <span data-i18n={subItem.langKey}>{subItem.name}</span>
                             {subItem.subSubItems && <ChevronRight class="w-4 h-4 transition-transform duration-300 group-hover/sub:translate-x-1" />}
                           </a>
 
@@ -97,9 +109,18 @@ const menuItems: MenuItem[] = [
             ))
           }
         </ul>
+
+        <div class="language-toggle" aria-label="Pilih bahasa">
+          <button type="button" class="language-toggle-btn is-active" data-lang-option="id" aria-pressed="true">ID</button>
+          <button type="button" class="language-toggle-btn" data-lang-option="en" aria-pressed="false">EN</button>
+        </div>
       </div>
 
-      <div class="xl:hidden flex gap-1 md:gap-2 justify-center items-center">
+      <div class="xl:hidden flex gap-2 md:gap-3 justify-center items-center">
+        <div class="language-toggle language-toggle-mobile" aria-label="Pilih bahasa">
+          <button type="button" class="language-toggle-btn is-active" data-lang-option="id" aria-pressed="true">ID</button>
+          <button type="button" class="language-toggle-btn" data-lang-option="en" aria-pressed="false">EN</button>
+        </div>
         <button id="hamburger-button" class="text-brand-background focus:outline-none transition-transform duration-300 active:scale-90">
           <svg id="hamburger-icon" class="md:w-8 md:h-8 w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
@@ -117,12 +138,12 @@ const menuItems: MenuItem[] = [
             <div class="border-b border-white/10 px-7 py-4 transition-colors duration-200 hover:bg-white/5">
               {!item.subItems ? (
                 <a href={item.href} class="block w-full hover:text-brand-primary-lighter transition-colors duration-200">
-                  {item.name}
+                  <span data-i18n={item.langKey}>{item.name}</span>
                 </a>
               ) : (
                 <div>
                   <button class="accordion-toggle flex justify-between items-center w-full hover:text-brand-primary-lighter transition-colors duration-200">
-                    <span>{item.name}</span>
+                    <span data-i18n={item.langKey}>{item.name}</span>
                     <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -132,12 +153,12 @@ const menuItems: MenuItem[] = [
                       {item.subItems.map((subItem) =>
                         !subItem.subSubItems ? (
                           <a href={subItem.href} class="block py-1 text-base font-medium text-brand-primary-lighter/80 hover:text-brand-background hover:pl-2 transition-all duration-200">
-                            {subItem.name}
+                            <span data-i18n={subItem.langKey}>{subItem.name}</span>
                           </a>
                         ) : (
                           <div>
                             <button class="accordion-toggle flex gap-3 items-center w-full py-1 text-base font-medium text-brand-primary-lighter/80 hover:text-brand-background transition-colors duration-200">
-                              <span>{subItem.name}</span>
+                              <span data-i18n={subItem.langKey}>{subItem.name}</span>
                               <svg class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                               </svg>
@@ -146,7 +167,7 @@ const menuItems: MenuItem[] = [
                               <div class="pl-4 py-2 mt-2 flex flex-col gap-2 bg-white/5 rounded-lg">
                                 {subItem.subSubItems.map((subSubItem) => (
                                   <a href={subSubItem.href} class="block py-1 text-sm font-medium text-brand-primary-lighter/70 hover:text-brand-background hover:pl-2 transition-all duration-200">
-                                    {subSubItem.name}
+                                    <span data-i18n={subSubItem.langKey}>{subSubItem.name}</span>
                                   </a>
                                 ))}
                               </div>
@@ -233,9 +254,137 @@ const menuItems: MenuItem[] = [
       width: 100%;
       left: 0;
     }
+
+    .language-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px;
+      border: 1px solid rgba(164, 178, 147, 0.42);
+      border-radius: 999px;
+      background: rgba(247, 242, 231, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .language-toggle-btn {
+      min-width: 34px;
+      height: 28px;
+      border-radius: 999px;
+      color: rgba(247, 242, 231, 0.72);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      text-transform: uppercase;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .language-toggle-btn:hover {
+      color: var(--color-background);
+      transform: translateY(-1px);
+    }
+
+    .language-toggle-btn.is-active {
+      background: var(--color-primary-lighter);
+      color: var(--color-primary-darker);
+      box-shadow: 0 8px 18px rgba(42, 46, 37, 0.18);
+    }
+
+    .language-toggle-mobile .language-toggle-btn {
+      min-width: 32px;
+      height: 26px;
+      font-size: 10px;
+    }
   </style>
 
   <script>
+    type Language = "id" | "en";
+
+    const languageStorageKey = "journal-ocean-lang";
+    const languageScrollStorageKey = "journal-ocean-language-scroll-y";
+
+    const saveLanguageScrollPosition = () => {
+      try {
+        sessionStorage.setItem(languageScrollStorageKey, String(window.scrollY));
+      } catch {
+        // Ignore storage errors, for example in restricted/private browser modes.
+      }
+    };
+
+    const restoreLanguageScrollPosition = () => {
+      try {
+        const savedPosition = sessionStorage.getItem(languageScrollStorageKey);
+        if (!savedPosition) return;
+
+        sessionStorage.removeItem(languageScrollStorageKey);
+
+        const scrollY = Number(savedPosition);
+        if (!Number.isFinite(scrollY) || scrollY < 0) return;
+
+        if ("scrollRestoration" in window.history) {
+          window.history.scrollRestoration = "manual";
+        }
+
+        const restore = () => {
+          window.scrollTo({ top: scrollY, left: 0, behavior: "instant" });
+        };
+
+        // Run several times because SSR content, image layout, and the preloader can
+        // change the document height shortly after the initial page render.
+        requestAnimationFrame(restore);
+        setTimeout(restore, 80);
+        setTimeout(restore, 300);
+        setTimeout(restore, 900);
+        setTimeout(restore, 1600);
+      } catch {
+        // Keep language switching functional even if scroll restoration fails.
+      }
+    };
+
+    restoreLanguageScrollPosition();
+
+    const updateLanguageQuery = (language: Language, preserveScroll = false) => {
+      const url = new URL(window.location.href);
+      url.searchParams.set("lang", language);
+
+      if (preserveScroll) {
+        saveLanguageScrollPosition();
+      }
+
+      window.location.href = url.toString();
+    };
+
+    const setLanguage = (language: Language) => {
+      document.documentElement.lang = language;
+
+      document.querySelectorAll<HTMLButtonElement>("[data-lang-option]").forEach((button) => {
+        const isActive = button.dataset.langOption === language;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+
+      localStorage.setItem(languageStorageKey, language);
+    };
+
+    const urlLanguage = new URLSearchParams(window.location.search).get("lang");
+    const storedLanguage = localStorage.getItem(languageStorageKey);
+    const initialLanguage: Language = urlLanguage === "en" ? "en" : urlLanguage === "id" ? "id" : storedLanguage === "en" ? "en" : "id";
+    setLanguage(initialLanguage);
+
+    if (!urlLanguage && initialLanguage === "en") {
+      updateLanguageQuery("en");
+    }
+
+    document.querySelectorAll<HTMLButtonElement>("[data-lang-option]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const selectedLanguage = button.dataset.langOption === "en" ? "en" : "id";
+        setLanguage(selectedLanguage);
+        updateLanguageQuery(selectedLanguage, true);
+      });
+    });
+
     const hamburgerButton = document.getElementById("hamburger-button");
     const mobileMenu = document.getElementById("mobile-menu");
     const hamburgerIcon = document.getElementById("hamburger-icon");

@@ -1,20 +1,53 @@
 ---
-// Data untuk komponen ini didefinisikan di sini
-const subTitle = "Tentang Journal Ocean";
-const mainTitle = "Selamat datang di";
-const strokedText = "Journal Ocean";
-const description = "Journal Ocean merupakan organisasi yang bergerak di bidang sosial, kemanusiaan, dan keagamaan dengan komitmen untuk memberikan kontribusi positif bagi masyarakat dan lingkungan sekitar.";
+import {
+  directusAssetUrl,
+  getLandingProfileContentWithFallback,
+  normalizeSiteLanguage,
+} from "../../../lib/directus";
 
-// Gambar utama
-const img1Src = "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=1000&fit=crop";
-const img2Src = "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=400&h=400&fit=crop";
+const language = normalizeSiteLanguage(Astro.url.searchParams.get("lang"));
+const profileContent = await getLandingProfileContentWithFallback(language);
 
-// Daftar bidang kegiatan
+const subTitle = profileContent.subtitle ?? "Tentang Journal Ocean";
+const mainTitle = profileContent.main_title ?? "Selamat datang di";
+const strokedText = profileContent.highlight_title ?? "Journal Ocean";
+const description1 = profileContent.description_1 ?? "";
+const description2 = profileContent.description_2 ?? "";
+
+const img1Src = directusAssetUrl(profileContent.image_1) || "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=1000&fit=crop";
+const img1Alt = profileContent.image_1_alt ?? strokedText;
+const img2Src = directusAssetUrl(profileContent.image_2) || "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=400&h=400&fit=crop";
+const img2Alt = profileContent.image_2_alt ?? "Program Kemanusiaan";
+const statNumber = profileContent.stat_number ?? "12+";
+const statLabel = profileContent.stat_label ?? "Tahun Pengabdian";
+const signatureAvatar = profileContent.signature_avatar ?? "S";
+const signatureText = profileContent.signature_text ?? "Para pendiri Journal Ocean";
+const signatureSubtext = profileContent.signature_subtext ?? "Bersama Membangun Kebaikan";
+const pillarsEyebrow = profileContent.pillars_eyebrow ?? "Bidang Kegiatan";
+const pillarsTitle = profileContent.pillars_title ?? "Empat pilar <em>utama</em> yang kami jalankan.";
+const pillarsIntro = profileContent.pillars_intro ?? "";
+
 const facilitiesList = [
-  { name: "Program Sosial", initial: "A", desc: "Membangun kebersamaan dan kepedulian yang merata di setiap lapisan masyarakat." },
-  { name: "Program Kemanusiaan", initial: "B", desc: "Menjangkau mereka yang paling membutuhkan dengan aksi cepat dan terarah." },
-  { name: "Program Keagamaan", initial: "C", desc: "Mendalami nilai-nilai Islam dan mengamalkannya dalam keseharian." },
-  { name: "Kegiatan Rutin", initial: "D", desc: "Kajian, pelatihan, dan pertemuan komunitas yang konsisten sepanjang tahun." },
+  {
+    name: profileContent.pillar_1_name ?? "Program Sosial",
+    initial: profileContent.pillar_1_initial ?? "A",
+    desc: profileContent.pillar_1_desc ?? "",
+  },
+  {
+    name: profileContent.pillar_2_name ?? "Program Kemanusiaan",
+    initial: profileContent.pillar_2_initial ?? "B",
+    desc: profileContent.pillar_2_desc ?? "",
+  },
+  {
+    name: profileContent.pillar_3_name ?? "Program Keagamaan",
+    initial: profileContent.pillar_3_initial ?? "C",
+    desc: profileContent.pillar_3_desc ?? "",
+  },
+  {
+    name: profileContent.pillar_4_name ?? "Kegiatan Rutin",
+    initial: profileContent.pillar_4_initial ?? "D",
+    desc: profileContent.pillar_4_desc ?? "",
+  },
 ];
 ---
 
@@ -23,12 +56,12 @@ const facilitiesList = [
     <div class="profile-grid">
       <!-- Image Section -->
       <div class="profile-image-wrap">
-        <img src={img1Src} alt="Journal Ocean" class="profile-image" loading="lazy" />
+        <img src={img1Src} alt={img1Alt} class="profile-image" loading="lazy" />
         <div class="profile-image-stat">
-          <div class="num">12+</div>
-          <div class="label">Tahun Pengabdian</div>
+          <div class="num">{statNumber}</div>
+          <div class="label">{statLabel}</div>
         </div>
-        <img src={img2Src} alt="Program Kemanusiaan" class="profile-image-2" loading="lazy" />
+        <img src={img2Src} alt={img2Alt} class="profile-image-2" loading="lazy" />
       </div>
 
       <!-- Content Section -->
@@ -42,15 +75,15 @@ const facilitiesList = [
           {mainTitle} <em>{strokedText}</em>
         </h2>
 
-        <p class="profile-body">{description}</p>
-        <p class="profile-body">Kami merangkul setiap individu dan komunitas untuk tumbuh bersama — dengan keyakinan bahwa kolaborasi, keikhlasan, dan ilmu adalah tiga pilar utama perubahan.</p>
+        {description1 && <p class="profile-body">{description1}</p>}
+        {description2 && <p class="profile-body">{description2}</p>}
 
         <!-- Signature row -->
         <div class="profile-signature">
-          <div class="profile-signature-avatar">S</div>
+          <div class="profile-signature-avatar">{signatureAvatar}</div>
           <div class="profile-signature-meta">
-            Para pendiri Journal Ocean
-            <small>Bersama Membangun Kebaikan</small>
+            {signatureText}
+            <small>{signatureSubtext}</small>
           </div>
         </div>
       </div>
@@ -63,11 +96,11 @@ const facilitiesList = [
       <div class="pillars-head">
         <div>
           <div class="pillars-eyebrow">
-            <span>Bidang Kegiatan</span>
+            <span>{pillarsEyebrow}</span>
           </div>
-          <h3 class="pillars-title">Empat pilar <em>utama</em> yang kami jalankan.</h3>
+          <h3 class="pillars-title" set:html={pillarsTitle} />
         </div>
-        <p class="pillars-intro">Setiap program dirancang untuk menjawab kebutuhan nyata masyarakat, dengan pendekatan kolaboratif yang terukur dan berkelanjutan.</p>
+        {pillarsIntro && <p class="pillars-intro">{pillarsIntro}</p>}
       </div>
       <div class="pillars-grid">
         {

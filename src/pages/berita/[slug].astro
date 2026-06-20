@@ -1,6 +1,15 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { ArrowLeft, Calendar, Clock, User, MessageCircle, Send } from "lucide-astro";
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  BookOpen,
+  Calendar,
+  Clock,
+  MessageCircle,
+  Share2,
+  User,
+} from "lucide-astro";
 
 interface BeritaItem {
   slug: string;
@@ -18,8 +27,10 @@ const allBeritaData: BeritaItem[] = [
     slug: "program-beasiswa-2025",
     category: "Pengumuman",
     judul: "Program Beasiswa Journal Ocean 2025",
-    thumbnail: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&h=1080&fit=crop",
-    excerpt: "Journal Ocean membuka program beasiswa untuk siswa berprestasi dan keluarga kurang mampu.",
+    thumbnail:
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&h=1080&fit=crop",
+    excerpt:
+      "Journal Ocean membuka program beasiswa untuk siswa berprestasi dan keluarga kurang mampu.",
     date_created: "2024-11-15T10:00:00",
     author: "Admin Journal Ocean",
   },
@@ -27,8 +38,10 @@ const allBeritaData: BeritaItem[] = [
     slug: "bantuan-kemanusiaan-2025",
     category: "Berita",
     judul: "Kegiatan Bantuan Kemanusiaan di Daerah Terdampak Bencana",
-    thumbnail: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1920&h=1080&fit=crop",
-    excerpt: "Journal Ocean menggelar program bantuan kemanusiaan untuk korban bencana alam.",
+    thumbnail:
+      "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1920&h=1080&fit=crop",
+    excerpt:
+      "Journal Ocean menggelar program bantuan kemanusiaan untuk korban bencana alam.",
     date_created: "2024-11-10T14:30:00",
     author: "Tim Kemanusiaan",
   },
@@ -36,8 +49,10 @@ const allBeritaData: BeritaItem[] = [
     slug: "kegiatan-keagamaan-2025",
     category: "Kegiatan",
     judul: "Kegiatan Rutin Kajian Keagamaan Bulanan",
-    thumbnail: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop",
-    excerpt: "Journal Ocean mengadakan kajian keagamaan rutin setiap bulan yang terbuka untuk umum.",
+    thumbnail:
+      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop",
+    excerpt:
+      "Journal Ocean mengadakan kajian keagamaan rutin setiap bulan yang terbuka untuk umum.",
     date_created: "2024-11-08T09:15:00",
     author: "Divisi Keagamaan",
   },
@@ -45,8 +60,10 @@ const allBeritaData: BeritaItem[] = [
     slug: "kampanye-lingkungan-2025",
     category: "Kegiatan",
     judul: "Kampanye Peduli Lingkungan: Aksi Bersih-Bersih",
-    thumbnail: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1920&h=1080&fit=crop",
-    excerpt: "Journal Ocean menggelar aksi bersih-bersih lingkungan sebagai bentuk kepedulian terhadap kelestarian alam.",
+    thumbnail:
+      "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1920&h=1080&fit=crop",
+    excerpt:
+      "Journal Ocean menggelar aksi bersih-bersih lingkungan sebagai bentuk kepedulian terhadap kelestarian alam.",
     date_created: "2024-11-05T16:45:00",
     author: "Tim Lingkungan",
   },
@@ -54,8 +71,10 @@ const allBeritaData: BeritaItem[] = [
     slug: "penyaluran-zakat-2025",
     category: "Pengumuman",
     judul: "Penyaluran Zakat Fitrah dan Zakat Mal Tahun 2025",
-    thumbnail: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=1920&h=1080&fit=crop",
-    excerpt: "Journal Ocean membuka penyaluran zakat fitrah dan zakat mal untuk disalurkan kepada mustahik yang berhak.",
+    thumbnail:
+      "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=1920&h=1080&fit=crop",
+    excerpt:
+      "Journal Ocean membuka penyaluran zakat fitrah dan zakat mal untuk disalurkan kepada mustahik yang berhak.",
     date_created: "2024-11-01T11:20:00",
     author: "Divisi Keagamaan",
   },
@@ -63,8 +82,10 @@ const allBeritaData: BeritaItem[] = [
     slug: "pelatihan-keterampilan-2025",
     category: "Berita",
     judul: "Pelatihan Keterampilan untuk Pemberdayaan Masyarakat",
-    thumbnail: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920&h=1080&fit=crop",
-    excerpt: "Program pelatihan keterampilan bagi masyarakat untuk meningkatkan kemampuan dan peluang ekonomi.",
+    thumbnail:
+      "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920&h=1080&fit=crop",
+    excerpt:
+      "Program pelatihan keterampilan bagi masyarakat untuk meningkatkan kemampuan dan peluang ekonomi.",
     date_created: "2024-10-28T13:00:00",
     author: "Divisi Program Sosial",
   },
@@ -101,256 +122,324 @@ const fullContent = `
   
   <p class="mb-4">Kami berharap program ini dapat memberikan manfaat yang sebesar-besarnya bagi masyarakat dan menjadi langkah awal untuk menciptakan perubahan positif di lingkungan sekitar kita.</p>
 `;
+
+const relatedBerita = allBeritaData
+  .filter((item) => item.slug !== beritaItem.slug)
+  .slice(0, 3);
+
+const formattedDate = new Intl.DateTimeFormat("id-ID", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+}).format(new Date(beritaItem.date_created));
+
+const shortDate = new Intl.DateTimeFormat("id-ID", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+}).format(new Date(beritaItem.date_created));
+
+const plainContent = fullContent.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+const readingMinutes = Math.max(3, Math.ceil(plainContent.split(" ").length / 180));
+const articleUrl = Astro.url.href;
+const encodedTitle = encodeURIComponent(beritaItem.judul);
+const encodedShareText = encodeURIComponent(`${beritaItem.judul} ${articleUrl}`);
 ---
 
 <Layout title={beritaItem.judul}>
-  <section class="bg-gradient-to-br from-[#F5F5F5] via-white to-[#F5F5F5] py-8 lg:py-16 overflow-hidden relative">
-    <!-- Background decorative elements -->
-    <div class="absolute top-0 right-0 w-96 h-96 bg-brand-secondary/5 rounded-full blur-3xl -z-10"></div>
-    <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-accent-orange/5 rounded-full blur-3xl -z-10"></div>
+  <main class="article-page bg-[#F7F2E7] text-[#2A2E25]">
+    <section class="article-hero relative overflow-hidden pt-28 md:pt-32">
+      <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-40 right-[-12%] h-[520px] w-[520px] rounded-full bg-[#A4B293]/25 blur-3xl"></div>
+        <div class="absolute bottom-[-18%] left-[-10%] h-[440px] w-[440px] rounded-full bg-[#B8704A]/10 blur-3xl"></div>
+      </div>
 
-    <div class="container mx-auto px-6 md:px-8 max-w-7xl relative z-10">
-      <!-- Back Button -->
-      <a
-        href="/berita"
-        class="inline-flex items-center gap-2 text-brand-primary hover:text-brand-secondary font-semibold mb-6 transition-colors duration-200 group mt-10"
-      >
-        <ArrowLeft class="w-5 h-5 transition-transform duration-200 group-hover:-translate-x-1" />
-        <span>Kembali ke Berita</span>
-      </a>
+      <div class="relative mx-auto max-w-7xl px-6 md:px-8">
+        <a
+          href="/berita"
+          class="group mb-10 inline-flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.22em] text-[#4A5D3F] transition-colors hover:text-[#B8704A]"
+        >
+          <span class="flex h-9 w-9 items-center justify-center rounded-full border border-[#4A5D3F]/25 bg-white/35 transition-transform group-hover:-translate-x-1">
+            <ArrowLeft class="h-4 w-4" />
+          </span>
+          Kembali ke Berita
+        </a>
 
-      <!-- Main Content: 2 Column Layout -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Left Column: Article Content (2/3 width) -->
-        <div class="lg:col-span-2">
-          <article class="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <!-- Featured Image -->
-            <div class="relative h-64 md:h-96 overflow-hidden">
+        <div class="grid gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:items-end">
+          <div class="pb-0 lg:pb-16">
+            <div class="mb-8 flex flex-wrap items-center gap-3">
+              <span class="rounded-full border border-[#4A5D3F]/20 bg-[#EBE3D2] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#4A5D3F]">
+                {beritaItem.category}
+              </span>
+              <span class="h-px w-14 bg-[#4A5D3F]/30"></span>
+              <span class="text-[12px] font-medium uppercase tracking-[0.18em] text-[#6B7A5A]">
+                Journal Ocean Dispatch
+              </span>
+            </div>
+
+            <h1 class="max-w-4xl font-serif text-[clamp(2.7rem,6vw,6.7rem)] font-normal leading-[0.92] tracking-[-0.065em] text-[#2A2E25]">
+              {beritaItem.judul}
+            </h1>
+
+            <p class="mt-8 max-w-2xl text-lg leading-8 text-[#2A2E25]/72 md:text-xl">
+              {beritaItem.excerpt}
+            </p>
+          </div>
+
+          <figure class="hero-figure relative">
+            <div class="absolute -left-5 top-10 z-10 hidden rounded-full bg-[#4A5D3F] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#F7F2E7] shadow-xl md:block">
+              {shortDate}
+            </div>
+            <div class="relative aspect-[4/5] overflow-hidden rounded-t-[2.5rem] rounded-br-[2.5rem] border-[10px] border-[#EBE3D2] bg-[#EBE3D2] shadow-2xl shadow-[#4A5D3F]/15 md:aspect-[5/4] lg:aspect-[4/5]">
               <img
                 src={beritaItem.thumbnail}
                 alt={beritaItem.judul}
-                class="w-full h-full object-cover"
+                class="h-full w-full object-cover saturate-[0.86] transition-transform duration-700 hover:scale-105"
                 loading="eager"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              
-              <!-- Category Badge -->
-              <div class="absolute top-6 left-6">
-                <span class="px-4 py-2 bg-brand-primary text-white text-sm font-semibold rounded-full">
-                  {beritaItem.category}
-                </span>
-              </div>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#2A2E25]/55 via-transparent to-transparent"></div>
+              <figcaption class="absolute bottom-6 left-6 right-6 rounded-2xl border border-white/15 bg-[#2A2E25]/45 p-5 text-sm leading-6 text-[#F7F2E7] backdrop-blur-md">
+                {beritaItem.excerpt}
+              </figcaption>
             </div>
-
-            <!-- Article Header -->
-            <div class="p-6 md:p-8">
-              <!-- Title -->
-              <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                {beritaItem.judul}
-              </h1>
-
-              <!-- Metadata -->
-              <div class="flex flex-wrap items-center gap-6 mb-8 pb-6 border-b border-gray-200">
-                <div class="flex items-center gap-2 text-gray-600">
-                  <User class="w-5 h-5 text-brand-primary" />
-                  <span class="font-medium">{beritaItem.author}</span>
-                </div>
-                <div class="flex items-center gap-2 text-gray-600">
-                  <Calendar class="w-5 h-5 text-brand-primary" />
-                  <span>
-                    {new Intl.DateTimeFormat("id-ID", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    }).format(new Date(beritaItem.date_created))}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Article Body -->
-              <div class="prose prose-lg max-w-none mb-8">
-                <div class="text-gray-700 leading-relaxed text-lg" set:html={fullContent} />
-              </div>
-
-              <!-- Share Section -->
-              <div class="pt-6 border-t border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Bagikan Artikel</h3>
-                <div class="flex flex-wrap gap-3">
-                  <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${Astro.url.href}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="px-4 py-2 bg-[#1877F2] text-white rounded-lg hover:bg-[#166FE5] transition-colors duration-200"
-                  >
-                    Facebook
-                  </a>
-                  <a
-                    href={`https://twitter.com/intent/tweet?url=${Astro.url.href}&text=${encodeURIComponent(beritaItem.judul)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="px-4 py-2 bg-[#1DA1F2] text-white rounded-lg hover:bg-[#1a8cd8] transition-colors duration-200"
-                  >
-                    Twitter
-                  </a>
-                  <a
-                    href={`https://wa.me/?text=${encodeURIComponent(beritaItem.judul + ' ' + Astro.url.href)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="px-4 py-2 bg-[#25D366] text-white rounded-lg hover:bg-[#20BA5A] transition-colors duration-200"
-                  >
-                    WhatsApp
-                  </a>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <!-- Comments Section -->
-          <div class="mt-8 bg-white rounded-2xl shadow-lg p-6 md:p-8">
-            <div class="flex items-center gap-3 mb-6">
-              <MessageCircle class="w-6 h-6 text-brand-primary" />
-              <h2 class="text-2xl font-bold text-gray-900">Komentar</h2>
-              <span class="text-gray-500">({allBeritaData.length})</span>
-            </div>
-
-            <!-- Comment Form -->
-            <form class="mb-8 pb-8 border-b border-gray-200">
-              <div class="mb-4">
-                <textarea
-                  id="comment"
-                  name="comment"
-                  rows="4"
-                  placeholder="Tulis komentar Anda di sini..."
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent resize-none"
-                ></textarea>
-              </div>
-              <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-500">
-                  <span>Maksimal 500 karakter</span>
-                </div>
-                <button
-                  type="submit"
-                  class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 hover:scale-105"
-                >
-                  <Send class="w-5 h-5" />
-                  <span>Kirim Komentar</span>
-                </button>
-              </div>
-            </form>
-
-            <!-- Comments List -->
-            <div class="space-y-6">
-              {[
-                {
-                  name: "Ahmad Rizki",
-                  avatar: "AR",
-                  date: "2 jam lalu",
-                  comment: "Artikel yang sangat informatif! Terima kasih Journal Ocean atas program-programnya yang sangat bermanfaat bagi masyarakat.",
-                },
-                {
-                  name: "Siti Nurhaliza",
-                  avatar: "SN",
-                  date: "5 jam lalu",
-                  comment: "Sangat menginspirasi! Semoga program ini bisa terus berjalan dan memberikan manfaat yang lebih luas lagi.",
-                },
-                {
-                  name: "Budi Santoso",
-                  avatar: "BS",
-                  date: "1 hari lalu",
-                  comment: "Saya sangat tertarik dengan program ini. Bagaimana cara untuk berpartisipasi?",
-                },
-              ].map((comment) => (
-                <div class="flex gap-4 pb-6 border-b border-gray-100 last:border-0">
-                  <!-- Avatar -->
-                  <div class="flex-shrink-0">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-brand-primary to-brand-secondary flex items-center justify-center text-white font-semibold">
-                      {comment.avatar}
-                    </div>
-                  </div>
-                  
-                  <!-- Comment Content -->
-                  <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-2">
-                      <h4 class="font-semibold text-gray-900">{comment.name}</h4>
-                      <span class="text-sm text-gray-500">{comment.date}</span>
-                    </div>
-                    <p class="text-gray-700 leading-relaxed">{comment.comment}</p>
-                    <div class="mt-3 flex items-center gap-4">
-                      <button class="text-sm text-gray-500 hover:text-brand-primary transition-colors duration-200">
-                        Balas
-                      </button>
-                      <button class="text-sm text-gray-500 hover:text-brand-primary transition-colors duration-200">
-                        Suka
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <!-- Load More Comments -->
-            <div class="mt-6 text-center">
-              <button class="px-6 py-2 border border-brand-primary text-brand-primary rounded-lg hover:bg-brand-primary hover:text-white transition-all duration-200">
-                Muat Komentar Lainnya
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Column: Recommended Berita (1/3 width) -->
-        <div class="lg:col-span-1">
-          <div class="sticky top-24">
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-              <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200">
-                Berita Lainnya
-              </h2>
-              
-              <div class="space-y-6">
-                {allBeritaData
-                  .filter((item) => item.slug !== beritaItem.slug)
-                  .slice(0, 5)
-                  .map((item: BeritaItem) => (
-                    <a
-                      href={`/berita/${item.slug}`}
-                      class="group block"
-                    >
-                      <div class="flex gap-4">
-                        <!-- Thumbnail -->
-                        <div class="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden">
-                          <img
-                            src={item.thumbnail}
-                            alt={item.judul}
-                            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                            loading="lazy"
-                          />
-                        </div>
-                        
-                        <!-- Content -->
-                        <div class="flex-1 min-w-0">
-                          <div class="mb-1">
-                            <span class="inline-block px-2 py-0.5 bg-brand-secondary/10 text-brand-primary text-xs font-semibold rounded">
-                              {item.category}
-                            </span>
-                          </div>
-                          <h3 class="text-sm font-bold text-gray-900 mb-1 group-hover:text-brand-primary transition-colors duration-200 line-clamp-2">
-                            {item.judul}
-                          </h3>
-                          <div class="text-xs text-gray-500">
-                            {new Intl.DateTimeFormat("id-ID", {
-                              month: "short",
-                              day: "numeric",
-                            }).format(new Date(item.date_created))}
-                          </div>
-                        </div>
-                      </div>
-                    </a>
-                  ))}
-              </div>
-            </div>
-          </div>
+          </figure>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section class="relative mx-auto max-w-7xl px-6 py-14 md:px-8 lg:py-20">
+      <div class="grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <aside class="article-aside lg:sticky lg:top-28 lg:self-start">
+          <div class="rounded-[2rem] border border-[#4A5D3F]/12 bg-[#EBE3D2]/65 p-6 shadow-sm">
+            <div class="mb-6 flex items-center gap-3 border-b border-[#4A5D3F]/15 pb-5">
+              <div class="flex h-11 w-11 items-center justify-center rounded-full bg-[#4A5D3F] text-[#F7F2E7]">
+                <BookOpen class="h-5 w-5" />
+              </div>
+              <div>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6B7A5A]">Ringkasan</p>
+                <p class="font-serif text-xl text-[#2A2E25]">Artikel</p>
+              </div>
+            </div>
+
+            <dl class="space-y-5 text-sm text-[#2A2E25]/75">
+              <div class="flex items-start gap-3">
+                <User class="mt-0.5 h-4 w-4 text-[#4A5D3F]" />
+                <div>
+                  <dt class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6B7A5A]">Penulis</dt>
+                  <dd class="mt-1 font-medium text-[#2A2E25]">{beritaItem.author}</dd>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <Calendar class="mt-0.5 h-4 w-4 text-[#4A5D3F]" />
+                <div>
+                  <dt class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6B7A5A]">Tanggal</dt>
+                  <dd class="mt-1 font-medium text-[#2A2E25]">{formattedDate}</dd>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <Clock class="mt-0.5 h-4 w-4 text-[#4A5D3F]" />
+                <div>
+                  <dt class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6B7A5A]">Durasi</dt>
+                  <dd class="mt-1 font-medium text-[#2A2E25]">{readingMinutes} menit baca</dd>
+                </div>
+              </div>
+            </dl>
+
+            <div class="mt-8 border-t border-[#4A5D3F]/15 pt-6">
+              <p class="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#6B7A5A]">
+                <Share2 class="h-4 w-4" />
+                Bagikan
+              </p>
+              <div class="grid grid-cols-3 gap-2">
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${articleUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="rounded-full border border-[#4A5D3F]/15 bg-[#F7F2E7] px-3 py-2 text-center text-xs font-semibold text-[#4A5D3F] transition hover:bg-[#4A5D3F] hover:text-[#F7F2E7]"
+                >
+                  FB
+                </a>
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${articleUrl}&text=${encodedTitle}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="rounded-full border border-[#4A5D3F]/15 bg-[#F7F2E7] px-3 py-2 text-center text-xs font-semibold text-[#4A5D3F] transition hover:bg-[#4A5D3F] hover:text-[#F7F2E7]"
+                >
+                  X
+                </a>
+                <a
+                  href={`https://wa.me/?text=${encodedShareText}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="rounded-full border border-[#4A5D3F]/15 bg-[#F7F2E7] px-3 py-2 text-center text-xs font-semibold text-[#4A5D3F] transition hover:bg-[#4A5D3F] hover:text-[#F7F2E7]"
+                >
+                  WA
+                </a>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <article class="article-paper overflow-hidden rounded-[2.25rem] border border-[#4A5D3F]/10 bg-[#FFFDF7] shadow-xl shadow-[#4A5D3F]/8">
+          <div class="border-b border-[#4A5D3F]/10 bg-[#EBE3D2]/45 px-6 py-5 md:px-10">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6B7A5A]">
+                Article Narrative
+              </p>
+              <div class="flex items-center gap-2 text-sm text-[#2A2E25]/65">
+                <MessageCircle class="h-4 w-4 text-[#4A5D3F]" />
+                Diskusi komunitas terbuka
+              </div>
+            </div>
+          </div>
+
+          <div class="px-6 py-8 md:px-10 md:py-12 lg:px-14">
+            <div class="article-lead mb-10 border-l-2 border-[#B8704A] pl-6 font-serif text-2xl italic leading-10 text-[#4A5D3F] md:text-3xl">
+              “{beritaItem.excerpt}”
+            </div>
+
+            <div class="article-body" set:html={fullContent} />
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-6 pb-20 md:px-8 lg:pb-28">
+      <div class="mb-8 flex flex-col justify-between gap-4 border-t border-[#4A5D3F]/15 pt-10 md:flex-row md:items-end">
+        <div>
+          <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6B7A5A]">Baca Juga</p>
+          <h2 class="font-serif text-4xl font-normal tracking-[-0.04em] text-[#2A2E25] md:text-5xl">
+            Kabar terkait lainnya.
+          </h2>
+        </div>
+        <a
+          href="/berita"
+          class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-[#4A5D3F] transition hover:text-[#B8704A]"
+        >
+          Semua Berita
+          <ArrowUpRight class="h-4 w-4" />
+        </a>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        {relatedBerita.map((item) => (
+          <a
+            href={`/berita/${item.slug}`}
+            class="group overflow-hidden rounded-[1.75rem] border border-[#4A5D3F]/10 bg-[#EBE3D2]/45 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#4A5D3F]/10"
+          >
+            <div class="aspect-[5/3] overflow-hidden bg-[#EBE3D2]">
+              <img
+                src={item.thumbnail}
+                alt={item.judul}
+                class="h-full w-full object-cover saturate-[0.86] transition duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+            <div class="p-6">
+              <div class="mb-4 flex items-center justify-between gap-4">
+                <span class="rounded-full bg-[#F7F2E7] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#4A5D3F]">
+                  {item.category}
+                </span>
+                <span class="text-xs text-[#2A2E25]/50">
+                  {new Intl.DateTimeFormat("id-ID", {
+                    day: "2-digit",
+                    month: "short",
+                  }).format(new Date(item.date_created))}
+                </span>
+              </div>
+              <h3 class="font-serif text-2xl leading-tight tracking-[-0.03em] text-[#2A2E25] transition group-hover:text-[#4A5D3F]">
+                {item.judul}
+              </h3>
+              <p class="mt-3 line-clamp-2 text-sm leading-6 text-[#2A2E25]/68">
+                {item.excerpt}
+              </p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
 </Layout>
 
+<style>
+  .article-page {
+    background:
+      radial-gradient(circle at top right, rgba(164, 178, 147, 0.24), transparent 34rem),
+      linear-gradient(180deg, #f7f2e7 0%, #ebe3d2 100%);
+  }
+
+  .article-hero {
+    min-height: 78vh;
+  }
+
+  .article-paper {
+    box-shadow: 0 24px 80px rgba(74, 93, 63, 0.08);
+  }
+
+  .article-body {
+    color: rgba(42, 46, 37, 0.78);
+    font-size: 1.125rem;
+    line-height: 1.95;
+  }
+
+  .article-body :global(p) {
+    margin: 0 0 1.35rem;
+  }
+
+  .article-body :global(p:first-child) {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: rgba(42, 46, 37, 0.86);
+  }
+
+  .article-body :global(h2) {
+    margin: 3rem 0 1rem;
+    font-family: "Fraunces", "Times New Roman", serif;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+    color: #2a2e25;
+  }
+
+  .article-body :global(ul) {
+    margin: 1.5rem 0 2rem;
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+    background: rgba(235, 227, 210, 0.5);
+    list-style: none;
+  }
+
+  .article-body :global(li) {
+    position: relative;
+    margin-bottom: 0.85rem;
+    padding-left: 1.65rem;
+    color: rgba(42, 46, 37, 0.74);
+  }
+
+  .article-body :global(li:last-child) {
+    margin-bottom: 0;
+  }
+
+  .article-body :global(li::before) {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.78rem;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: #b8704a;
+  }
+
+  @media (max-width: 768px) {
+    .article-hero {
+      min-height: auto;
+    }
+
+    .article-body {
+      font-size: 1rem;
+      line-height: 1.85;
+    }
+  }
+</style>

@@ -1,7 +1,93 @@
 ---
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Twitter, Youtube } from "lucide-astro";
+import {
+  getFooterContentWithFallback,
+  normalizeSiteLanguage,
+} from "../../lib/directus";
 
 const currentYear = new Date().getFullYear();
+const language = normalizeSiteLanguage(Astro.url.searchParams.get("lang"));
+const footerContent = await getFooterContentWithFallback(language);
+
+const formatFooterText = (value?: string) =>
+  (value ?? "").replace(/\r\n/g, "\n").split("\n");
+
+const copyrightText = (footerContent.copyright_text ?? "Journal Ocean ©{year}. All rights reserved.").replace(
+  "{year}",
+  String(currentYear),
+);
+
+const aboutLinks = [
+  {
+    label: footerContent.about_link_1_label ?? "Profil Journal Ocean",
+    href: footerContent.about_link_1_href ?? "/profil",
+  },
+  {
+    label: footerContent.about_link_2_label ?? "Visi & Misi",
+    href: footerContent.about_link_2_href ?? "/profil#visi-misi",
+  },
+  {
+    label: footerContent.about_link_3_label ?? "Struktur",
+    href: footerContent.about_link_3_href ?? "/profil#struktur",
+  },
+].filter((item) => item.label);
+
+const programLinks = [
+  {
+    label: footerContent.program_link_1_label ?? "Sosial",
+    href: footerContent.program_link_1_href ?? "/program#sosial",
+  },
+  {
+    label: footerContent.program_link_2_label ?? "Kemanusiaan",
+    href: footerContent.program_link_2_href ?? "/program#kemanusiaan",
+  },
+  {
+    label: footerContent.program_link_3_label ?? "Keagamaan",
+    href: footerContent.program_link_3_href ?? "/program#keagamaan",
+  },
+].filter((item) => item.label);
+
+const normalizeExternalUrl = (value?: string) => {
+  if (!value) return "";
+  if (value === "#" || value.startsWith("/") || /^(https?:|mailto:|tel:)/i.test(value)) {
+    return value;
+  }
+  return `https://${value}`;
+};
+
+const socialLinks = [
+  {
+    label: footerContent.facebook_label,
+    href: normalizeExternalUrl(footerContent.facebook_url),
+    Icon: Facebook,
+  },
+  {
+    label: footerContent.instagram_label,
+    href: normalizeExternalUrl(footerContent.instagram_url),
+    Icon: Instagram,
+  },
+  {
+    label: footerContent.twitter_label,
+    href: normalizeExternalUrl(footerContent.twitter_url),
+    Icon: Twitter,
+  },
+  {
+    label: footerContent.youtube_label,
+    href: normalizeExternalUrl(footerContent.youtube_url),
+    Icon: Youtube,
+  },
+].filter((item) => item.label && item.href);
+
+const legalLinks = [
+  {
+    label: footerContent.privacy_label ?? "Kebijakan Privasi",
+    href: footerContent.privacy_href ?? "#",
+  },
+  {
+    label: footerContent.terms_label ?? "Syarat & Ketentuan",
+    href: footerContent.terms_href ?? "#",
+  },
+].filter((item) => item.label);
 ---
 
 <footer class="footer">
@@ -9,50 +95,54 @@ const currentYear = new Date().getFullYear();
     <div class="footer-top">
       <!-- Brand Section -->
       <div>
-        <div class="footer-brand">Journal Ocean</div>
-        <div class="footer-brand-sub">Jurnal · Sejak 2014</div>
-        <p class="footer-tag">Journal Ocean bergerak di bidang sosial, kemanusiaan, dan keagamaan — bersama membangun kebaikan untuk sesama.</p>
+        <div class="footer-brand">{footerContent.brand_name ?? "Journal Ocean"}</div>
+        <div class="footer-brand-sub">{footerContent.brand_subtitle ?? "Jurnal · Sejak 2014"}</div>
+        <p class="footer-tag">{footerContent.tagline}</p>
       </div>
 
       <!-- Quick Links -->
       <div class="footer-col">
-        <h4>Tentang</h4>
+        <h4>{footerContent.about_title ?? "Tentang"}</h4>
         <ul>
-          <li><a href="/profile">Profil Journal Ocean</a></li>
-          <li><a href="/program">Visi &amp; Misi</a></li>
-          <li><a href="/berita">Struktur</a></li>
+          {aboutLinks.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
         </ul>
       </div>
 
       <!-- Program -->
       <div class="footer-col">
-        <h4>Program</h4>
+        <h4>{footerContent.program_title ?? "Program"}</h4>
         <ul>
-          <li><a href="/program#sosial">Sosial</a></li>
-          <li><a href="/program#kemanusiaan">Kemanusiaan</a></li>
-          <li><a href="/program#keagamaan">Keagamaan</a></li>
+          {programLinks.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
         </ul>
       </div>
 
       <!-- Kontak -->
       <div class="footer-col">
-        <h4>Hubungi</h4>
+        <h4>{footerContent.contact_title ?? "Hubungi"}</h4>
         <ul class="footer-contact">
           <li class="flex items-start gap-2">
-            <MapPin class="w-4 h-4 mt-1 flex-shrink-0" />
-            <span>Jl. Contoh No. 123<br />Kota Anda, Provinsi</span>
+            <MapPin class="w-4 h-4 mt-1 shrink-0" />
+            <a href={footerContent.address_href ?? "#"}>
+              {formatFooterText(footerContent.address_text).map((line, index) => (
+                <>{index > 0 && <br />}{line}</>
+              ))}
+            </a>
           </li>
           <li class="flex items-center gap-2">
-            <Phone class="w-4 h-4 flex-shrink-0" />
-            <a href="tel:+6251112345678">(0511) 1234 5678</a>
+            <Phone class="w-4 h-4 shrink-0" />
+            <a href={footerContent.phone_href ?? "#"}>{footerContent.phone_label}</a>
           </li>
           <li class="flex items-center gap-2">
-            <Mail class="w-4 h-4 flex-shrink-0" />
-            <a href="mailto:info@journalocean.org">info@journalocean.org</a>
+            <Mail class="w-4 h-4 shrink-0" />
+            <a href={footerContent.email_href ?? "#"}>{footerContent.email_label}</a>
           </li>
           <li class="flex items-center gap-2">
-            <Clock class="w-4 h-4 flex-shrink-0" />
-            <span>Senin - Jumat<br />08:00 - 16:00 WITA</span>
+            <Clock class="w-4 h-4 shrink-0" />
+            <span>
+              {formatFooterText(footerContent.office_hours_text).map((line, index) => (
+                <>{index > 0 && <br />}{line}</>
+              ))}
+            </span>
           </li>
         </ul>
       </div>
@@ -62,21 +152,14 @@ const currentYear = new Date().getFullYear();
     <div class="footer-social">
       <div class="footer-social-row">
         <div class="flex items-center gap-2">
-          <span class="footer-social-label">Ikuti Kami:</span>
+          <span class="footer-social-label">{footerContent.social_label ?? "Ikuti Kami:"}</span>
         </div>
         <div class="flex gap-3">
-          <a href="#" class="footer-social-icon" aria-label="Facebook">
-            <Facebook class="w-5 h-5" />
-          </a>
-          <a href="#" class="footer-social-icon" aria-label="Instagram">
-            <Instagram class="w-5 h-5" />
-          </a>
-          <a href="#" class="footer-social-icon" aria-label="Twitter">
-            <Twitter class="w-5 h-5" />
-          </a>
-          <a href="#" class="footer-social-icon" aria-label="YouTube">
-            <Youtube class="w-5 h-5" />
-          </a>
+          {socialLinks.map(({ href, label, Icon }) => (
+            <a href={href} class="footer-social-icon" aria-label={label}>
+              <Icon class="w-5 h-5" />
+            </a>
+          ))}
         </div>
       </div>
     </div>
@@ -84,12 +167,15 @@ const currentYear = new Date().getFullYear();
     <!-- Copyright -->
     <div class="footer-bottom">
       <p class="footer-copyright">
-        Journal Ocean ©{currentYear}. All rights reserved.
+        {copyrightText}
       </p>
       <div class="footer-legal">
-        <a href="#">Kebijakan Privasi</a>
-        <span>|</span>
-        <a href="#">Syarat &amp; Ketentuan</a>
+        {legalLinks.map((link, index) => (
+          <>
+            {index > 0 && <span>|</span>}
+            <a href={link.href}>{link.label}</a>
+          </>
+        ))}
       </div>
     </div>
   </div>
