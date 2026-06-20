@@ -1,6 +1,6 @@
-# Jurnal Ocean — Website
+# Journal Ocean — Website
 
-Website resmi **Jurnal Ocean** (sebelumnya Yayasan Sawiyan), dibangun dengan [Astro](https://astro.build/) + Tailwind CSS v4 + Directus CMS.
+Website resmi **Journal Ocean** (sebelumnya Yayasan Sawiyan), dibangun dengan [Astro](https://astro.build/) + Tailwind CSS v4 + Directus CMS.
 
 ---
 
@@ -29,7 +29,7 @@ DIRECTUS_TOKEN='...'   # opsional, hanya kalau perlu write access
 ├── docs/                       # Dokumentasi setup & panduan
 │   └── directus-cms-setup.md   # Setup collection, fields, permissions di Directus
 ├── public/                     # Static assets (logo, favicon, dll)
-│   └── logo-jurnalocean.png
+│   └── logo-journalocean.png
 ├── src/
 │   ├── components/
 │   │   ├── animations/         # Framer Motion wrappers
@@ -37,7 +37,7 @@ DIRECTUS_TOKEN='...'   # opsional, hanya kalau perlu write access
 │   │   └── pages/              # Komponen per-halaman
 │   │       ├── berita/         # HeroWithSidebar, LatestBeritaCarousel
 │   │       ├── landing-pages/  # Profile, Pengumuman, Slider ← dari CMS
-│   │       ├── profil/         # ProfilJurnalOcean, VisiMisi, StrukturOrganisasi
+│   │       ├── profil/         # ProfilJournalOcean, VisiMisi, StrukturOrganisasi
 │   │       └── program/        # ProgramSosial, Kemanusiaan, Keagamaan
 │   ├── layouts/
 │   │   └── Layout.astro        # Root layout

@@ -14,10 +14,36 @@ export interface HeroSlide {
 // ============================================
 // Environment
 // ============================================
-const DIRECTUS_URL = (import.meta.env.DIRECTUS_URL ?? '')
-  .toString()
-  .replace(/\/+$/, ''); // strip trailing slash
-const DIRECTUS_TOKEN = (import.meta.env.DIRECTUS_TOKEN ?? '').toString().trim();
+function normalizeEnvValue(value: unknown): string {
+  let normalized = (value ?? '').toString().trim();
+
+  // Some deployment dashboards store copied values with literal escaped quotes,
+  // e.g. \'https://cms.sawiyan.or.id/\'. Directus SDK expects a clean URL.
+  for (let i = 0; i < 3; i += 1) {
+    normalized = normalized
+      .trim()
+      .replace(/^\\+(['"])/, '$1')
+      .replace(/\\+(['"])$/, '$1');
+
+    if (
+      (normalized.startsWith("'") && normalized.endsWith("'")) ||
+      (normalized.startsWith('"') && normalized.endsWith('"'))
+    ) {
+      normalized = normalized.slice(1, -1);
+      continue;
+    }
+
+    break;
+  }
+
+  return normalized.trim();
+}
+
+const DIRECTUS_URL = normalizeEnvValue(import.meta.env.DIRECTUS_URL).replace(
+  /\/+$/,
+  ''
+); // strip trailing slash
+const DIRECTUS_TOKEN = normalizeEnvValue(import.meta.env.DIRECTUS_TOKEN);
 
 /** Public flag so consumers can know whether CMS is configured. */
 export const isDirectusConfigured = DIRECTUS_URL.length > 0;
@@ -174,7 +200,7 @@ export const FALLBACK_HERO_SLIDES: HeroSlide[] = [
       'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1920&h=1080&fit=crop',
     quote:
       '“Integritas adalah napas dari setiap pengabdian yang kami lakukan.”',
-    quote_attr: 'Jurnal Ocean',
+    quote_attr: 'Journal Ocean',
   },
   {
     id: 2,
@@ -186,7 +212,7 @@ export const FALLBACK_HERO_SLIDES: HeroSlide[] = [
     image:
       'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1920&h=1080&fit=crop',
     quote: '“Ilmu yang bermanfaat adalah cahaya yang tak pernah padam.”',
-    quote_attr: 'Jurnal Ocean',
+    quote_attr: 'Journal Ocean',
   },
   {
     id: 3,
@@ -198,7 +224,7 @@ export const FALLBACK_HERO_SLIDES: HeroSlide[] = [
     image:
       'https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1920&h=1080&fit=crop',
     quote: "“Al-Qur'an adalah kompas abadi yang menuntun langkah kami.”",
-    quote_attr: 'Jurnal Ocean',
+    quote_attr: 'Journal Ocean',
   },
   {
     id: 4,
@@ -210,7 +236,7 @@ export const FALLBACK_HERO_SLIDES: HeroSlide[] = [
     image:
       'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&h=1080&fit=crop',
     quote: '“Inovasi adalah cara kami menjawab tantangan zaman.”',
-    quote_attr: 'Jurnal Ocean',
+    quote_attr: 'Journal Ocean',
   },
   {
     id: 5,
@@ -222,7 +248,7 @@ export const FALLBACK_HERO_SLIDES: HeroSlide[] = [
     image:
       'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1920&h=1080&fit=crop',
     quote: '“Kepedulian sosial adalah ibadah yang paling dekat.”',
-    quote_attr: 'Jurnal Ocean',
+    quote_attr: 'Journal Ocean',
   },
   {
     id: 6,
@@ -234,7 +260,7 @@ export const FALLBACK_HERO_SLIDES: HeroSlide[] = [
     image:
       'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&h=1080&fit=crop',
     quote: '“Kolaborasi adalah kekuatan yang tak tergantikan.”',
-    quote_attr: 'Jurnal Ocean',
+    quote_attr: 'Journal Ocean',
   },
 ];
 
