@@ -3,16 +3,25 @@ interface BeritaItem {
   slug: string;
   category: string;
   judul: string;
-  thumbnail: string;
+  thumbnail?: string;
+  url_thumbnail?: string;
+  image_alt?: string;
   excerpt: string;
-  date_created: string;
-  author: string;
+  date_created?: string;
+  author?: string;
+  reading_time?: number | null;
 }
 
-const { heroBerita, sidebarBerita } = Astro.props;
+const { heroBerita, sidebarBerita, language = "id" } = Astro.props;
+const locale = language === "en" ? "en-US" : "id-ID";
+const mainLabel = language === "en" ? "Featured News" : "Berita Utama";
+const sidebarLabel = language === "en" ? "More News" : "Berita Lainnya";
+const articleLabel = language === "en" ? "articles" : "artikel";
+const readMoreLabel = language === "en" ? "Read More" : "Baca Selengkapnya";
 
-const formatDate = (dateStr: string) => {
-  return new Intl.DateTimeFormat("id-ID", {
+const formatDate = (dateStr: string | undefined) => {
+  if (!dateStr) return "";
+  return new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -28,11 +37,22 @@ const formatDate = (dateStr: string) => {
       <article class="news-head-feature">
         <a href={`/berita/${heroBerita.slug}`} class="news-head-feature-link">
           <div class="news-head-feature-image">
-            <img src={heroBerita.thumbnail} alt={heroBerita.judul} class="news-head-feature-img" loading="eager" />
+            {heroBerita.thumbnail ? (
+              <img
+                src={heroBerita.thumbnail}
+                alt={heroBerita.image_alt ?? heroBerita.judul}
+                class="news-head-feature-img"
+                loading="eager"
+              />
+            ) : (
+              <div class="news-head-feature-img news-head-img-fallback" aria-hidden="true">
+                <span>{heroBerita.category}</span>
+              </div>
+            )}
           </div>
           <div class="news-head-feature-content">
             <div class="news-head-feature-meta">
-              <span class="news-head-eyebrow-tag">Berita Utama</span>
+              <span class="news-head-eyebrow-tag">{mainLabel}</span>
               <span class="news-head-meta-date">
                 {formatDate(heroBerita.date_created)}
               </span>
@@ -42,7 +62,7 @@ const formatDate = (dateStr: string) => {
             </h1>
             <p class="news-head-feature-excerpt">{heroBerita.excerpt}</p>
             <div class="news-head-feature-cta">
-              <span>Baca Selengkapnya</span>
+              <span>{readMoreLabel}</span>
               <svg xmlns="http://www.w3.org/2000/svg" class="news-head-feature-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
@@ -57,10 +77,10 @@ const formatDate = (dateStr: string) => {
         <div class="news-head-sidebar-head">
           <div class="news-head-eyebrow">
             <span class="news-head-eyebrow-rule"></span>
-            <span>Berita Lainnya</span>
+            <span>{sidebarLabel}</span>
           </div>
           <div class="news-head-sidebar-side">
-            <span>— {sidebarBerita.length} artikel</span>
+            <span>— {sidebarBerita.length} {articleLabel}</span>
           </div>
         </div>
 
@@ -135,6 +155,18 @@ const formatDate = (dateStr: string) => {
 
   .news-head-feature:hover .news-head-feature-img {
     transform: scale(1.03);
+  }
+
+  .news-head-img-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-sand), var(--color-surface));
+    color: var(--color-primary);
+    font-family: "Fraunces", "Times New Roman", serif;
+    font-size: 22px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
 
   .news-head-feature-content {

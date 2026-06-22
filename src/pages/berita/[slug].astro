@@ -10,137 +10,67 @@ import {
   Share2,
   User,
 } from "lucide-astro";
+import {
+  getNewsItemBySlug,
+  getPublishedNews,
+  normalizeSiteLanguage,
+} from "../../lib/directus";
 
-interface BeritaItem {
-  slug: string;
-  category: string;
-  judul: string;
-  thumbnail: string;
-  excerpt: string;
-  date_created: string;
-  author: string;
+const { slug } = Astro.params;
+const language = normalizeSiteLanguage(Astro.url.searchParams.get("lang"));
+
+if (!slug) {
+  return Astro.redirect("/berita");
 }
 
-// Dummy data - dalam production ini akan diambil dari API atau CMS
-const allBeritaData: BeritaItem[] = [
-  {
-    slug: "program-beasiswa-2025",
-    category: "Pengumuman",
-    judul: "Program Beasiswa Journal Ocean 2025",
-    thumbnail:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&h=1080&fit=crop",
-    excerpt:
-      "Journal Ocean membuka program beasiswa untuk siswa berprestasi dan keluarga kurang mampu.",
-    date_created: "2024-11-15T10:00:00",
-    author: "Admin Journal Ocean",
-  },
-  {
-    slug: "bantuan-kemanusiaan-2025",
-    category: "Berita",
-    judul: "Kegiatan Bantuan Kemanusiaan di Daerah Terdampak Bencana",
-    thumbnail:
-      "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1920&h=1080&fit=crop",
-    excerpt:
-      "Journal Ocean menggelar program bantuan kemanusiaan untuk korban bencana alam.",
-    date_created: "2024-11-10T14:30:00",
-    author: "Tim Kemanusiaan",
-  },
-  {
-    slug: "kegiatan-keagamaan-2025",
-    category: "Kegiatan",
-    judul: "Kegiatan Rutin Kajian Keagamaan Bulanan",
-    thumbnail:
-      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop",
-    excerpt:
-      "Journal Ocean mengadakan kajian keagamaan rutin setiap bulan yang terbuka untuk umum.",
-    date_created: "2024-11-08T09:15:00",
-    author: "Divisi Keagamaan",
-  },
-  {
-    slug: "kampanye-lingkungan-2025",
-    category: "Kegiatan",
-    judul: "Kampanye Peduli Lingkungan: Aksi Bersih-Bersih",
-    thumbnail:
-      "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1920&h=1080&fit=crop",
-    excerpt:
-      "Journal Ocean menggelar aksi bersih-bersih lingkungan sebagai bentuk kepedulian terhadap kelestarian alam.",
-    date_created: "2024-11-05T16:45:00",
-    author: "Tim Lingkungan",
-  },
-  {
-    slug: "penyaluran-zakat-2025",
-    category: "Pengumuman",
-    judul: "Penyaluran Zakat Fitrah dan Zakat Mal Tahun 2025",
-    thumbnail:
-      "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=1920&h=1080&fit=crop",
-    excerpt:
-      "Journal Ocean membuka penyaluran zakat fitrah dan zakat mal untuk disalurkan kepada mustahik yang berhak.",
-    date_created: "2024-11-01T11:20:00",
-    author: "Divisi Keagamaan",
-  },
-  {
-    slug: "pelatihan-keterampilan-2025",
-    category: "Berita",
-    judul: "Pelatihan Keterampilan untuk Pemberdayaan Masyarakat",
-    thumbnail:
-      "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920&h=1080&fit=crop",
-    excerpt:
-      "Program pelatihan keterampilan bagi masyarakat untuk meningkatkan kemampuan dan peluang ekonomi.",
-    date_created: "2024-10-28T13:00:00",
-    author: "Divisi Program Sosial",
-  },
-];
+const beritaItem = await getNewsItemBySlug(slug, language);
 
-// Get slug from URL params
-const { slug } = Astro.params;
-
-// Find the berita item
-const beritaItem = allBeritaData.find((item) => item.slug === slug);
-
-// If berita not found, return 404
 if (!beritaItem) {
   return Astro.redirect("/berita");
 }
 
-// Full content (dummy - dalam production ini akan dari CMS)
-const fullContent = `
-  <p class="mb-4">${beritaItem.excerpt}</p>
-  
-  <p class="mb-4">Journal Ocean dengan bangga mengumumkan program terbaru yang bertujuan untuk memberikan dampak positif bagi masyarakat. Program ini dirancang dengan cermat untuk memastikan manfaat yang maksimal bagi semua pihak yang terlibat.</p>
-  
-  <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">Tujuan Program</h2>
-  <p class="mb-4">Program ini memiliki beberapa tujuan utama yang ingin dicapai, antara lain:</p>
-  <ul class="list-disc list-inside mb-4 space-y-2 text-gray-700">
-    <li>Memberikan bantuan yang tepat sasaran kepada mereka yang membutuhkan</li>
-    <li>Meningkatkan kualitas hidup masyarakat melalui berbagai program pemberdayaan</li>
-    <li>Membangun sinergi dengan berbagai pihak untuk mencapai tujuan bersama</li>
-    <li>Menciptakan dampak berkelanjutan yang dapat dirasakan dalam jangka panjang</li>
-  </ul>
-  
-  <h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4">Cara Berpartisipasi</h2>
-  <p class="mb-4">Bagi Anda yang ingin berpartisipasi dalam program ini, silakan menghubungi tim kami melalui berbagai saluran komunikasi yang tersedia. Kami akan dengan senang hati membantu Anda untuk bergabung dalam program ini.</p>
-  
-  <p class="mb-4">Kami berharap program ini dapat memberikan manfaat yang sebesar-besarnya bagi masyarakat dan menjadi langkah awal untuk menciptakan perubahan positif di lingkungan sekitar kita.</p>
-`;
-
+const allBeritaData = await getPublishedNews(language, 20);
 const relatedBerita = allBeritaData
   .filter((item) => item.slug !== beritaItem.slug)
   .slice(0, 3);
 
-const formattedDate = new Intl.DateTimeFormat("id-ID", {
+const locale = language === "en" ? "en-US" : "id-ID";
+const backLabel = language === "en" ? "Back to News" : "Kembali ke Berita";
+const summaryLabel = language === "en" ? "Summary" : "Ringkasan";
+const articleLabel = language === "en" ? "Article" : "Artikel";
+const authorLabel = language === "en" ? "Author" : "Penulis";
+const dateLabel = language === "en" ? "Date" : "Tanggal";
+const durationLabel = language === "en" ? "Duration" : "Durasi";
+const minuteLabel = language === "en" ? "min read" : "menit baca";
+const shareLabel = language === "en" ? "Share" : "Bagikan";
+const narrativeLabel = language === "en" ? "Article Narrative" : "Narasi Artikel";
+const discussionLabel =
+  language === "en" ? "Open community discussion" : "Diskusi komunitas terbuka";
+const relatedLabel = language === "en" ? "Read Also" : "Baca Juga";
+const relatedTitle =
+  language === "en" ? "More related stories." : "Kabar terkait lainnya.";
+const allNewsLabel = language === "en" ? "All News" : "Semua Berita";
+const langQuery = `?lang=${language}`;
+
+const dateValue = beritaItem.date_created ?? beritaItem.published_at ?? "";
+const formattedDate = new Intl.DateTimeFormat(locale, {
   day: "numeric",
   month: "long",
   year: "numeric",
-}).format(new Date(beritaItem.date_created));
+}).format(new Date(dateValue));
 
-const shortDate = new Intl.DateTimeFormat("id-ID", {
+const shortDate = new Intl.DateTimeFormat(locale, {
   day: "2-digit",
   month: "short",
   year: "numeric",
-}).format(new Date(beritaItem.date_created));
+}).format(new Date(dateValue));
 
-const plainContent = fullContent.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-const readingMinutes = Math.max(3, Math.ceil(plainContent.split(" ").length / 180));
+const fullContent = beritaItem.isi || `<p>${beritaItem.excerpt}</p>`;
+const plainContent = fullContent
+  .replace(/<[^>]+>/g, " ")
+  .replace(/\s+/g, " ")
+  .trim();
+const readingMinutes = beritaItem.reading_time ?? Math.max(3, Math.ceil(plainContent.split(" ").length / 180));
 const articleUrl = Astro.url.href;
 const encodedTitle = encodeURIComponent(beritaItem.judul);
 const encodedShareText = encodeURIComponent(`${beritaItem.judul} ${articleUrl}`);
@@ -156,13 +86,13 @@ const encodedShareText = encodeURIComponent(`${beritaItem.judul} ${articleUrl}`)
 
       <div class="relative mx-auto max-w-7xl px-6 md:px-8">
         <a
-          href="/berita"
+          href={`/berita${langQuery}`}
           class="group mb-10 inline-flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.22em] text-[#4A5D3F] transition-colors hover:text-[#B8704A]"
         >
           <span class="flex h-9 w-9 items-center justify-center rounded-full border border-[#4A5D3F]/25 bg-white/35 transition-transform group-hover:-translate-x-1">
             <ArrowLeft class="h-4 w-4" />
           </span>
-          Kembali ke Berita
+          {backLabel}
         </a>
 
         <div class="grid gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:items-end">
@@ -191,12 +121,18 @@ const encodedShareText = encodeURIComponent(`${beritaItem.judul} ${articleUrl}`)
               {shortDate}
             </div>
             <div class="relative aspect-[4/5] overflow-hidden rounded-t-[2.5rem] rounded-br-[2.5rem] border-[10px] border-[#EBE3D2] bg-[#EBE3D2] shadow-2xl shadow-[#4A5D3F]/15 md:aspect-[5/4] lg:aspect-[4/5]">
-              <img
-                src={beritaItem.thumbnail}
-                alt={beritaItem.judul}
-                class="h-full w-full object-cover saturate-[0.86] transition-transform duration-700 hover:scale-105"
-                loading="eager"
-              />
+              {beritaItem.thumbnail ? (
+                <img
+                  src={beritaItem.thumbnail}
+                  alt={beritaItem.image_alt ?? beritaItem.judul}
+                  class="h-full w-full object-cover saturate-[0.86] transition-transform duration-700 hover:scale-105"
+                  loading="eager"
+                />
+              ) : (
+                <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#EBE3D2] to-[#F7F2E7] font-serif text-2xl uppercase tracking-[0.12em] text-[#4A5D3F]">
+                  {beritaItem.category}
+                </div>
+              )}
               <div class="absolute inset-0 bg-gradient-to-t from-[#2A2E25]/55 via-transparent to-transparent"></div>
               <figcaption class="absolute bottom-6 left-6 right-6 rounded-2xl border border-white/15 bg-[#2A2E25]/45 p-5 text-sm leading-6 text-[#F7F2E7] backdrop-blur-md">
                 {beritaItem.excerpt}
@@ -216,8 +152,8 @@ const encodedShareText = encodeURIComponent(`${beritaItem.judul} ${articleUrl}`)
                 <BookOpen class="h-5 w-5" />
               </div>
               <div>
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6B7A5A]">Ringkasan</p>
-                <p class="font-serif text-xl text-[#2A2E25]">Artikel</p>
+                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6B7A5A]">{summaryLabel}</p>
+                <p class="font-serif text-xl text-[#2A2E25]">{articleLabel}</p>
               </div>
             </div>
 
@@ -225,22 +161,22 @@ const encodedShareText = encodeURIComponent(`${beritaItem.judul} ${articleUrl}`)
               <div class="flex items-start gap-3">
                 <User class="mt-0.5 h-4 w-4 text-[#4A5D3F]" />
                 <div>
-                  <dt class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6B7A5A]">Penulis</dt>
+                  <dt class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6B7A5A]">{authorLabel}</dt>
                   <dd class="mt-1 font-medium text-[#2A2E25]">{beritaItem.author}</dd>
                 </div>
               </div>
               <div class="flex items-start gap-3">
                 <Calendar class="mt-0.5 h-4 w-4 text-[#4A5D3F]" />
                 <div>
-                  <dt class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6B7A5A]">Tanggal</dt>
+                  <dt class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6B7A5A]">{dateLabel}</dt>
                   <dd class="mt-1 font-medium text-[#2A2E25]">{formattedDate}</dd>
                 </div>
               </div>
               <div class="flex items-start gap-3">
                 <Clock class="mt-0.5 h-4 w-4 text-[#4A5D3F]" />
                 <div>
-                  <dt class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6B7A5A]">Durasi</dt>
-                  <dd class="mt-1 font-medium text-[#2A2E25]">{readingMinutes} menit baca</dd>
+                  <dt class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6B7A5A]">{durationLabel}</dt>
+                  <dd class="mt-1 font-medium text-[#2A2E25]">{readingMinutes} {minuteLabel}</dd>
                 </div>
               </div>
             </dl>
@@ -248,7 +184,7 @@ const encodedShareText = encodeURIComponent(`${beritaItem.judul} ${articleUrl}`)
             <div class="mt-8 border-t border-[#4A5D3F]/15 pt-6">
               <p class="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#6B7A5A]">
                 <Share2 class="h-4 w-4" />
-                Bagikan
+                {shareLabel}
               </p>
               <div class="grid grid-cols-3 gap-2">
                 <a
@@ -284,11 +220,11 @@ const encodedShareText = encodeURIComponent(`${beritaItem.judul} ${articleUrl}`)
           <div class="border-b border-[#4A5D3F]/10 bg-[#EBE3D2]/45 px-6 py-5 md:px-10">
             <div class="flex flex-wrap items-center justify-between gap-4">
               <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6B7A5A]">
-                Article Narrative
+                {narrativeLabel}
               </p>
               <div class="flex items-center gap-2 text-sm text-[#2A2E25]/65">
                 <MessageCircle class="h-4 w-4 text-[#4A5D3F]" />
-                Diskusi komunitas terbuka
+                {discussionLabel}
               </div>
             </div>
           </div>
@@ -307,16 +243,16 @@ const encodedShareText = encodeURIComponent(`${beritaItem.judul} ${articleUrl}`)
     <section class="mx-auto max-w-7xl px-6 pb-20 md:px-8 lg:pb-28">
       <div class="mb-8 flex flex-col justify-between gap-4 border-t border-[#4A5D3F]/15 pt-10 md:flex-row md:items-end">
         <div>
-          <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6B7A5A]">Baca Juga</p>
+          <p class="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6B7A5A]">{relatedLabel}</p>
           <h2 class="font-serif text-4xl font-normal tracking-[-0.04em] text-[#2A2E25] md:text-5xl">
-            Kabar terkait lainnya.
+            {relatedTitle}
           </h2>
         </div>
         <a
-          href="/berita"
+          href={`/berita${langQuery}`}
           class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-[#4A5D3F] transition hover:text-[#B8704A]"
         >
-          Semua Berita
+          {allNewsLabel}
           <ArrowUpRight class="h-4 w-4" />
         </a>
       </div>
@@ -324,16 +260,22 @@ const encodedShareText = encodeURIComponent(`${beritaItem.judul} ${articleUrl}`)
       <div class="grid gap-6 md:grid-cols-3">
         {relatedBerita.map((item) => (
           <a
-            href={`/berita/${item.slug}`}
+            href={`/berita/${item.slug}${langQuery}`}
             class="group overflow-hidden rounded-[1.75rem] border border-[#4A5D3F]/10 bg-[#EBE3D2]/45 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#4A5D3F]/10"
           >
             <div class="aspect-[5/3] overflow-hidden bg-[#EBE3D2]">
-              <img
-                src={item.thumbnail}
-                alt={item.judul}
-                class="h-full w-full object-cover saturate-[0.86] transition duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
+              {item.thumbnail ? (
+                <img
+                  src={item.thumbnail}
+                  alt={item.image_alt ?? item.judul}
+                  class="h-full w-full object-cover saturate-[0.86] transition duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#EBE3D2] to-[#F7F2E7] font-serif text-lg uppercase tracking-[0.1em] text-[#4A5D3F]">
+                  {item.category}
+                </div>
+              )}
             </div>
             <div class="p-6">
               <div class="mb-4 flex items-center justify-between gap-4">
@@ -341,7 +283,7 @@ const encodedShareText = encodeURIComponent(`${beritaItem.judul} ${articleUrl}`)
                   {item.category}
                 </span>
                 <span class="text-xs text-[#2A2E25]/50">
-                  {new Intl.DateTimeFormat("id-ID", {
+                  {new Intl.DateTimeFormat(locale, {
                     day: "2-digit",
                     month: "short",
                   }).format(new Date(item.date_created))}

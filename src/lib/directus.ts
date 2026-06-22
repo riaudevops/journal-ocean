@@ -128,6 +128,77 @@ export interface FooterContent extends FooterContentTranslation {
   translations?: FooterContentTranslation[];
 }
 
+export interface AnnouncementContentTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  title?: string;
+  Title?: string;
+  subtitle?: string;
+  Subtitle?: string;
+  quote?: string;
+  Quote?: string;
+  view_all?: string;
+  viewAll?: string;
+  View_All?: string;
+}
+
+export interface AnnouncementContent extends AnnouncementContentTranslation {
+  id?: number | string;
+  translations?: AnnouncementContentTranslation[];
+  [key: string]: unknown;
+}
+
+export interface PreloaderContentTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  footer_label?: string;
+  loading_label?: string;
+  aria_label?: string;
+}
+
+export interface PreloaderContent extends PreloaderContentTranslation {
+  id?: number | string;
+  code_label?: string;
+  coordinate_label?: string;
+  translations?: PreloaderContentTranslation[];
+}
+
+export interface NewsItemTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  category?: string;
+  judul?: string;
+  excerpt?: string;
+  isi?: string;
+  image_alt?: string;
+  meta_title?: string;
+  meta_description?: string;
+}
+
+export interface NewsItem extends NewsItemTranslation {
+  id?: number | string;
+  status?: 'draft' | 'published' | 'archived' | string;
+  sort?: number | null;
+  slug?: string;
+  category: string;
+  judul: string;
+  excerpt: string;
+  isi?: string;
+  thumbnail?: string | null;
+  url_thumbnail?: string;
+  image_alt?: string;
+  author?: string;
+  published_at?: string;
+  date_created?: string;
+  is_featured?: boolean;
+  show_on_home?: boolean;
+  home_sort?: number | null;
+  reading_time?: number | null;
+  meta_title?: string;
+  meta_description?: string;
+  translations?: NewsItemTranslation[];
+}
+
 function normalizeEnvValue(value: unknown): string {
   let normalized = (value ?? '').toString().trim();
 
@@ -238,10 +309,31 @@ function getTranslationCode(
     | NavbarContentTranslation
     | LandingProfileTranslation
     | FooterContentTranslation
+    | AnnouncementContentTranslation
+    | PreloaderContentTranslation
+    | NewsItemTranslation
 ): string {
   const raw = translation.languages_code;
   if (!raw) return '';
   return typeof raw === 'string' ? raw : (raw.code ?? '');
+}
+
+export function getCategoryLabel(
+  category: string | null | undefined,
+  language: SiteLanguage = 'id'
+): string {
+  const normalizedCategory = (category ?? '').toLowerCase();
+  const labels: Record<string, Record<SiteLanguage, string>> = {
+    berita: { id: 'Berita', en: 'News' },
+    pengumuman: { id: 'Pengumuman', en: 'Announcement' },
+    kegiatan: { id: 'Kegiatan', en: 'Activity' },
+  };
+
+  return (
+    labels[normalizedCategory]?.[normalizeSiteLanguage(language)] ??
+    category ??
+    ''
+  );
 }
 
 function applyHeroSlideTranslation(
@@ -377,6 +469,207 @@ export async function getNavbarContentWithFallback(
   const fromCms = await getNavbarContent(normalizedLanguage);
   if (fromCms) return fromCms;
   return applyNavbarTranslation(FALLBACK_NAVBAR_CONTENT, normalizedLanguage);
+}
+
+function getAnnouncementField(
+  content: AnnouncementContent | AnnouncementContentTranslation,
+  keys: string[]
+): string | undefined {
+  for (const key of keys) {
+    const value = content[key as keyof typeof content];
+    if (typeof value === 'string' && value.trim()) return value;
+  }
+  return undefined;
+}
+
+function applyAnnouncementTranslation(
+  content: AnnouncementContent,
+  language: SiteLanguage
+): AnnouncementContent {
+  const base: AnnouncementContent = {
+    ...content,
+    title: getAnnouncementField(content, ['title', 'Title']),
+    subtitle: getAnnouncementField(content, ['subtitle', 'Subtitle']),
+    quote: getAnnouncementField(content, ['quote', 'Quote']),
+    view_all: getAnnouncementField(content, [
+      'view_all',
+      'viewAll',
+      'View_All',
+      'View All',
+    ]),
+  };
+
+  if (language === 'id' || !Array.isArray(content.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = content.translations.find((item) =>
+    languageCodes.includes(getTranslationCode(item))
+  );
+
+  if (!translation) return base;
+
+  return {
+    ...base,
+    title: getAnnouncementField(translation, ['title', 'Title']) || base.title,
+    subtitle:
+      getAnnouncementField(translation, ['subtitle', 'Subtitle']) ||
+      base.subtitle,
+    quote: getAnnouncementField(translation, ['quote', 'Quote']) || base.quote,
+    view_all:
+      getAnnouncementField(translation, [
+        'view_all',
+        'viewAll',
+        'View_All',
+        'View All',
+      ]) || base.view_all,
+  };
+}
+
+export const FALLBACK_ANNOUNCEMENT_CONTENT: AnnouncementContent = {
+  id: 1,
+  title: 'Berita & Pengumuman',
+  subtitle: 'Kabar terbaru dari Journal Ocean.',
+  quote: '"Cerita-cerita kecil yang membentuk dampak yang lebih besar."',
+  view_all: 'Lihat Semua Berita',
+};
+
+export async function getAnnouncementContent(
+  language: SiteLanguage = 'id'
+): Promise<AnnouncementContent | null> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `announcement:v1:${normalizedLanguage}`;
+  const cached = cacheGet<AnnouncementContent>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) {
+    console.warn(
+      '[directus] DIRECTUS_URL not set, returning empty announcement'
+    );
+    return null;
+  }
+
+  try {
+    const item = await client.request(
+      (readItems as any)('announcement', {
+        fields: ['*', 'translations.*'],
+        limit: 1,
+      })
+    );
+
+    const content = Array.isArray(item) ? item[0] : item;
+    if (!content) return null;
+
+    const result = applyAnnouncementTranslation(
+      content as AnnouncementContent,
+      normalizedLanguage
+    );
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getAnnouncementContent failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return null;
+  }
+}
+
+export async function getAnnouncementContentWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<AnnouncementContent> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const fromCms = await getAnnouncementContent(normalizedLanguage);
+  if (fromCms) return fromCms;
+  return FALLBACK_ANNOUNCEMENT_CONTENT;
+}
+
+function applyPreloaderTranslation(
+  content: PreloaderContent,
+  language: SiteLanguage
+): PreloaderContent {
+  if (language === 'id' || !Array.isArray(content.translations)) return content;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = content.translations.find((item) =>
+    languageCodes.includes(getTranslationCode(item))
+  );
+
+  if (!translation) return content;
+
+  return {
+    ...content,
+    eyebrow: translation.eyebrow || content.eyebrow,
+    title: translation.title || content.title,
+    description: translation.description || content.description,
+    footer_label: translation.footer_label || content.footer_label,
+    loading_label: translation.loading_label || content.loading_label,
+    aria_label: translation.aria_label || content.aria_label,
+  };
+}
+
+export const FALLBACK_PRELOADER_CONTENT: PreloaderContent = {
+  id: 1,
+  code_label: 'JOC',
+  coordinate_label: '06°N · 95°E',
+  eyebrow: 'Journal Ocean Dispatch',
+  title: 'Menyiapkan jurnal kebaikan.',
+  description:
+    'Merapikan kabar, program, dan cerita komunitas sebelum halaman dibuka.',
+  footer_label: 'Warm Sage & Sand',
+  loading_label: 'Loading',
+  aria_label: 'Memuat halaman Journal Ocean',
+};
+
+export async function getPreloaderContent(
+  language: SiteLanguage = 'id'
+): Promise<PreloaderContent | null> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `preloader:v1:${normalizedLanguage}`;
+  const cached = cacheGet<PreloaderContent>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) {
+    console.warn('[directus] DIRECTUS_URL not set, returning empty preloader');
+    return null;
+  }
+
+  try {
+    const item = await client.request(
+      (readItems as any)('preloader', {
+        fields: ['*', 'translations.*'],
+        limit: 1,
+      })
+    );
+
+    const content = Array.isArray(item) ? item[0] : item;
+    if (!content) return null;
+
+    const result = applyPreloaderTranslation(
+      content as PreloaderContent,
+      normalizedLanguage
+    );
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getPreloaderContent failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return null;
+  }
+}
+
+export async function getPreloaderContentWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<PreloaderContent> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const fromCms = await getPreloaderContent(normalizedLanguage);
+  return {
+    ...FALLBACK_PRELOADER_CONTENT,
+    ...fromCms,
+  };
 }
 
 function applyFooterTranslation(
@@ -553,6 +846,95 @@ export async function getFooterContentWithFallback(
   return applyFooterTranslation(FALLBACK_FOOTER_CONTENT, normalizedLanguage);
 }
 
+function toBoolean(value: unknown): boolean {
+  return value === true || value === 'true' || value === 1 || value === '1';
+}
+
+function toNumberOrNull(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function stripHtml(value: string | undefined): string {
+  return (value ?? '')
+    .replace(/<[^>]*>?/gm, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function slugify(value: string): string {
+  return (
+    value
+      .toLowerCase()
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'news'
+  );
+}
+
+function applyNewsItemTranslation(
+  item: NewsItem,
+  language: SiteLanguage
+): NewsItem {
+  if (language === 'id' || !Array.isArray(item.translations)) return item;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = item.translations.find((entry) =>
+    languageCodes.includes(getTranslationCode(entry))
+  );
+
+  if (!translation) return item;
+
+  return {
+    ...item,
+    category: translation.category || item.category,
+    judul: translation.judul || item.judul,
+    excerpt: translation.excerpt || item.excerpt,
+    isi: translation.isi || item.isi,
+    image_alt: translation.image_alt || item.image_alt,
+    meta_title: translation.meta_title || item.meta_title,
+    meta_description: translation.meta_description || item.meta_description,
+  };
+}
+
+function normalizeNewsItem(item: NewsItem, language: SiteLanguage): NewsItem {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const translatedItem = applyNewsItemTranslation(item, normalizedLanguage);
+  const publishedAt =
+    translatedItem.published_at ?? translatedItem.date_created ?? '';
+  const thumbnail =
+    typeof translatedItem.thumbnail === 'string'
+      ? directusAssetUrl(translatedItem.thumbnail)
+      : '';
+  const excerpt =
+    translatedItem.excerpt || stripHtml(translatedItem.isi).slice(0, 180);
+  const readingTime = toNumberOrNull(translatedItem.reading_time) ?? 3;
+  const slug = translatedItem.slug || slugify(translatedItem.judul);
+
+  return {
+    ...translatedItem,
+    slug,
+    category: getCategoryLabel(translatedItem.category, normalizedLanguage),
+    judul: translatedItem.judul,
+    excerpt,
+    thumbnail,
+    url_thumbnail: thumbnail,
+    image_alt:
+      translatedItem.image_alt || `Thumbnail untuk ${translatedItem.judul}`,
+    author: translatedItem.author || 'Admin Journal Ocean',
+    published_at: publishedAt,
+    date_created: publishedAt,
+    is_featured: toBoolean(translatedItem.is_featured),
+    show_on_home: toBoolean(translatedItem.show_on_home),
+    home_sort: toNumberOrNull(translatedItem.home_sort),
+    reading_time: readingTime,
+    meta_title: translatedItem.meta_title || translatedItem.judul,
+    meta_description: translatedItem.meta_description || excerpt,
+  };
+}
+
 function applyLandingProfileTranslation(
   content: LandingProfileContent,
   language: SiteLanguage
@@ -722,6 +1104,87 @@ export async function getLandingProfileContentWithFallback(
   return applyLandingProfileTranslation(
     FALLBACK_LANDING_PROFILE,
     normalizedLanguage
+  );
+}
+
+interface NewsQueryOptions {
+  limit?: number;
+  homeOnly?: boolean;
+}
+
+export async function getNewsItems(
+  language: SiteLanguage = 'id',
+  options: NewsQueryOptions = {}
+): Promise<NewsItem[]> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const limit = options.limit ?? 20;
+  const cacheKey = `news:v1:${normalizedLanguage}:${options.homeOnly ? 'home' : 'all'}:${limit}`;
+  const cached = cacheGet<NewsItem[]>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) {
+    console.warn('[directus] DIRECTUS_URL not set, returning empty news');
+    return [];
+  }
+
+  try {
+    const filter: Record<string, unknown> = {
+      status: { _eq: 'published' },
+    };
+
+    if (options.homeOnly) {
+      filter.show_on_home = { _eq: true };
+    }
+
+    const items = await client.request(
+      (readItems as any)('news', {
+        fields: ['*', 'translations.*'],
+        filter,
+        sort: options.homeOnly
+          ? ['home_sort', '-published_at']
+          : ['-published_at'],
+        limit,
+      })
+    );
+
+    const result = ((items as NewsItem[]) ?? []).map((item) =>
+      normalizeNewsItem(item, normalizedLanguage)
+    );
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getNewsItems failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return [];
+  }
+}
+
+export async function getHomeNews(
+  language: SiteLanguage = 'id',
+  limit = 3
+): Promise<NewsItem[]> {
+  return getNewsItems(language, { homeOnly: true, limit });
+}
+
+export async function getPublishedNews(
+  language: SiteLanguage = 'id',
+  limit = 20
+): Promise<NewsItem[]> {
+  return getNewsItems(language, { limit });
+}
+
+export async function getNewsItemBySlug(
+  slug: string,
+  language: SiteLanguage = 'id'
+): Promise<NewsItem | null> {
+  const normalizedSlug = slugify(slug);
+  const items = await getNewsItems(language, { limit: 100 });
+  return (
+    items.find((item) => slugify(item.slug ?? item.judul) === normalizedSlug) ??
+    null
   );
 }
 

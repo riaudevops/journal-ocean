@@ -1,35 +1,27 @@
 ---
 import { ArrowRight } from "@lucide/astro";
+import {
+  getAnnouncementContentWithFallback,
+  getHomeNews,
+  normalizeSiteLanguage,
+} from "../../../lib/directus";
 
-const title = "Kabar terbaru dari Journal Ocean.";
+const language = normalizeSiteLanguage(Astro.url.searchParams.get("lang"));
+const announcement = await getAnnouncementContentWithFallback(language);
+const pengumumanData = await getHomeNews(language, 5);
+const headerTitle = announcement.title ?? "Berita & Pengumuman";
+const headerSubtitle = announcement.subtitle ?? "Kabar terbaru dari Journal Ocean.";
+const headerQuote =
+  announcement.quote ??
+  "\"Cerita-cerita kecil yang membentuk dampak yang lebih besar.\"";
+const headerViewAll = announcement.view_all ?? "Lihat Semua Berita";
 const linkHref = "/berita";
-
-const pengumumanData = [
-  {
-    slug: "program-beasiswa-2025",
-    judul: "Program Beasiswa Journal Ocean 2025 Resmi Dibuka",
-    thumbnail: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=1000&fit=crop",
-    url_thumbnail: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=1000&fit=crop",
-    isi: "Journal Ocean membuka program beasiswa untuk siswa berprestasi dan keluarga kurang mampu. Program ini bertujuan untuk memberikan kesempatan pendidikan yang lebih baik bagi generasi penerus bangsa.",
-    date_created: "2024-11-15T10:00:00",
-  },
-  {
-    slug: "bantuan-kemanusiaan-2025",
-    judul: "Bantuan Kemanusiaan untuk Daerah Terdampak Bencana",
-    thumbnail: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&h=600&fit=crop",
-    url_thumbnail: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&h=600&fit=crop",
-    isi: "Journal Ocean menggelar program bantuan kemanusiaan untuk korban bencana alam. Bantuan meliputi bahan makanan, pakaian, dan kebutuhan pokok lainnya. Mari bersama-sama membantu mereka yang membutuhkan.",
-    date_created: "2024-11-10T14:30:00",
-  },
-  {
-    slug: "kegiatan-keagamaan-2025",
-    judul: "Kajian Keagamaan Bulanan untuk Umum",
-    thumbnail: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop",
-    url_thumbnail: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop",
-    isi: "Journal Ocean mengadakan kajian keagamaan rutin setiap bulan yang terbuka untuk umum. Kegiatan ini bertujuan untuk memperdalam pemahaman keagamaan dan memperkuat ukhuwah islamiyah.",
-    date_created: "2024-11-08T09:15:00",
-  },
-];
+const readMoreLabel = language === "en" ? "Read More" : "Baca Selengkapnya";
+const minuteLabel = language === "en" ? "min read" : "min baca";
+const locale = language === "en" ? "en-US" : "id-ID";
+const langQuery = `?lang=${language}`;
+const featuredNews = pengumumanData[0];
+const sideNews = pengumumanData.slice(1, 5);
 ---
 
 <section class="news-section">
@@ -38,57 +30,101 @@ const pengumumanData = [
     <div class="news-head">
       <div class="news-head-left">
         <div class="news-eyebrow">
-          <span>Berita &amp; Pengumuman</span>
+          <span>{headerTitle}</span>
         </div>
         <h2 class="news-title">
-          Kabar <em>terbaru</em> dari Journal Ocean.
+          {headerSubtitle}
         </h2>
       </div>
       <div class="news-head-side">
-        <p>"Cerita-cerita kecil yang membentuk dampak yang lebih besar."</p>
-        <a href={linkHref} class="news-side-cta">
-          Lihat Semua Berita
+        <p>{headerQuote}</p>
+        <a href={`${linkHref}${langQuery}`} class="news-side-cta">
+          {headerViewAll}
           <ArrowRight class="w-3.5 h-3.5" />
         </a>
       </div>
     </div>
 
-    <!-- News Grid: 1 feature + 2 standard -->
-    <div class="news-grid">
-      {pengumumanData.map((pengumuman, idx) => (
-        <article class={`news-card ${idx === 0 ? "feature" : ""}`}>
-          <div class="news-img-wrap">
-            <img
-              src={pengumuman.url_thumbnail}
-              alt={`Thumbnail untuk ${pengumuman.judul}`}
-              class="news-img"
-              loading="lazy"
-            />
-          </div>
+    <!-- News Grid: 1 besar kiri + 4 kecil kanan -->
+    {featuredNews && (
+      <div class="news-grid">
+        <article class="news-card feature">
+          <a href={`/berita/${featuredNews.slug}${langQuery}`} class="news-img-wrap">
+            {featuredNews.url_thumbnail ? (
+              <img
+                src={featuredNews.url_thumbnail}
+                alt={featuredNews.image_alt ?? featuredNews.judul}
+                class="news-img"
+                loading="lazy"
+              />
+            ) : (
+              <div class="news-img news-img-fallback" aria-hidden="true">
+                <span>{featuredNews.category}</span>
+              </div>
+            )}
+          </a>
           <div class="news-meta">
             <span>
-              {new Intl.DateTimeFormat("id-ID", {
+              {new Intl.DateTimeFormat(locale, {
                 day: "numeric",
                 month: "long",
                 year: "numeric",
-              }).format(new Date(pengumuman.date_created))}
+              }).format(new Date(featuredNews.date_created ?? ""))}
             </span>
             <span class="news-meta-dot"></span>
-            <span>{idx === 0 ? "5 min baca" : idx === 1 ? "4 min" : "3 min"}</span>
+            <span>{featuredNews.reading_time ?? 3} {minuteLabel}</span>
           </div>
-          <h3 class={`news-card-title ${idx === 0 ? "feature" : ""}`}>
-            <a href={`/berita/${pengumuman.slug}`}>{pengumuman.judul}</a>
+          <h3 class="news-card-title feature">
+            <a href={`/berita/${featuredNews.slug}${langQuery}`}>{featuredNews.judul}</a>
           </h3>
           <p class="news-card-excerpt">
-            {pengumuman.isi?.replace(/<[^>]*>?/gm, " ").substring(0, idx === 0 ? 200 : 120) + "..."}
+            {featuredNews.excerpt.substring(0, 200)}...
           </p>
-          <a href={`/berita/${pengumuman.slug}`} class="news-card-link">
-            Baca Selengkapnya
+          <a href={`/berita/${featuredNews.slug}${langQuery}`} class="news-card-link">
+            {readMoreLabel}
             <ArrowRight class="w-3.5 h-3.5" />
           </a>
         </article>
-      ))}
-    </div>
+
+        <div class="news-side-grid">
+          {sideNews.map((pengumuman) => (
+            <article class="news-card compact">
+              <a href={`/berita/${pengumuman.slug}${langQuery}`} class="news-img-wrap compact">
+                {pengumuman.url_thumbnail ? (
+                  <img
+                    src={pengumuman.url_thumbnail}
+                    alt={pengumuman.image_alt ?? pengumuman.judul}
+                    class="news-img"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div class="news-img news-img-fallback" aria-hidden="true">
+                    <span>{pengumuman.category}</span>
+                  </div>
+                )}
+              </a>
+              <div class="news-meta compact">
+                <span>
+                  {new Intl.DateTimeFormat(locale, {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  }).format(new Date(pengumuman.date_created ?? ""))}
+                </span>
+                <span class="news-meta-dot"></span>
+                <span>{pengumuman.reading_time ?? 3} {minuteLabel}</span>
+              </div>
+              <h3 class="news-card-title compact">
+                <a href={`/berita/${pengumuman.slug}${langQuery}`}>{pengumuman.judul}</a>
+              </h3>
+              <p class="news-card-excerpt compact">
+                {pengumuman.excerpt.substring(0, 92)}...
+              </p>
+            </article>
+          ))}
+        </div>
+      </div>
+    )}
   </div>
 </section>
 
@@ -177,12 +213,20 @@ const pengumumanData = [
   /* Grid */
   .news-grid {
     display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
     gap: 32px;
+    align-items: stretch;
+  }
+
+  .news-side-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 24px;
   }
 
   .news-card {
     position: relative;
+    min-width: 0;
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -191,8 +235,13 @@ const pengumumanData = [
   .news-img-wrap {
     position: relative;
     overflow: hidden;
+    display: block;
     border-radius: 4px;
     margin-bottom: 24px;
+  }
+
+  .news-img-wrap.compact {
+    margin-bottom: 16px;
   }
 
   .news-img {
@@ -207,8 +256,24 @@ const pengumumanData = [
     aspect-ratio: 4/5;
   }
 
+  .news-card.compact .news-img {
+    aspect-ratio: 16/10;
+  }
+
   .news-card:hover .news-img {
     transform: scale(1.04);
+  }
+
+  .news-img-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-sand), var(--color-surface));
+    color: var(--color-primary);
+    font-family: 'Fraunces', 'Times New Roman', serif;
+    font-size: 18px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .news-meta {
@@ -221,6 +286,13 @@ const pengumumanData = [
     text-transform: uppercase;
     color: var(--color-primary);
     margin: 0 0 10px 0;
+  }
+
+  .news-meta.compact {
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.09em;
+    flex-wrap: wrap;
   }
 
   .news-meta-dot {
@@ -243,6 +315,11 @@ const pengumumanData = [
     font-size: 32px;
   }
 
+  .news-card-title.compact {
+    font-size: clamp(18px, 1.8vw, 22px);
+    margin-bottom: 8px;
+  }
+
   .news-card-title a {
     color: var(--color-text-primary);
     text-decoration: none;
@@ -258,6 +335,12 @@ const pengumumanData = [
     line-height: 1.6;
     color: var(--color-text-secondary);
     margin: 0 0 16px 0;
+  }
+
+  .news-card-excerpt.compact {
+    margin-bottom: 0;
+    font-size: 13.5px;
+    line-height: 1.55;
   }
 
   .news-card-link {
@@ -291,6 +374,25 @@ const pengumumanData = [
     .news-grid {
       grid-template-columns: 1fr;
       gap: 48px;
+    }
+
+    .news-side-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .news-section {
+      padding: 88px 20px;
+    }
+
+    .news-head {
+      margin-bottom: 48px;
+    }
+
+    .news-side-grid {
+      grid-template-columns: 1fr;
+      gap: 36px;
     }
   }
 </style>

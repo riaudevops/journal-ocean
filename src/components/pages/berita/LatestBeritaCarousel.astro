@@ -3,16 +3,25 @@ interface BeritaItem {
   slug: string;
   category: string;
   judul: string;
-  thumbnail: string;
+  thumbnail?: string;
+  url_thumbnail?: string;
+  image_alt?: string;
   excerpt: string;
-  date_created: string;
-  author: string;
+  date_created?: string;
+  author?: string;
+  reading_time?: number | null;
 }
 
-const { latestBerita } = Astro.props;
+const { latestBerita, language = "id" } = Astro.props;
+const locale = language === "en" ? "en-US" : "id-ID";
+const eyebrowLabel = language === "en" ? "Latest News" : "Berita Terbaru";
+const titleLead = language === "en" ? "Latest" : "Update";
+const titleRest = language === "en" ? "from the organization." : "dari organisasi.";
+const ctaLabel = language === "en" ? "Read →" : "Baca →";
 
-const formatDate = (dateStr: string) => {
-  return new Intl.DateTimeFormat("id-ID", {
+const formatDate = (dateStr: string | undefined) => {
+  if (!dateStr) return "";
+  return new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -27,10 +36,10 @@ const formatDate = (dateStr: string) => {
       <div class="news-latest-head-left">
         <div class="news-latest-eyebrow">
           <span class="news-latest-eyebrow-rule"></span>
-          <span>Berita Terbaru</span>
+          <span>{eyebrowLabel}</span>
         </div>
         <h2 id="news-latest-title" class="news-latest-title">
-          Update <em>terkini</em> dari organisasi.
+          {titleLead} <em>{language === "en" ? "updates" : "terkini"}</em> {titleRest}
         </h2>
       </div>
       <div class="news-latest-nav">
@@ -56,7 +65,18 @@ const formatDate = (dateStr: string) => {
               <article class="embla__slide-latest news-card">
                 <a href={`/berita/${berita.slug}`} class="news-card-link">
                   <div class="news-card-image">
-                    <img src={berita.thumbnail} alt={berita.judul} class="news-card-img" loading="lazy" />
+                    {berita.thumbnail ? (
+                      <img
+                        src={berita.thumbnail}
+                        alt={berita.image_alt ?? berita.judul}
+                        class="news-card-img"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div class="news-card-img news-card-img-fallback" aria-hidden="true">
+                        <span>{berita.category}</span>
+                      </div>
+                    )}
                     <div class="news-card-num">{String(idx + 1).padStart(2, "0")}</div>
                   </div>
                   <div class="news-card-content">
@@ -67,7 +87,7 @@ const formatDate = (dateStr: string) => {
                       <div class="news-card-meta">
                         {berita.author} · {formatDate(berita.date_created)}
                       </div>
-                      <span class="news-card-cta">Baca →</span>
+                      <span class="news-card-cta">{ctaLabel}</span>
                     </div>
                   </div>
                 </a>
@@ -325,6 +345,18 @@ const formatDate = (dateStr: string) => {
 
   .news-card:hover .news-card-img {
     transform: scale(1.04);
+  }
+
+  .news-card-img-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-sand), var(--color-background));
+    color: var(--color-primary);
+    font-family: "Fraunces", "Times New Roman", serif;
+    font-size: 18px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .news-card-num {

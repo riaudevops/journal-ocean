@@ -1,357 +1,556 @@
 ---
-// Preloader component dengan animasi yang mengikuti cursor
+// Editorial Warm preloader — jurnal laut, arsip, dan kompas kecil.
+import {
+  getPreloaderContentWithFallback,
+  normalizeSiteLanguage,
+} from "../../lib/directus";
+
+const language = normalizeSiteLanguage(Astro.url.searchParams.get("lang"));
+const preloaderContent = await getPreloaderContentWithFallback(language);
 ---
 
-<div id="preloader" class="fixed inset-0 z-[9999] bg-brand-primary flex items-center justify-center transition-opacity duration-500">
-  <!-- Background dengan pattern -->
-  <div class="absolute inset-0 overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-brand-primary via-brand-primary-darker to-brand-primary opacity-90"></div>
-    <div class="absolute inset-0 opacity-20">
-      <div class="absolute top-0 left-0 w-full h-full" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,0.05) 35px, rgba(255,255,255,0.05) 70px);"></div>
-    </div>
-  </div>
+<div
+  id="preloader"
+  class="preloader"
+  aria-live="polite"
+  aria-label={preloaderContent.aria_label}
+>
+  <div class="preloader__grain" aria-hidden="true"></div>
+  <div class="preloader__orb preloader__orb--sage" aria-hidden="true"></div>
+  <div class="preloader__orb preloader__orb--rust" aria-hidden="true"></div>
 
-  <!-- Content Container -->
-  <div class="relative z-10 flex flex-col items-center justify-center gap-8 text-center">
-    <!-- Logo/Text Journal Ocean -->
-    <div class="relative">
-      <h1 class="text-4xl md:text-6xl font-bold font-sora tracking-wider relative z-10">
-        <span class="bg-gradient-to-r from-brand-accent-gold via-brand-accent-orange to-brand-secondary bg-[length:200%_auto] bg-clip-text text-transparent animate-[gradient_3s_ease_infinite]"> JOURNAL OCEAN </span>
-      </h1>
-      <!-- Glow effect -->
-      <div class="absolute inset-0 bg-gradient-to-r from-brand-accent-gold/30 via-brand-accent-orange/30 to-brand-secondary/30 blur-2xl opacity-50 animate-pulse"></div>
+  <section class="preloader__card">
+    <div class="preloader__folio" aria-hidden="true">
+      <span>{preloaderContent.code_label}</span>
+      <span>{preloaderContent.coordinate_label}</span>
     </div>
 
-    <!-- Progress Bar (Optional) -->
-    <div class="w-64 md:w-80 h-1 bg-white/20 rounded-full overflow-hidden">
-      <div id="progress-bar" class="h-full bg-gradient-to-r from-brand-accent-gold via-brand-accent-orange to-brand-secondary rounded-full transition-all duration-300" style="width: 0%"></div>
+    <div class="preloader__mark" aria-hidden="true">
+      <div class="preloader__rings">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="preloader__compass">
+        <span class="preloader__needle"></span>
+        <span class="preloader__dot"></span>
+      </div>
     </div>
-  </div>
 
-  <!-- Closing animation overlay -->
-  <div id="preloader-closing" class="absolute bg-brand-primary rounded-full opacity-0 pointer-events-none" style="left: 50%; top: 50%; width: 0; height: 0; transform: translate(-50%, -50%) scale(0);"></div>
+    <div class="preloader__copy">
+      <p class="preloader__eyebrow">{preloaderContent.eyebrow}</p>
+      <h1>{preloaderContent.title}</h1>
+      <p class="preloader__text">{preloaderContent.description}</p>
+    </div>
 
-  <!-- Cursor Effect -->
-  <div id="cursor-effect" class="absolute pointer-events-none opacity-0 z-[10000]" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
-    <!-- Ripple effect circles -->
-    <div id="cursor-ripple-1" class="absolute rounded-full border-4 border-brand-accent-gold opacity-0 w-20 h-20" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
-    <div id="cursor-ripple-2" class="absolute rounded-full border-4 border-brand-accent-orange opacity-0 w-20 h-20" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
-    <div id="cursor-ripple-3" class="absolute rounded-full border-4 border-brand-secondary opacity-0 w-20 h-20" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
-    <!-- Center glow -->
-    <div id="cursor-glow" class="absolute rounded-full bg-gradient-to-r from-brand-accent-gold via-brand-accent-orange to-brand-secondary opacity-0 blur-xl w-20 h-20" style="left: 50%; top: 50%; transform: translate(-50%, -50%);"></div>
-  </div>
+    <div class="preloader__progress" aria-hidden="true">
+      <div id="progress-bar" class="preloader__progress-fill"></div>
+    </div>
+
+    <div class="preloader__footer" aria-hidden="true">
+      <span>{preloaderContent.footer_label}</span>
+      <span>{preloaderContent.loading_label}</span>
+    </div>
+  </section>
 </div>
 
 <style>
-  @keyframes gradient {
+  .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    padding: clamp(0.65rem, 3vw, 1.5rem);
+    color: #2a2e25;
+    background:
+      radial-gradient(
+        circle at 18% 18%,
+        rgba(164, 178, 147, 0.34),
+        transparent 28rem
+      ),
+      radial-gradient(
+        circle at 82% 76%,
+        rgba(184, 112, 74, 0.18),
+        transparent 24rem
+      ),
+      linear-gradient(135deg, #f7f2e7 0%, #ebe3d2 100%);
+    transition:
+      opacity 520ms ease,
+      visibility 520ms ease;
+  }
+
+  .preloader.is-leaving {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .preloader__grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.42;
+    background-image:
+      linear-gradient(rgba(74, 93, 63, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74, 93, 63, 0.032) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: radial-gradient(circle at center, black, transparent 76%);
+  }
+
+  .preloader__orb {
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(10px);
+    opacity: 0.62;
+    animation: drift 5.8s ease-in-out infinite alternate;
+  }
+
+  .preloader__orb--sage {
+    top: 14%;
+    left: 10%;
+    width: 10rem;
+    height: 10rem;
+    background: rgba(164, 178, 147, 0.28);
+  }
+
+  .preloader__orb--rust {
+    right: 12%;
+    bottom: 12%;
+    width: 8rem;
+    height: 8rem;
+    background: rgba(184, 112, 74, 0.16);
+    animation-delay: -1.2s;
+  }
+
+  .preloader__card {
+    position: relative;
+    box-sizing: border-box;
+    width: min(100%, 720px);
+    min-height: clamp(360px, 68dvh, 430px);
+    max-height: calc(100dvh - clamp(1.3rem, 6vw, 3rem));
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1fr);
+    gap: clamp(1rem, 3.5vw, 2.75rem);
+    align-items: center;
+    padding: clamp(1.5rem, 4vw, 3.2rem);
+    border: 1px solid rgba(74, 93, 63, 0.16);
+    border-radius: 2.25rem;
+    background:
+      linear-gradient(
+        115deg,
+        rgba(255, 253, 247, 0.88),
+        rgba(235, 227, 210, 0.76)
+      ),
+      #fffdf7;
+    box-shadow: 0 32px 90px rgba(74, 93, 63, 0.16);
+    isolation: isolate;
+  }
+
+  .preloader__card::before {
+    content: '';
+    position: absolute;
+    inset: 1rem;
+    z-index: -1;
+    border: 1px dashed rgba(74, 93, 63, 0.22);
+    border-radius: 1.65rem;
+  }
+
+  .preloader__folio,
+  .preloader__footer {
+    position: absolute;
+    left: clamp(1.5rem, 4vw, 3.2rem);
+    right: clamp(1.5rem, 4vw, 3.2rem);
+    display: flex;
+    justify-content: space-between;
+    min-width: 0;
+    gap: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(74, 93, 63, 0.68);
+  }
+
+  .preloader__folio span,
+  .preloader__footer span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .preloader__folio {
+    top: 1.3rem;
+  }
+
+  .preloader__footer {
+    bottom: 1.25rem;
+  }
+
+  .preloader__mark {
+    position: relative;
+    aspect-ratio: 1;
+    width: clamp(8.75rem, 28vw, 240px);
+    justify-self: center;
+  }
+
+  .preloader__rings,
+  .preloader__rings span,
+  .preloader__compass {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+  }
+
+  .preloader__rings {
+    border: 1px solid rgba(74, 93, 63, 0.18);
+    background:
+      repeating-radial-gradient(
+        circle,
+        transparent 0 15px,
+        rgba(74, 93, 63, 0.045) 16px 17px
+      ),
+      rgba(235, 227, 210, 0.42);
+    animation: breathe 2.6s ease-in-out infinite;
+  }
+
+  .preloader__rings span {
+    border: 1px solid rgba(74, 93, 63, 0.16);
+    transform: scale(var(--scale));
+  }
+
+  .preloader__rings span:nth-child(1) {
+    --scale: 0.76;
+  }
+
+  .preloader__rings span:nth-child(2) {
+    --scale: 0.52;
+  }
+
+  .preloader__rings span:nth-child(3) {
+    --scale: 0.28;
+    background: #f7f2e7;
+  }
+
+  .preloader__compass {
+    display: grid;
+    place-items: center;
+    animation: compass-turn 4s cubic-bezier(0.7, 0, 0.25, 1) infinite;
+  }
+
+  .preloader__needle {
+    width: 0.35rem;
+    height: 54%;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #b8704a 0 48%, #4a5d3f 52% 100%);
+    box-shadow: 0 10px 28px rgba(74, 93, 63, 0.18);
+  }
+
+  .preloader__dot {
+    position: absolute;
+    width: 1.15rem;
+    height: 1.15rem;
+    border: 3px solid #f7f2e7;
+    border-radius: 999px;
+    background: #4a5d3f;
+  }
+
+  .preloader__copy {
+    min-width: 0;
+    padding-block: 2.25rem;
+  }
+
+  .preloader__eyebrow {
+    margin: 0 0 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(0.58rem, 1.8vw, 0.72rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6b7a5a;
+  }
+
+  .preloader__copy h1 {
+    margin: 0;
+    max-width: 11ch;
+    font-family: 'Fraunces', 'Times New Roman', serif;
+    font-size: clamp(2.15rem, 7vw, 5.2rem);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: -0.055em;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+    color: #2a2e25;
+  }
+
+  .preloader__text {
+    max-width: 29rem;
+    margin: 1.35rem 0 0;
+    font-size: clamp(0.86rem, 2.3vw, 0.98rem);
+    line-height: 1.8;
+    color: rgba(42, 46, 37, 0.68);
+  }
+
+  .preloader__progress {
+    position: absolute;
+    left: clamp(1.5rem, 4vw, 3.2rem);
+    right: clamp(1.5rem, 4vw, 3.2rem);
+    bottom: 3.55rem;
+    height: 0.42rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(74, 93, 63, 0.12);
+  }
+
+  .preloader__progress-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #4a5d3f, #a4b293 48%, #b8704a);
+    transition: width 180ms ease;
+  }
+
+  @keyframes compass-turn {
+    0% {
+      transform: rotate(-18deg);
+    }
+    45% {
+      transform: rotate(204deg);
+    }
+    70% {
+      transform: rotate(174deg);
+    }
+    100% {
+      transform: rotate(342deg);
+    }
+  }
+
+  @keyframes breathe {
     0%,
     100% {
-      background-position: 0% 50%;
+      transform: scale(0.98);
     }
     50% {
-      background-position: 100% 50%;
+      transform: scale(1.03);
+    }
+  }
+
+  @keyframes drift {
+    from {
+      transform: translate3d(-0.75rem, 0.35rem, 0) scale(1);
+    }
+    to {
+      transform: translate3d(0.9rem, -0.8rem, 0) scale(1.08);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .preloader__card {
+      min-height: min(620px, calc(100dvh - 1.5rem));
+      grid-template-columns: 1fr;
+      align-content: center;
+      justify-items: center;
+      padding: clamp(1.6rem, 6vw, 2.4rem);
+      padding-block: 4.35rem 4.8rem;
+      text-align: center;
+    }
+
+    .preloader__card::before {
+      inset: 0.72rem;
+      border-radius: 1.35rem;
+    }
+
+    .preloader__folio,
+    .preloader__footer {
+      left: clamp(1.25rem, 6vw, 2rem);
+      right: clamp(1.25rem, 6vw, 2rem);
+      font-size: clamp(0.54rem, 2.15vw, 0.64rem);
+      letter-spacing: 0.11em;
+    }
+
+    .preloader__mark {
+      width: clamp(7.75rem, 44vw, 180px);
+    }
+
+    .preloader__copy {
+      padding-block: 0;
+    }
+
+    .preloader__copy h1,
+    .preloader__text {
+      margin-inline: auto;
+    }
+
+    .preloader__copy h1 {
+      max-width: 12ch;
+      font-size: clamp(2rem, 11vw, 3.45rem);
+      line-height: 0.95;
+    }
+
+    .preloader__text {
+      max-width: 28ch;
+      margin-top: 1rem;
+      line-height: 1.65;
+    }
+
+    .preloader__progress {
+      left: clamp(1.25rem, 6vw, 2rem);
+      right: clamp(1.25rem, 6vw, 2rem);
+      bottom: 3.25rem;
+    }
+  }
+
+  @media (max-width: 420px), (max-height: 620px) {
+    .preloader__card {
+      border-radius: 1.55rem;
+      min-height: auto;
+      max-height: calc(100dvh - 1rem);
+      padding: 3.7rem 1rem 4.15rem;
+      gap: 0.8rem;
+    }
+
+    .preloader__card::before {
+      inset: 0.55rem;
+      border-radius: 1.1rem;
+    }
+
+    .preloader__folio,
+    .preloader__footer {
+      left: 1rem;
+      right: 1rem;
+      gap: 0.45rem;
+      font-size: 0.5rem;
+      letter-spacing: 0.08em;
+    }
+
+    .preloader__folio {
+      top: 1rem;
+    }
+
+    .preloader__footer {
+      bottom: 0.95rem;
+    }
+
+    .preloader__mark {
+      width: clamp(6.6rem, 36dvh, 8.75rem);
+    }
+
+    .preloader__eyebrow {
+      margin-bottom: 0.65rem;
+      letter-spacing: 0.12em;
+    }
+
+    .preloader__copy h1 {
+      max-width: 11ch;
+      font-size: clamp(1.75rem, 10.5vw, 2.65rem);
+      letter-spacing: -0.04em;
+    }
+
+    .preloader__text {
+      max-width: 27ch;
+      margin-top: 0.8rem;
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+
+    .preloader__progress {
+      left: 1rem;
+      right: 1rem;
+      bottom: 2.75rem;
+      height: 0.34rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .preloader *,
+    .preloader *::before,
+    .preloader *::after {
+      animation: none !important;
+      transition-duration: 1ms !important;
     }
   }
 </style>
 
 <script>
-  // Track cursor position
-  let cursorX = window.innerWidth / 2;
-  let cursorY = window.innerHeight / 2;
-  let hasCursorPosition = false;
-
-  // Track mouse movement - update immediately on any mouse activity
-  const trackMouse = (e: MouseEvent) => {
-    cursorX = e.clientX;
-    cursorY = e.clientY;
-    hasCursorPosition = true;
-  };
-
-  // Track mouse position on any mouse event (move, enter, over)
-  const trackMouseEnter = (e: MouseEvent) => {
-    cursorX = e.clientX;
-    cursorY = e.clientY;
-    hasCursorPosition = true;
-  };
-
-  const trackMouseOver = (e: MouseEvent) => {
-    cursorX = e.clientX;
-    cursorY = e.clientY;
-    hasCursorPosition = true;
-  };
-
-  // Add multiple event listeners to catch cursor position
-  document.addEventListener("mousemove", trackMouse, { passive: true });
-  document.addEventListener("mouseenter", trackMouseEnter, { passive: true });
-  document.addEventListener("mouseover", trackMouseOver, { passive: true });
-
-  // Initialize with center position
-  cursorX = window.innerWidth / 2;
-  cursorY = window.innerHeight / 2;
-
-  // Also track touch for mobile
-  const updateTouchPosition = (e: TouchEvent) => {
-    if (e.touches.length > 0) {
-      cursorX = e.touches[0].clientX;
-      cursorY = e.touches[0].clientY;
-      hasCursorPosition = true;
-    }
-  };
-  document.addEventListener("touchstart", updateTouchPosition);
-  document.addEventListener("touchmove", updateTouchPosition);
-
-  // Wait for critical resources to load (optimized for faster loading)
-  const waitForImages = (): Promise<void> => {
-    return new Promise((resolve) => {
-      // Only wait for images that are above the fold or critical
-      const images = Array.from(document.querySelectorAll("img"));
-      const criticalImages = images.filter((img) => {
-        // Check if image is in viewport or has loading="eager"
-        const rect = img.getBoundingClientRect();
-        const isAboveFold = rect.top < window.innerHeight * 2;
-        const isEager = img.getAttribute("loading") === "eager" || !img.hasAttribute("loading");
-        return isAboveFold || isEager;
-      });
-
-      const imagePromises = criticalImages.map((img) => {
-        if (img.complete) return Promise.resolve();
-        return new Promise<void>((imgResolve) => {
-          // Timeout after 1 second to prevent waiting too long
-          const timeout = setTimeout(() => imgResolve(), 1000);
-          img.onload = () => {
-            clearTimeout(timeout);
-            imgResolve();
-          };
-          img.onerror = () => {
-            clearTimeout(timeout);
-            imgResolve(); // Resolve even on error
-          };
-        });
-      });
-
-      // Set minimum display time for smooth UX (reduced from 300ms to 100ms)
-      const minDisplayTime = 100;
-
-      if (document.readyState === "complete") {
-        Promise.all(imagePromises).then(() => {
-          setTimeout(() => resolve(), minDisplayTime);
-        });
-      } else {
-        // Wait for DOMContentLoaded instead of full load for faster response
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", () => {
-            Promise.all(imagePromises).then(() => {
-              setTimeout(() => resolve(), minDisplayTime);
-            });
-          });
-        } else {
-          Promise.all(imagePromises).then(() => {
-            setTimeout(() => resolve(), minDisplayTime);
-          });
-        }
-      }
+  const waitForCriticalImages = (): Promise<void> => {
+    const images = Array.from(document.querySelectorAll('img'));
+    const criticalImages = images.filter((img) => {
+      const rect = img.getBoundingClientRect();
+      const isAboveFold = rect.top < window.innerHeight * 1.5;
+      const isEager =
+        img.getAttribute('loading') === 'eager' || !img.hasAttribute('loading');
+      return isAboveFold || isEager;
     });
+
+    const imagePromises = criticalImages.map((img) => {
+      if (img.complete) return Promise.resolve();
+      return new Promise<void>((resolve) => {
+        const timeout = window.setTimeout(resolve, 900);
+        img.addEventListener(
+          'load',
+          () => {
+            window.clearTimeout(timeout);
+            resolve();
+          },
+          { once: true }
+        );
+        img.addEventListener(
+          'error',
+          () => {
+            window.clearTimeout(timeout);
+            resolve();
+          },
+          { once: true }
+        );
+      });
+    });
+
+    return Promise.all(imagePromises).then(() => undefined);
   };
 
-  // Simulate progress bar (faster progression)
-  const simulateProgress = () => {
-    const progressBar = document.getElementById("progress-bar");
-    if (!progressBar) return;
-
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += Math.random() * 20 + 10; // Faster progression (10-30 per interval)
-      if (progress > 95) progress = 95; // Don't complete until everything is loaded
-      progressBar.style.width = `${progress}%`;
-    }, 80); // Faster interval (80ms instead of 100ms)
-
-    return interval;
-  };
-
-  // Animate closing with cursor position and cursor effect
-  const animateClosing = () => {
-    const preloader = document.getElementById("preloader");
-    const closingOverlay = document.getElementById("preloader-closing");
-    const cursorEffect = document.getElementById("cursor-effect");
-    const cursorRipple1 = document.getElementById("cursor-ripple-1");
-    const cursorRipple2 = document.getElementById("cursor-ripple-2");
-    const cursorRipple3 = document.getElementById("cursor-ripple-3");
-    const cursorGlow = document.getElementById("cursor-glow");
-
-    if (!preloader || !closingOverlay || !cursorEffect) return;
-
-    // Get the latest cursor position at the moment of closing
-    let targetX = cursorX;
-    let targetY = cursorY;
-
-    const isInitialCenter = targetX === window.innerWidth / 2 && targetY === window.innerHeight / 2;
-
-    // If we have a valid cursor position that's not the initial center, use it
-    if (hasCursorPosition && !isNaN(targetX) && !isNaN(targetY) && !isInitialCenter) {
-      targetX = cursorX;
-      targetY = cursorY;
-    } else {
-      // Fallback to center if no valid cursor position
-      targetX = window.innerWidth / 2;
-      targetY = window.innerHeight / 2;
-    }
-
-    // Ensure coordinates are within viewport bounds
-    targetX = Math.max(0, Math.min(targetX, window.innerWidth));
-    targetY = Math.max(0, Math.min(targetY, window.innerHeight));
-
-    // Position cursor effect at cursor location
-    cursorEffect.style.left = `${targetX}px`;
-    cursorEffect.style.top = `${targetY}px`;
-    cursorEffect.style.transform = "translate(-50%, -50%)";
-
-    // Calculate distance from all corners to determine max radius needed
-    const distances = [
-      Math.sqrt(Math.pow(targetX, 2) + Math.pow(targetY, 2)), // Top-left
-      Math.sqrt(Math.pow(window.innerWidth - targetX, 2) + Math.pow(targetY, 2)), // Top-right
-      Math.sqrt(Math.pow(targetX, 2) + Math.pow(window.innerHeight - targetY, 2)), // Bottom-left
-      Math.sqrt(Math.pow(window.innerWidth - targetX, 2) + Math.pow(window.innerHeight - targetY, 2)), // Bottom-right
-    ];
-    const maxRadius = Math.max(...distances) * 1.5; // Add extra for smooth coverage
-    const diameter = maxRadius * 2;
-
-    // Set initial position for closing overlay
-    closingOverlay.style.left = `${targetX}px`;
-    closingOverlay.style.top = `${targetY}px`;
-    closingOverlay.style.transform = "translate(-50%, -50%) scale(0)";
-    closingOverlay.style.width = `${diameter}px`;
-    closingOverlay.style.height = `${diameter}px`;
-
-    // Trigger reflow
-    closingOverlay.offsetHeight;
-
-    // Start cursor effect animation
-    setTimeout(() => {
-      cursorEffect.style.opacity = "1";
-      cursorEffect.style.transition = "opacity 0.3s ease-out";
-
-      // Animate ripple effects
-      if (cursorRipple1 && cursorRipple2 && cursorRipple3) {
-        // Ripple 1 - immediate
-        cursorRipple1.style.transition = "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)";
-        cursorRipple1.style.opacity = "1";
-        cursorRipple1.style.transform = "translate(-50%, -50%) scale(4)";
-        cursorRipple1.style.width = "80px";
-        cursorRipple1.style.height = "80px";
-
-        // Ripple 2 (delayed)
-        setTimeout(() => {
-          cursorRipple2.style.transition = "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)";
-          cursorRipple2.style.opacity = "0.7";
-          cursorRipple2.style.transform = "translate(-50%, -50%) scale(5)";
-          cursorRipple2.style.width = "80px";
-          cursorRipple2.style.height = "80px";
-        }, 100);
-
-        // Ripple 3 (more delayed)
-        setTimeout(() => {
-          cursorRipple3.style.transition = "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)";
-          cursorRipple3.style.opacity = "0.5";
-          cursorRipple3.style.transform = "translate(-50%, -50%) scale(6)";
-          cursorRipple3.style.width = "80px";
-          cursorRipple3.style.height = "80px";
-        }, 200);
-      }
-
-      // Animate glow effect
-      if (cursorGlow) {
-        cursorGlow.style.transition = "opacity 0.4s ease-out, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)";
-        cursorGlow.style.opacity = "0.8";
-        cursorGlow.style.transform = "translate(-50%, -50%) scale(3)";
-      }
-    }, 10);
-
-    // Start closing animation
-    setTimeout(() => {
-      closingOverlay.style.opacity = "1";
-      closingOverlay.style.transform = "translate(-50%, -50%) scale(1)";
-      closingOverlay.style.transition = "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease-out";
-    }, 10);
-
-    // Fade out preloader content
-    setTimeout(() => {
-      preloader.style.opacity = "0";
-      preloader.style.transition = "opacity 0.3s ease-out";
-    }, 50);
-
-    // Fade out cursor effect
-    setTimeout(() => {
-      if (cursorEffect) {
-        cursorEffect.style.opacity = "0";
-        cursorEffect.style.transition = "opacity 0.3s ease-out";
-      }
-    }, 400);
-
-    // Remove preloader after animation
-    setTimeout(() => {
-      preloader.style.display = "none";
-      document.body.style.overflow = "";
-      // Clean up event listeners
-      document.removeEventListener("mousemove", trackMouse);
-      document.removeEventListener("mouseenter", trackMouseEnter);
-      document.removeEventListener("mouseover", trackMouseOver);
-      document.removeEventListener("touchstart", updateTouchPosition);
-      document.removeEventListener("touchmove", updateTouchPosition);
-    }, 700);
-  };
-
-  // Initialize preloader
   const initPreloader = async () => {
-    const preloader = document.getElementById("preloader");
-    if (!preloader) return;
+    const preloader = document.getElementById('preloader');
+    const progressBar = document.getElementById('progress-bar');
+    if (!preloader || !progressBar) return;
 
-    // Prevent body scroll
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow = 'hidden';
 
-    // Start progress bar simulation
-    const progressInterval = simulateProgress();
+    let progress = 8;
+    progressBar.style.width = `${progress}%`;
 
-    // Set maximum wait time (2 seconds) to prevent preloader from showing too long
-    const maxWaitTime = setTimeout(() => {
-      // Force close if taking too long
-      const progressBar = document.getElementById("progress-bar");
-      if (progressBar) {
-        progressBar.style.width = "100%";
-      }
-      if (progressInterval) {
-        clearInterval(progressInterval);
-      }
-      setTimeout(() => {
-        animateClosing();
-      }, 100);
-    }, 2000);
+    const progressInterval = window.setInterval(() => {
+      progress = Math.min(92, progress + Math.random() * 14 + 6);
+      progressBar.style.width = `${progress}%`;
+    }, 110);
 
-    // Wait for critical resources to load
-    await waitForImages();
+    const closePreloader = () => {
+      window.clearInterval(progressInterval);
+      progressBar.style.width = '100%';
 
-    // Clear max wait timeout since we loaded successfully
-    clearTimeout(maxWaitTime);
+      window.setTimeout(() => {
+        preloader.classList.add('is-leaving');
+        document.body.style.overflow = '';
+      }, 180);
 
-    // Complete progress bar
-    const progressBar = document.getElementById("progress-bar");
-    if (progressBar) {
-      progressBar.style.width = "100%";
-    }
+      window.setTimeout(() => {
+        preloader.remove();
+      }, 760);
+    };
 
-    // Clear progress interval
-    if (progressInterval) {
-      clearInterval(progressInterval);
-    }
+    const maxWait = new Promise<void>((resolve) => {
+      window.setTimeout(resolve, 1900);
+    });
 
-    // Wait a bit more for smooth transition (reduced from 200ms to 100ms)
-    setTimeout(() => {
-      animateClosing();
-    }, 100);
+    await Promise.race([waitForCriticalImages(), maxWait]);
+    closePreloader();
   };
 
-  // Start preloader when DOM is ready
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initPreloader);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPreloader, {
+      once: true,
+    });
   } else {
     initPreloader();
   }
