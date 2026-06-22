@@ -102,7 +102,7 @@ const preloaderContent = await getPreloaderContentWithFallback(language);
     border-radius: 999px;
     filter: blur(10px);
     opacity: 0.62;
-    animation: drift 5.8s ease-in-out infinite alternate;
+    animation: preloader-drift 5.8s ease-in-out infinite alternate;
   }
 
   .preloader__orb--sage {
@@ -213,7 +213,7 @@ const preloaderContent = await getPreloaderContentWithFallback(language);
         rgba(74, 93, 63, 0.045) 16px 17px
       ),
       rgba(235, 227, 210, 0.42);
-    animation: breathe 2.6s ease-in-out infinite;
+    animation: preloader-breathe 2.6s ease-in-out infinite;
   }
 
   .preloader__rings span {
@@ -237,7 +237,7 @@ const preloaderContent = await getPreloaderContentWithFallback(language);
   .preloader__compass {
     display: grid;
     place-items: center;
-    animation: compass-turn 4s cubic-bezier(0.7, 0, 0.25, 1) infinite;
+    animation: preloader-compass 4s cubic-bezier(0.7, 0, 0.25, 1) infinite;
   }
 
   .preloader__needle {
@@ -312,39 +312,7 @@ const preloaderContent = await getPreloaderContentWithFallback(language);
     transition: width 180ms ease;
   }
 
-  @keyframes compass-turn {
-    0% {
-      transform: rotate(-18deg);
-    }
-    45% {
-      transform: rotate(204deg);
-    }
-    70% {
-      transform: rotate(174deg);
-    }
-    100% {
-      transform: rotate(342deg);
-    }
-  }
 
-  @keyframes breathe {
-    0%,
-    100% {
-      transform: scale(0.98);
-    }
-    50% {
-      transform: scale(1.03);
-    }
-  }
-
-  @keyframes drift {
-    from {
-      transform: translate3d(-0.75rem, 0.35rem, 0) scale(1);
-    }
-    to {
-      transform: translate3d(0.9rem, -0.8rem, 0) scale(1.08);
-    }
-  }
 
   @media (max-width: 720px) {
     .preloader__card {
@@ -463,14 +431,7 @@ const preloaderContent = await getPreloaderContentWithFallback(language);
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .preloader *,
-    .preloader *::before,
-    .preloader *::after {
-      animation: none !important;
-      transition-duration: 1ms !important;
-    }
-  }
+
 </style>
 
 <script>

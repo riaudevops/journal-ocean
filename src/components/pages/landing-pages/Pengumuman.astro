@@ -1,125 +1,93 @@
 ---
-import { ArrowRight } from "@lucide/astro";
+import { ArrowRight } from '@lucide/astro';
 import {
   getAnnouncementContentWithFallback,
   getHomeNews,
   normalizeSiteLanguage,
-} from "../../../lib/directus";
+} from '../../../lib/directus';
 
-const language = normalizeSiteLanguage(Astro.url.searchParams.get("lang"));
+const language = normalizeSiteLanguage(Astro.url.searchParams.get('lang'));
 const announcement = await getAnnouncementContentWithFallback(language);
 const pengumumanData = await getHomeNews(language, 5);
-const headerTitle = announcement.title ?? "Berita & Pengumuman";
-const headerSubtitle = announcement.subtitle ?? "Kabar terbaru dari Journal Ocean.";
-const headerQuote =
-  announcement.quote ??
-  "\"Cerita-cerita kecil yang membentuk dampak yang lebih besar.\"";
-const headerViewAll = announcement.view_all ?? "Lihat Semua Berita";
-const linkHref = "/berita";
-const readMoreLabel = language === "en" ? "Read More" : "Baca Selengkapnya";
-const minuteLabel = language === "en" ? "min read" : "min baca";
-const locale = language === "en" ? "en-US" : "id-ID";
+const headerTitle = announcement.title ?? 'Berita & Pengumuman';
+const headerSubtitle = announcement.subtitle ?? 'Kabar terbaru dari Journal Ocean.';
+const headerQuote = announcement.quote ?? '"Cerita-cerita kecil yang membentuk dampak yang lebih besar."';
+const headerViewAll = announcement.view_all ?? 'Lihat Semua Berita';
+const linkHref = '/berita';
+const readMoreLabel = language === 'en' ? 'Read More' : 'Baca Selengkapnya';
+const minuteLabel = language === 'en' ? 'min read' : 'min baca';
+const locale = language === 'en' ? 'en-US' : 'id-ID';
 const langQuery = `?lang=${language}`;
 const featuredNews = pengumumanData[0];
 const sideNews = pengumumanData.slice(1, 5);
 ---
 
-<section class="news-section">
-  <div class="news-inner">
-    <!-- Header: title + side quote -->
-    <div class="news-head">
-      <div class="news-head-left">
-        <div class="news-eyebrow">
-          <span>{headerTitle}</span>
-        </div>
-        <h2 class="news-title">
+<section class="bg-brand-background px-8 py-32 max-[640px]:px-5 max-[640px]:py-22">
+  <div class="mx-auto max-w-[1320px]">
+    <div class="mb-[72px] grid grid-cols-[1.5fr_1fr] items-end gap-12 border-b border-brand-border pb-8 max-[960px]:grid-cols-1 max-[960px]:mb-12 max-[960px]:gap-6">
+      <div>
+        <div class="mb-5 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">{headerTitle}</div>
+        <h2 class="m-0 max-w-[14ch] font-serif text-[clamp(40px,5vw,64px)] font-normal leading-[1.05] tracking-[-0.025em] text-brand-ink [&_em]:italic [&_em]:text-brand-primary">
           {headerSubtitle}
         </h2>
       </div>
-      <div class="news-head-side">
-        <p>{headerQuote}</p>
-        <a href={`${linkHref}${langQuery}`} class="news-side-cta">
+      <div class="max-w-[36ch] font-serif text-right text-lg italic leading-[1.5] text-brand-ink-soft max-[960px]:text-left">
+        <p class="m-0 mb-4">{headerQuote}</p>
+        <a href={`${linkHref}${langQuery}`} class="inline-flex items-center gap-2 border-b-[1.5px] border-brand-primary pb-1 font-sans text-xs font-semibold uppercase tracking-[0.15em] text-brand-primary no-underline transition-all duration-300 hover:gap-3.5">
           {headerViewAll}
-          <ArrowRight class="w-3.5 h-3.5" />
+          <ArrowRight class="h-3.5 w-3.5" />
         </a>
       </div>
     </div>
 
-    <!-- News Grid: 1 besar kiri + 4 kecil kanan -->
     {featuredNews && (
-      <div class="news-grid">
-        <article class="news-card feature">
-          <a href={`/berita/${featuredNews.slug}${langQuery}`} class="news-img-wrap">
+      <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] items-stretch gap-8 max-[960px]:grid-cols-1 max-[960px]:gap-12">
+        <article class="flex min-w-0 flex-col">
+          <a href={`/berita/${featuredNews.slug}${langQuery}`} class="relative mb-6 block overflow-hidden rounded">
             {featuredNews.url_thumbnail ? (
-              <img
-                src={featuredNews.url_thumbnail}
-                alt={featuredNews.image_alt ?? featuredNews.judul}
-                class="news-img"
-                loading="lazy"
-              />
+              <img src={featuredNews.url_thumbnail} alt={featuredNews.image_alt ?? featuredNews.judul} class="aspect-[4/5] w-full object-cover saturate-[0.85] transition-transform duration-600 hover:scale-[1.04]" loading="lazy" />
             ) : (
-              <div class="news-img news-img-fallback" aria-hidden="true">
+              <div class="flex aspect-[4/5] w-full items-center justify-center bg-[linear-gradient(135deg,var(--color-sand),var(--color-surface))] font-serif text-lg tracking-[0.08em] uppercase text-brand-primary" aria-hidden="true">
                 <span>{featuredNews.category}</span>
               </div>
             )}
           </a>
-          <div class="news-meta">
-            <span>
-              {new Intl.DateTimeFormat(locale, {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              }).format(new Date(featuredNews.date_created ?? ""))}
-            </span>
-            <span class="news-meta-dot"></span>
+          <div class="mb-2.5 flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.12em] text-brand-primary">
+            <span>{new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(featuredNews.date_created ?? ''))}</span>
+            <span class="h-1 w-1 rounded-full bg-brand-primary"></span>
             <span>{featuredNews.reading_time ?? 3} {minuteLabel}</span>
           </div>
-          <h3 class="news-card-title feature">
-            <a href={`/berita/${featuredNews.slug}${langQuery}`}>{featuredNews.judul}</a>
+          <h3 class="m-0 mb-3 font-serif text-[32px] font-medium leading-[1.2] tracking-[-0.015em] text-brand-ink">
+            <a href={`/berita/${featuredNews.slug}${langQuery}`} class="text-brand-ink no-underline transition-colors hover:text-brand-primary">{featuredNews.judul}</a>
           </h3>
-          <p class="news-card-excerpt">
-            {featuredNews.excerpt.substring(0, 200)}...
-          </p>
-          <a href={`/berita/${featuredNews.slug}${langQuery}`} class="news-card-link">
+          <p class="m-0 mb-4 text-[14.5px] leading-[1.6] text-brand-ink-soft">{featuredNews.excerpt.substring(0, 200)}...</p>
+          <a href={`/berita/${featuredNews.slug}${langQuery}`} class="mt-auto inline-flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-[0.15em] text-brand-primary transition-all duration-300 hover:gap-3">
             {readMoreLabel}
-            <ArrowRight class="w-3.5 h-3.5" />
+            <ArrowRight class="h-3.5 w-3.5" />
           </a>
         </article>
 
-        <div class="news-side-grid">
+        <div class="grid grid-cols-2 gap-7 gap-y-8 max-[640px]:grid-cols-1 max-[640px]:gap-9">
           {sideNews.map((pengumuman) => (
-            <article class="news-card compact">
-              <a href={`/berita/${pengumuman.slug}${langQuery}`} class="news-img-wrap compact">
+            <article class="group relative flex min-w-0 flex-col">
+              <a href={`/berita/${pengumuman.slug}${langQuery}`} class="relative mb-4 block overflow-hidden rounded">
                 {pengumuman.url_thumbnail ? (
-                  <img
-                    src={pengumuman.url_thumbnail}
-                    alt={pengumuman.image_alt ?? pengumuman.judul}
-                    class="news-img"
-                    loading="lazy"
-                  />
+                  <img src={pengumuman.url_thumbnail} alt={pengumuman.image_alt ?? pengumuman.judul} class="aspect-[16/10] w-full object-cover saturate-[0.85] transition-transform duration-600 group-hover:scale-[1.04]" loading="lazy" />
                 ) : (
-                  <div class="news-img news-img-fallback" aria-hidden="true">
+                  <div class="flex aspect-[16/10] w-full items-center justify-center bg-[linear-gradient(135deg,var(--color-sand),var(--color-surface))] font-serif text-lg tracking-[0.08em] uppercase text-brand-primary" aria-hidden="true">
                     <span>{pengumuman.category}</span>
                   </div>
                 )}
               </a>
-              <div class="news-meta compact">
-                <span>
-                  {new Intl.DateTimeFormat(locale, {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  }).format(new Date(pengumuman.date_created ?? ""))}
-                </span>
-                <span class="news-meta-dot"></span>
+              <div class="mb-2 flex flex-wrap items-center gap-2 text-[10px] font-medium tracking-[0.09em] uppercase text-brand-primary">
+                <span>{new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(pengumuman.date_created ?? ''))}</span>
+                <span class="h-1 w-1 rounded-full bg-brand-primary"></span>
                 <span>{pengumuman.reading_time ?? 3} {minuteLabel}</span>
               </div>
-              <h3 class="news-card-title compact">
-                <a href={`/berita/${pengumuman.slug}${langQuery}`}>{pengumuman.judul}</a>
+              <h3 class="m-0 mb-2 font-serif text-[clamp(18px,1.8vw,22px)] font-medium leading-[1.2] tracking-[-0.015em] text-brand-ink">
+                <a href={`/berita/${pengumuman.slug}${langQuery}`} class="text-brand-ink no-underline transition-colors hover:text-brand-primary">{pengumuman.judul}</a>
               </h3>
-              <p class="news-card-excerpt compact">
-                {pengumuman.excerpt.substring(0, 92)}...
-              </p>
+              <p class="m-0 text-[13.5px] leading-[1.55] text-brand-ink-soft">{pengumuman.excerpt.substring(0, 92)}...</p>
             </article>
           ))}
         </div>
@@ -127,272 +95,3 @@ const sideNews = pengumumanData.slice(1, 5);
     )}
   </div>
 </section>
-
-<style>
-  .news-section {
-    background: var(--color-background);
-    padding: 128px 32px;
-  }
-
-  .news-inner {
-    max-width: 1320px;
-    margin: 0 auto;
-  }
-
-  /* Header */
-  .news-head {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    align-items: end;
-    gap: 48px;
-    margin-bottom: 72px;
-    padding-bottom: 32px;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .news-eyebrow {
-    font-size: 11.5px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    margin-bottom: 20px;
-  }
-
-  .news-title {
-    font-family: 'Fraunces', 'Times New Roman', serif;
-    font-weight: 400;
-    font-size: clamp(40px, 5vw, 64px);
-    line-height: 1.05;
-    letter-spacing: -0.025em;
-    max-width: 14ch;
-    margin: 0;
-  }
-
-  .news-title em {
-    font-style: italic;
-    color: var(--color-primary);
-  }
-
-  .news-head-side {
-    text-align: right;
-    font-family: 'Fraunces', 'Times New Roman', serif;
-    font-style: italic;
-    font-size: 18px;
-    line-height: 1.5;
-    color: var(--color-text-secondary);
-    max-width: 36ch;
-    margin-left: auto;
-  }
-
-  .news-head-side p {
-    margin: 0 0 16px 0;
-  }
-
-  .news-side-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'Inter', sans-serif;
-    font-style: normal;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    text-decoration: none;
-    padding-bottom: 4px;
-    border-bottom: 1.5px solid var(--color-primary);
-    transition: gap 0.3s;
-  }
-
-  .news-side-cta:hover {
-    gap: 14px;
-  }
-
-  /* Grid */
-  .news-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    gap: 32px;
-    align-items: stretch;
-  }
-
-  .news-side-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 28px 24px;
-  }
-
-  .news-card {
-    position: relative;
-    min-width: 0;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .news-img-wrap {
-    position: relative;
-    overflow: hidden;
-    display: block;
-    border-radius: 4px;
-    margin-bottom: 24px;
-  }
-
-  .news-img-wrap.compact {
-    margin-bottom: 16px;
-  }
-
-  .news-img {
-    width: 100%;
-    aspect-ratio: 4/3;
-    object-fit: cover;
-    filter: saturate(0.85);
-    transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
-  }
-
-  .news-card.feature .news-img {
-    aspect-ratio: 4/5;
-  }
-
-  .news-card.compact .news-img {
-    aspect-ratio: 16/10;
-  }
-
-  .news-card:hover .news-img {
-    transform: scale(1.04);
-  }
-
-  .news-img-fallback {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--color-sand), var(--color-surface));
-    color: var(--color-primary);
-    font-family: 'Fraunces', 'Times New Roman', serif;
-    font-size: 18px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .news-meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    margin: 0 0 10px 0;
-  }
-
-  .news-meta.compact {
-    gap: 8px;
-    font-size: 10px;
-    letter-spacing: 0.09em;
-    flex-wrap: wrap;
-  }
-
-  .news-meta-dot {
-    width: 4px;
-    height: 4px;
-    background: var(--color-primary);
-    border-radius: 50%;
-  }
-
-  .news-card-title {
-    font-family: 'Fraunces', 'Times New Roman', serif;
-    font-size: 22px;
-    font-weight: 500;
-    line-height: 1.2;
-    letter-spacing: -0.015em;
-    margin: 0 0 12px 0;
-  }
-
-  .news-card-title.feature {
-    font-size: 32px;
-  }
-
-  .news-card-title.compact {
-    font-size: clamp(18px, 1.8vw, 22px);
-    margin-bottom: 8px;
-  }
-
-  .news-card-title a {
-    color: var(--color-text-primary);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .news-card-title a:hover {
-    color: var(--color-primary);
-  }
-
-  .news-card-excerpt {
-    font-size: 14.5px;
-    line-height: 1.6;
-    color: var(--color-text-secondary);
-    margin: 0 0 16px 0;
-  }
-
-  .news-card-excerpt.compact {
-    margin-bottom: 0;
-    font-size: 13.5px;
-    line-height: 1.55;
-  }
-
-  .news-card-link {
-    font-size: 11.5px;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: auto;
-    transition: gap 0.3s;
-  }
-
-  .news-card-link:hover {
-    gap: 12px;
-  }
-
-  @media (max-width: 960px) {
-    .news-head {
-      grid-template-columns: 1fr;
-    }
-
-    .news-head-side {
-      text-align: left;
-      margin-left: 0;
-    }
-
-    .news-grid {
-      grid-template-columns: 1fr;
-      gap: 48px;
-    }
-
-    .news-side-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 640px) {
-    .news-section {
-      padding: 88px 20px;
-    }
-
-    .news-head {
-      margin-bottom: 48px;
-    }
-
-    .news-side-grid {
-      grid-template-columns: 1fr;
-      gap: 36px;
-    }
-  }
-</style>

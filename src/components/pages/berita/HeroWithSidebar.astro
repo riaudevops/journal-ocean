@@ -12,90 +12,75 @@ interface BeritaItem {
   reading_time?: number | null;
 }
 
-const { heroBerita, sidebarBerita, language = "id" } = Astro.props;
-const locale = language === "en" ? "en-US" : "id-ID";
-const mainLabel = language === "en" ? "Featured News" : "Berita Utama";
-const sidebarLabel = language === "en" ? "More News" : "Berita Lainnya";
-const articleLabel = language === "en" ? "articles" : "artikel";
-const readMoreLabel = language === "en" ? "Read More" : "Baca Selengkapnya";
+const { heroBerita, sidebarBerita, language = 'id' } = Astro.props;
+const locale = language === 'en' ? 'en-US' : 'id-ID';
+const mainLabel = language === 'en' ? 'Featured News' : 'Berita Utama';
+const sidebarLabel = language === 'en' ? 'More News' : 'Berita Lainnya';
+const articleLabel = language === 'en' ? 'articles' : 'artikel';
+const readMoreLabel = language === 'en' ? 'Read More' : 'Baca Selengkapnya';
+const langQuery = `?lang=${language}`;
 
 const formatDate = (dateStr: string | undefined) => {
-  if (!dateStr) return "";
-  return new Intl.DateTimeFormat(locale, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(dateStr));
+  if (!dateStr) return '';
+  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(dateStr));
 };
 ---
 
-<section class="news-head" aria-labelledby="news-head-title">
-  <div class="news-head-inner">
-    <!-- 1.4fr / 1fr split: feature (left) + sidebar (right) -->
-    <div class="news-head-grid">
-      <!-- Feature card (left, larger) -->
-      <article class="news-head-feature">
-        <a href={`/berita/${heroBerita.slug}`} class="news-head-feature-link">
-          <div class="news-head-feature-image">
-            {heroBerita.thumbnail ? (
+<section class="bg-brand-background px-8 pb-16 pt-24 max-[960px]:px-6 max-[960px]:pt-16" aria-labelledby="news-head-title">
+  <div class="mx-auto max-w-7xl">
+    <div class="grid grid-cols-[1.4fr_1fr] items-start gap-16 max-[960px]:grid-cols-1 max-[960px]:gap-12">
+      <article class="relative">
+        <a href={`/berita/${heroBerita.slug}${langQuery}`} class="block text-inherit no-underline">
+          <div class="mb-8 aspect-[16/10] overflow-hidden rounded">
+            {heroBerita.url_thumbnail || heroBerita.thumbnail ? (
               <img
-                src={heroBerita.thumbnail}
+                src={heroBerita.url_thumbnail || heroBerita.thumbnail}
                 alt={heroBerita.image_alt ?? heroBerita.judul}
-                class="news-head-feature-img"
+                class="h-full w-full object-cover saturate-[0.85] transition-transform duration-600 group-hover:scale-[1.03]"
                 loading="eager"
               />
             ) : (
-              <div class="news-head-feature-img news-head-img-fallback" aria-hidden="true">
+              <div class="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,var(--color-sand),var(--color-surface))] font-serif text-[22px] tracking-[0.1em] uppercase text-brand-primary" aria-hidden="true">
                 <span>{heroBerita.category}</span>
               </div>
             )}
           </div>
-          <div class="news-head-feature-content">
-            <div class="news-head-feature-meta">
-              <span class="news-head-eyebrow-tag">{mainLabel}</span>
-              <span class="news-head-meta-date">
-                {formatDate(heroBerita.date_created)}
-              </span>
+          <div class="max-w-[56ch]">
+            <div class="mb-4 flex items-center gap-4">
+              <span class="inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary before:h-px before:w-8 before:bg-brand-primary before:content-['']">{mainLabel}</span>
+              <span class="font-mono text-[11.5px] tracking-[0.05em] text-brand-ink-faint">{formatDate(heroBerita.date_created)}</span>
             </div>
-            <h1 id="news-head-title" class="news-head-feature-title">
+            <h1 id="news-head-title" class="m-0 mb-5 font-serif text-[clamp(32px,4vw,52px)] font-normal leading-[1.1] tracking-[-0.02em] text-brand-ink transition-colors duration-300 hover:text-brand-primary">
               {heroBerita.judul}
             </h1>
-            <p class="news-head-feature-excerpt">{heroBerita.excerpt}</p>
-            <div class="news-head-feature-cta">
+            <p class="m-0 mb-6 text-[17px] leading-[1.6] text-brand-ink-soft">{heroBerita.excerpt}</p>
+            <div class="inline-flex items-center gap-2.5 text-[13px] font-medium uppercase tracking-[0.05em] text-brand-primary transition-all duration-300 group-hover:gap-4">
               <span>{readMoreLabel}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="news-head-feature-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </div>
           </div>
         </a>
       </article>
 
-      <!-- Sidebar list (right) -->
-      <aside class="news-head-sidebar">
-        <div class="news-head-sidebar-head">
-          <div class="news-head-eyebrow">
-            <span class="news-head-eyebrow-rule"></span>
+      <aside class="sticky top-24 max-[960px]:static">
+        <div class="mb-6 flex items-center justify-between border-b border-brand-border pb-5">
+          <div class="inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">
+            <span class="h-px w-6 bg-brand-primary"></span>
             <span>{sidebarLabel}</span>
           </div>
-          <div class="news-head-sidebar-side">
-            <span>— {sidebarBerita.length} {articleLabel}</span>
-          </div>
+          <span class="font-mono text-[11px] tracking-[0.05em] text-brand-ink-faint">— {sidebarBerita.length} {articleLabel}</span>
         </div>
 
-        <ol class="news-head-list">
+        <ol class="m-0 list-none p-0">
           {
             sidebarBerita.map((berita: BeritaItem, idx: number) => (
-              <li class="news-head-item">
-                <a href={`/berita/${berita.slug}`} class="news-head-item-link">
-                  <span class="news-head-item-num">{String(idx + 1).padStart(2, "0")}</span>
-                  <div class="news-head-item-body">
-                    <div class="news-head-item-category">{berita.category}</div>
-                    <h4 class="news-head-item-title">{berita.judul}</h4>
-                    <div class="news-head-item-meta">
-                      {berita.author} · {formatDate(berita.date_created)}
-                    </div>
+              <li class="border-b border-brand-border">
+                <a href={`/berita/${berita.slug}${langQuery}`} class="grid grid-cols-[40px_1fr] gap-4 py-5 text-inherit no-underline transition-all duration-300 hover:pl-1">
+                  <span class="pt-1 font-mono text-xs tracking-[0.05em] text-brand-ink-faint">{String(idx + 1).padStart(2, '0')}</span>
+                  <div>
+                    <div class="mb-1.5 text-[10.5px] font-medium uppercase tracking-[0.15em] text-brand-primary">{berita.category}</div>
+                    <h4 class="m-0 mb-2 font-serif text-[17px] font-medium leading-[1.3] tracking-[-0.01em] text-brand-ink transition-colors duration-300 hover:text-brand-primary">{berita.judul}</h4>
+                    <div class="text-xs text-brand-ink-faint">{berita.author} · {formatDate(berita.date_created)}</div>
                   </div>
                 </a>
               </li>
@@ -106,267 +91,3 @@ const formatDate = (dateStr: string | undefined) => {
     </div>
   </div>
 </section>
-
-<style>
-  .news-head {
-    background: var(--color-background);
-    padding: 96px 32px 64px;
-  }
-
-  .news-head-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-  }
-
-  .news-head-grid {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 64px;
-    align-items: start;
-  }
-
-  /* ============================================
-     FEATURE CARD (left)
-     ============================================ */
-  .news-head-feature {
-    position: relative;
-  }
-
-  .news-head-feature-link {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .news-head-feature-image {
-    aspect-ratio: 16/10;
-    overflow: hidden;
-    border-radius: 4px;
-    margin-bottom: 32px;
-  }
-
-  .news-head-feature-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: saturate(0.85);
-    transition: transform 0.6s;
-  }
-
-  .news-head-feature:hover .news-head-feature-img {
-    transform: scale(1.03);
-  }
-
-  .news-head-img-fallback {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--color-sand), var(--color-surface));
-    color: var(--color-primary);
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-size: 22px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .news-head-feature-content {
-    max-width: 56ch;
-  }
-
-  .news-head-feature-meta {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
-  }
-
-  .news-head-eyebrow-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 11.5px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-  }
-
-  .news-head-eyebrow-tag::before {
-    content: "";
-    display: inline-block;
-    width: 32px;
-    height: 1px;
-    background: var(--color-primary);
-  }
-
-  .news-head-meta-date {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11.5px;
-    color: var(--color-text-tertiary);
-    letter-spacing: 0.05em;
-  }
-
-  .news-head-feature-title {
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-weight: 400;
-    font-size: clamp(32px, 4vw, 52px);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    color: var(--color-text-primary);
-    margin: 0 0 20px 0;
-  }
-
-  .news-head-feature:hover .news-head-feature-title {
-    color: var(--color-primary);
-    transition: color 0.3s;
-  }
-
-  .news-head-feature-excerpt {
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--color-text-secondary);
-    margin: 0 0 24px 0;
-  }
-
-  .news-head-feature-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    color: var(--color-primary);
-    text-transform: uppercase;
-    transition: gap 0.3s;
-  }
-
-  .news-head-feature:hover .news-head-feature-cta {
-    gap: 16px;
-  }
-
-  .news-head-feature-arrow {
-    width: 16px;
-    height: 16px;
-  }
-
-  /* ============================================
-     SIDEBAR LIST (right)
-     ============================================ */
-  .news-head-sidebar {
-    position: sticky;
-    top: 96px;
-  }
-
-  .news-head-sidebar-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 20px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .news-head-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 11.5px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-  }
-
-  .news-head-eyebrow-rule {
-    width: 24px;
-    height: 1px;
-    background: var(--color-primary);
-  }
-
-  .news-head-sidebar-side {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    color: var(--color-text-tertiary);
-    letter-spacing: 0.05em;
-  }
-
-  .news-head-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .news-head-item {
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .news-head-item:last-child {
-    border-bottom: none;
-  }
-
-  .news-head-item-link {
-    display: grid;
-    grid-template-columns: 40px 1fr;
-    gap: 16px;
-    padding: 20px 0;
-    text-decoration: none;
-    color: inherit;
-    transition: padding-left 0.3s;
-  }
-
-  .news-head-item:hover .news-head-item-link {
-    padding-left: 4px;
-  }
-
-  .news-head-item-num {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    color: var(--color-text-tertiary);
-    padding-top: 4px;
-    letter-spacing: 0.05em;
-  }
-
-  .news-head-item-category {
-    font-size: 10.5px;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    margin-bottom: 6px;
-  }
-
-  .news-head-item-title {
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-weight: 500;
-    font-size: 17px;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-    color: var(--color-text-primary);
-    margin: 0 0 8px 0;
-  }
-
-  .news-head-item:hover .news-head-item-title {
-    color: var(--color-primary);
-    transition: color 0.3s;
-  }
-
-  .news-head-item-meta {
-    font-size: 12px;
-    color: var(--color-text-tertiary);
-  }
-
-  @media (max-width: 960px) {
-    .news-head {
-      padding: 64px 24px;
-    }
-
-    .news-head-grid {
-      grid-template-columns: 1fr;
-      gap: 48px;
-    }
-
-    .news-head-sidebar {
-      position: static;
-    }
-  }
-</style>

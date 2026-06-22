@@ -53,31 +53,31 @@ const programCards = [
 ];
 ---
 
-<section id="kemanusiaan" class="program" aria-labelledby="kemanusiaan-title">
-  <div class="program-inner">
+<section id="kemanusiaan" class="bg-brand-background px-8 py-32 max-[960px]:px-6 max-[960px]:py-16" aria-labelledby="kemanusiaan-title">
+  <div class="mx-auto max-w-7xl">
     <!-- Header -->
-    <header class="program-head">
-      <div class="program-eyebrow">
-        <span class="program-eyebrow-rule"></span>
+    <header class="mx-auto mb-20 max-w-[720px] text-center max-[960px]:mb-12">
+      <div class="mb-5 inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">
+        <span class="h-px w-8 bg-brand-primary"></span>
         <span>{programFeature.category}</span>
       </div>
-      <h2 id="kemanusiaan-title" class="program-title">
+      <h2 id="kemanusiaan-title" class="m-0 mb-6 font-serif text-[clamp(40px,5vw,64px)] font-normal leading-[1.05] tracking-[-0.025em] text-brand-ink [&_em]:italic [&_em]:text-brand-primary">
         Program Kemanusiaan <em>Journal Ocean</em>.
       </h2>
-      <p class="program-intro">Program-program kemanusiaan untuk membantu masyarakat yang terdampak bencana dan membutuhkan bantuan darurat.</p>
+      <p class="mx-auto m-0 max-w-[56ch] text-[17px] leading-[1.6] text-brand-ink-soft">Program-program kemanusiaan untuk membantu masyarakat yang terdampak bencana dan membutuhkan bantuan darurat.</p>
     </header>
 
     <!-- Feature row (2-col image+text) — reversed (image right) for variety -->
     <div class="program-feature program-feature--reversed">
-      <div class="program-feature-content">
-        <div class="program-feature-eyebrow">{programFeature.eyebrow}</div>
-        <h3 class="program-feature-title">{programFeature.title}</h3>
-        <p class="program-feature-desc">{programFeature.desc}</p>
-        <ul class="program-feature-list">
+      <div class="max-w-[52ch]">
+        <div class="mb-5 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">{programFeature.eyebrow}</div>
+        <h3 class="m-0 mb-5 font-serif text-[clamp(32px,3.6vw,48px)] font-normal leading-[1.1] tracking-[-0.02em] text-brand-ink">{programFeature.title}</h3>
+        <p class="m-0 mb-6 text-base leading-[1.7] text-brand-ink-soft">{programFeature.desc}</p>
+        <ul class="m-0 flex list-none flex-col gap-3 p-0">
           {
             programFeature.bullets.map((bullet) => (
-              <li class="program-feature-item">
-                <span class="program-feature-dot"></span>
+              <li class="flex items-start gap-3 text-[14.5px] leading-[1.5] text-brand-ink">
+                <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-primary"></span>
                 <span>{bullet}</span>
               </li>
             ))
@@ -85,28 +85,28 @@ const programCards = [
         </ul>
       </div>
 
-      <div class="program-feature-image">
-        <img src={programFeature.image} alt={programFeature.title} class="program-feature-img" loading="lazy" />
-        <div class="program-feature-stat">
-          <div class="num">{programFeature.stat.num}</div>
-          <div class="label">{programFeature.stat.label}</div>
+      <div class="relative aspect-[4/3]">
+        <img src={programFeature.image} alt={programFeature.title} class="h-full w-full rounded object-cover saturate-[0.85]" loading="lazy" />
+        <div class="absolute -bottom-6 -right-6 rounded bg-brand-primary px-7 py-6 text-brand-background shadow-[0_8px_24px_rgba(42,46,37,0.15)] max-[960px]:bottom-[-16px] max-[960px]:right-0">
+          <div class="font-serif text-4xl font-normal leading-none">{programFeature.stat.num}</div>
+          <div class="mt-1.5 text-[10.5px] font-medium uppercase tracking-[0.15em] text-brand-primary-lighter">{programFeature.stat.label}</div>
         </div>
       </div>
     </div>
 
     <!-- Card grid (3-col) -->
-    <div class="program-grid">
+    <div class="grid grid-cols-3 gap-6 max-[960px]:grid-cols-1">
       {
         programCards.map((program, idx) => (
-          <article class="program-card">
-            <div class="program-card-image">
-              <img src={program.image} alt={program.title} class="program-card-img" loading="lazy" />
-              <div class="program-card-num">0{idx + 1}</div>
+          <article class="group overflow-hidden rounded bg-brand-surface transition duration-400 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(42,46,37,0.08)]">
+            <div class="relative aspect-[4/3] overflow-hidden">
+              <img src={program.image} alt={program.title} class="h-full w-full object-cover saturate-[0.85] transition duration-600 group-hover:scale-[1.04]" loading="lazy" />
+              <div class="absolute left-4 top-4 rounded bg-brand-background px-2.5 py-1.5 font-mono text-[11px] font-medium tracking-[0.1em] text-brand-primary">0{idx + 1}</div>
             </div>
-            <div class="program-card-content">
-              <div class="program-card-icon">{program.icon}</div>
-              <h4 class="program-card-title">{program.title}</h4>
-              <p class="program-card-desc">{program.desc}</p>
+            <div class="px-7 pb-8 pt-7">
+              <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary font-serif text-lg italic text-brand-background">{program.icon}</div>
+              <h4 class="m-0 mb-2.5 font-serif text-xl font-medium leading-[1.2] tracking-[-0.015em] text-brand-ink">{program.title}</h4>
+              <p class="m-0 text-sm leading-[1.6] text-brand-ink-soft">{program.desc}</p>
             </div>
           </article>
         ))
@@ -114,285 +114,3 @@ const programCards = [
     </div>
   </div>
 </section>
-
-<style>
-  .program {
-    background: var(--color-background);
-    padding: 128px 32px;
-  }
-
-  .program-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-  }
-
-  .program-head {
-    max-width: 720px;
-    margin: 0 auto 80px;
-    text-align: center;
-  }
-
-  .program-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 11.5px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    margin-bottom: 20px;
-  }
-
-  .program-eyebrow-rule {
-    width: 32px;
-    height: 1px;
-    background: var(--color-primary);
-  }
-
-  .program-title {
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-weight: 400;
-    font-size: clamp(40px, 5vw, 64px);
-    line-height: 1.05;
-    letter-spacing: -0.025em;
-    color: var(--color-text-primary);
-    margin: 0 0 24px 0;
-  }
-
-  .program-title em {
-    font-style: italic;
-    color: var(--color-primary);
-  }
-
-  .program-intro {
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--color-text-secondary);
-    max-width: 56ch;
-    margin: 0 auto;
-  }
-
-  /* Feature row */
-  .program-feature {
-    display: grid;
-    grid-template-columns: 1fr 1.1fr;
-    gap: 80px;
-    align-items: center;
-    margin-bottom: 96px;
-    padding-bottom: 96px;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .program-feature-image {
-    position: relative;
-    aspect-ratio: 4/3;
-  }
-
-  .program-feature-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 4px;
-    filter: saturate(0.85);
-  }
-
-  .program-feature-stat {
-    position: absolute;
-    bottom: -24px;
-    left: -24px;
-    background: var(--color-primary);
-    color: var(--color-background);
-    padding: 24px 28px;
-    border-radius: 4px;
-    box-shadow: 0 8px 24px rgba(42, 46, 37, 0.15);
-  }
-
-  .program-feature-stat .num {
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-size: 36px;
-    font-weight: 400;
-    line-height: 1;
-  }
-
-  .program-feature-stat .label {
-    font-size: 10.5px;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--color-primary-lighter);
-    margin-top: 6px;
-  }
-
-  .program-feature-content {
-    max-width: 52ch;
-  }
-
-  .program-feature-eyebrow {
-    font-size: 11.5px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    margin-bottom: 20px;
-  }
-
-  .program-feature-title {
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-weight: 400;
-    font-size: clamp(32px, 3.6vw, 48px);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    color: var(--color-text-primary);
-    margin: 0 0 20px 0;
-  }
-
-  .program-feature-desc {
-    font-size: 16px;
-    line-height: 1.7;
-    color: var(--color-text-secondary);
-    margin: 0 0 24px 0;
-  }
-
-  .program-feature-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .program-feature-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    font-size: 14.5px;
-    line-height: 1.5;
-    color: var(--color-text-primary);
-  }
-
-  .program-feature-dot {
-    width: 6px;
-    height: 6px;
-    background: var(--color-primary);
-    border-radius: 50%;
-    margin-top: 8px;
-    flex-shrink: 0;
-  }
-
-  /* Card grid */
-  .program-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-
-  .program-card {
-    background: var(--color-surface);
-    border-radius: 4px;
-    overflow: hidden;
-    transition:
-      transform 0.4s,
-      box-shadow 0.4s;
-  }
-
-  .program-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(42, 46, 37, 0.08);
-  }
-
-  .program-card-image {
-    position: relative;
-    aspect-ratio: 4/3;
-    overflow: hidden;
-  }
-
-  .program-card-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: saturate(0.85);
-    transition: transform 0.6s;
-  }
-
-  .program-card:hover .program-card-img {
-    transform: scale(1.04);
-  }
-
-  .program-card-num {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    background: var(--color-background);
-    color: var(--color-primary);
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    font-weight: 500;
-    padding: 6px 10px;
-    border-radius: 4px;
-    letter-spacing: 0.1em;
-  }
-
-  .program-card-content {
-    padding: 28px 28px 32px;
-  }
-
-  .program-card-icon {
-    width: 40px;
-    height: 40px;
-    background: var(--color-primary);
-    color: var(--color-background);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-style: italic;
-    font-size: 18px;
-    margin-bottom: 16px;
-  }
-
-  .program-card-title {
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 1.2;
-    letter-spacing: -0.015em;
-    color: var(--color-text-primary);
-    margin: 0 0 10px 0;
-  }
-
-  .program-card-desc {
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--color-text-secondary);
-    margin: 0;
-  }
-
-  @media (max-width: 960px) {
-    .program {
-      padding: 64px 24px;
-    }
-
-    .program-head {
-      margin-bottom: 48px;
-    }
-
-    .program-feature {
-      grid-template-columns: 1fr;
-      gap: 48px;
-      margin-bottom: 64px;
-      padding-bottom: 64px;
-    }
-
-    .program-feature-stat {
-      left: 0;
-      bottom: -16px;
-    }
-
-    .program-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>

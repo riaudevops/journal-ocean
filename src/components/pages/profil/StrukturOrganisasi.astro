@@ -1,381 +1,168 @@
 ---
-const logoJournalOcean = "/logo-journalocean.png";
+import {
+  directusAssetUrl,
+  getOrganizationStructureContentWithFallback,
+  getOrganizationStructureItemsWithFallback,
+  normalizeSiteLanguage,
+} from '../../../lib/directus';
 
-// Tier 1: JOC (top, full-width moss card)
-const tier1 = {
-  code: "JOC",
-  name: "Journal Ocean",
-  desc: "Badan pengelola tertinggi organisasi",
-};
+const language = normalizeSiteLanguage(Astro.url.searchParams.get('lang'));
+const content = await getOrganizationStructureContentWithFallback(language);
+const items = await getOrganizationStructureItemsWithFallback(language);
 
-// Tier 2: Pembina + Pengawas
-const tier2 = [
-  {
-    code: "PEMBINA",
-    name: "Pembina Journal Ocean",
-    desc: "Memberikan arahan strategis",
-  },
-  {
-    code: "PENGAWAS",
-    name: "Pengawas Journal Ocean",
-    desc: "Mengawasi jalannya organisasi",
-  },
-];
+const [tier1, ...restItems] = items;
+const tier2 = restItems.slice(0, 2);
+const tier3 = restItems.slice(2, 5);
 
-// Tier 3: Executive board
-const tier3 = [
-  {
-    code: "KETUA",
-    name: "Ketua Journal Ocean",
-    desc: "Memimpin operasional harian",
-  },
-  {
-    code: "SEKRETARIS",
-    name: "Sekretaris Journal Ocean",
-    desc: "Mengelola administrasi",
-  },
-  {
-    code: "BENDAHARA",
-    name: "Bendahara Journal Ocean",
-    desc: "Mengelola keuangan organisasi",
-  },
-];
+const hasIcon = (icon?: string | null) => typeof icon === 'string' && icon.trim().length > 0;
+const resolveIcon = (icon?: string | null) => directusAssetUrl(icon);
 ---
 
-<section id="struktur-organisasi" class="struktur" aria-labelledby="struktur-title">
-  <div class="struktur-inner">
-    <!-- Header -->
-    <header class="struktur-head">
-      <div class="struktur-eyebrow">
-        <span class="struktur-eyebrow-rule"></span>
-        <span>Struktur Organisasi</span>
+<section
+  id="struktur-organisasi"
+  class="border-b border-brand-border bg-brand-sand px-8 py-32 max-[960px]:px-6 max-[960px]:py-16"
+  aria-labelledby="struktur-title"
+>
+  <div class="mx-auto max-w-7xl">
+    <header class="mb-18 grid grid-cols-[0.9fr_1.1fr] gap-10 max-[960px]:mb-12 max-[960px]:grid-cols-1">
+      <div>
+        <div class="mb-6 inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">
+          <span class="h-px w-8 bg-brand-primary"></span>
+          <span>{content.eyebrow}</span>
+        </div>
+        <div class="max-w-xs border-l border-brand-primary/20 pl-5 text-[12px] uppercase tracking-[0.22em] text-brand-primary/75">
+          {content.subeyebrow}
+        </div>
       </div>
-      <div class="struktur-head-grid">
-        <h2 id="struktur-title" class="struktur-title">
-          Organisasi yang <em>solid</em> dan profesional.
-        </h2>
-        <p class="struktur-intro">Tata kelola organisasi yang transparan dan terstruktur untuk memastikan setiap program berjalan dengan integritas dan akuntabilitas.</p>
+
+      <div class="max-w-3xl">
+        <h2
+          id="struktur-title"
+          class="m-0 font-serif text-[clamp(40px,5vw,64px)] font-normal leading-[1.05] tracking-tight text-brand-ink [&_em]:italic [&_em]:text-brand-primary"
+          set:html={content.title}
+        />
+        <p class="mt-5 max-w-[56ch] text-[15px] leading-[1.7] text-brand-ink-soft">
+          {content.subtitle}
+        </p>
       </div>
     </header>
 
-    <!-- Tier 1: JOC (top, full-width featured) -->
-    <div class="struktur-tier-1">
-      <div class="struktur-card-featured">
-        <div class="struktur-card-featured-mark">
-          <img src={logoJournalOcean} alt="JOC Logo" class="struktur-card-featured-logo" loading="lazy" onerror="this.style.display='none'" />
-          <div class="struktur-card-featured-code">{tier1.code}</div>
+    <div class="relative overflow-hidden rounded-4xl border border-brand-primary/10 bg-brand-background px-8 py-10 shadow-[0_24px_60px_rgba(42,46,37,0.06)] max-[960px]:rounded-3xl max-[960px]:px-5 max-[960px]:py-6">
+      <div class="pointer-events-none absolute inset-x-8 top-40.5 h-px bg-brand-primary/12 max-[960px]:hidden"></div>
+      <div class="pointer-events-none absolute left-1/2 top-30 h-23 w-px -translate-x-1/2 bg-brand-primary/20 max-[960px]:hidden"></div>
+      <div class="pointer-events-none absolute left-1/2 top-104.5 h-17 w-px -translate-x-1/2 bg-brand-primary/20 max-[960px]:hidden"></div>
+
+      {tier1 && (
+        <div class="mx-auto mb-10 max-w-3xl">
+          <article class="relative overflow-hidden rounded-[28px] bg-brand-primary px-8 py-8 text-brand-background max-[960px]:rounded-[22px] max-[960px]:px-5">
+            <div class="absolute right-5 top-5 font-mono text-[11px] uppercase tracking-[0.24em] text-brand-primary-lighter/80">
+              {String(tier1.sort ?? 1).padStart(2, '0')}
+            </div>
+            <div class="flex items-center gap-5 max-[720px]:flex-col max-[720px]:items-start">
+              <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-[22px] bg-brand-background/95 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+                {hasIcon(tier1.icon) ? (
+                  <img
+                    src={resolveIcon(tier1.icon)}
+                    alt={tier1.name || 'JOC Logo'}
+                    class="h-full w-full object-contain"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span class="font-serif text-[30px] italic text-brand-primary">
+                    {tier1.initial || tier1.code?.slice(0, 1) || 'J'}
+                  </span>
+                )}
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="mb-2 font-mono text-[11px] uppercase tracking-[0.26em] text-brand-primary-lighter">
+                  {tier1.code}
+                </div>
+                <h3 class="m-0 font-serif text-[clamp(28px,3vw,38px)] font-medium tracking-[-0.03em] text-brand-background">
+                  {tier1.name}
+                </h3>
+                <p class="mt-2 max-w-[48ch] text-[14px] leading-[1.7] text-brand-background/80">
+                  {tier1.desc}
+                </p>
+              </div>
+            </div>
+          </article>
         </div>
-        <div class="struktur-card-featured-meta">
-          <div class="struktur-card-featured-name">{tier1.name}</div>
-          <div class="struktur-card-featured-desc">{tier1.desc}</div>
-        </div>
-        <div class="struktur-card-featured-num">01</div>
+      )}
+
+      <div class="relative mb-10 grid grid-cols-2 gap-6 max-[960px]:grid-cols-1">
+        {
+          tier2.map((item, idx) => (
+            <article class="relative rounded-3xl border border-brand-primary/10 bg-brand-surface px-7 py-7 transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(42,46,37,0.08)] max-[960px]:rounded-[20px] max-[960px]:px-5">
+              <div class="mb-5 flex items-start justify-between gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-brand-sand p-2">
+                    {hasIcon(item.icon) ? (
+                      <img
+                        src={resolveIcon(item.icon)}
+                        alt={item.name || 'Logo'}
+                        class="h-full w-full object-contain"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span class="font-serif text-[24px] italic text-brand-primary">
+                        {item.initial || item.code?.slice(0, 1) || 'J'}
+                      </span>
+                    )}
+                  </div>
+                  <div class="font-mono text-[11px] uppercase tracking-[0.22em] text-brand-primary">
+                    {item.code}
+                  </div>
+                </div>
+                <div class="font-mono text-[11px] uppercase tracking-[0.22em] text-brand-ink-faint">
+                  {String(item.sort ?? idx + 2).padStart(2, '0')}
+                </div>
+              </div>
+
+              <h3 class="m-0 font-serif text-[24px] font-medium leading-[1.15] tracking-[-0.02em] text-brand-ink">
+                {item.name}
+              </h3>
+              <p class="mt-3 max-w-[32ch] text-[14px] leading-[1.7] text-brand-ink-soft">
+                {item.desc}
+              </p>
+            </article>
+          ))
+        }
       </div>
-    </div>
 
-    <!-- Connector -->
-    <div class="struktur-connector">
-      <div class="struktur-connector-line"></div>
-    </div>
+      <div class="mb-7 flex items-center justify-center gap-3 text-center text-[11px] uppercase tracking-[0.28em] text-brand-primary/70">
+        <span class="h-px w-8 bg-brand-primary/30"></span>
+        <span>{content.label}</span>
+        <span class="h-px w-8 bg-brand-primary/30"></span>
+      </div>
 
-    <!-- Tier 2: Pembina + Pengawas (2-col) -->
-    <div class="struktur-tier-2">
-      {
-        tier2.map((item, idx) => (
-          <div class="struktur-card">
-            <div class="struktur-card-num">0{idx + 2}</div>
-            <div class="struktur-card-mark">
-              <img src={logoJournalOcean} alt="Logo" class="struktur-card-logo" loading="lazy" onerror="this.style.display='none'" />
-              <div class="struktur-card-code">{item.code}</div>
-            </div>
-            <div class="struktur-card-name">{item.name}</div>
-            <div class="struktur-card-desc">{item.desc}</div>
-          </div>
-        ))
-      }
-    </div>
+      <div class="grid grid-cols-3 gap-5 max-[1100px]:grid-cols-1">
+        {
+          tier3.map((item, idx) => (
+            <article class="relative flex h-full flex-col rounded-3xl border border-brand-primary/10 bg-[linear-gradient(180deg,rgba(247,242,231,0.82)_0%,rgba(255,255,255,0.96)_100%)] px-7 py-7 transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_42px_rgba(42,46,37,0.08)] max-[960px]:rounded-[20px] max-[960px]:px-5">
+              <div class="mb-6 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary font-serif text-[18px] italic text-brand-background">
+                    {item.initial || item.code?.slice(0, 1)}
+                  </div>
+                  <div class="font-mono text-[11px] uppercase tracking-[0.22em] text-brand-primary">
+                    {item.code}
+                  </div>
+                </div>
+                <div class="font-mono text-[11px] uppercase tracking-[0.22em] text-brand-ink-faint">
+                  {String(item.sort ?? idx + 4).padStart(2, '0')}
+                </div>
+              </div>
 
-    <!-- Connector -->
-    <div class="struktur-connector">
-      <div class="struktur-connector-line"></div>
-    </div>
-
-    <!-- Tier 3: Executive board (3-col) -->
-    <div class="struktur-tier-3">
-      {
-        tier3.map((item, idx) => (
-          <div class="struktur-card">
-            <div class="struktur-card-num">0{idx + 4}</div>
-            <div class="struktur-card-mark">
-              <img src={logoJournalOcean} alt="Logo" class="struktur-card-logo" loading="lazy" onerror="this.style.display='none'" />
-              <div class="struktur-card-code">{item.code}</div>
-            </div>
-            <div class="struktur-card-name">{item.name}</div>
-            <div class="struktur-card-desc">{item.desc}</div>
-          </div>
-        ))
-      }
+              <h3 class="m-0 font-serif text-[22px] font-medium leading-[1.2] tracking-[-0.02em] text-brand-ink">
+                {item.name}
+              </h3>
+              <p class="mt-3 max-w-[28ch] text-[14px] leading-[1.7] text-brand-ink-soft">
+                {item.desc}
+              </p>
+            </article>
+          ))
+        }
+      </div>
     </div>
   </div>
 </section>
-
-<style>
-  .struktur {
-    background: var(--color-sand);
-    padding: 128px 32px;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .struktur-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-  }
-
-  /* Header */
-  .struktur-head {
-    margin-bottom: 80px;
-  }
-
-  .struktur-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 11.5px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    margin-bottom: 24px;
-  }
-
-  .struktur-eyebrow-rule {
-    width: 32px;
-    height: 1px;
-    background: var(--color-primary);
-  }
-
-  .struktur-head-grid {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 64px;
-    align-items: end;
-  }
-
-  .struktur-title {
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-weight: 400;
-    font-size: clamp(40px, 5vw, 64px);
-    line-height: 1.05;
-    letter-spacing: -0.025em;
-    color: var(--color-text-primary);
-    margin: 0;
-  }
-
-  .struktur-title em {
-    font-style: italic;
-    color: var(--color-primary);
-  }
-
-  .struktur-intro {
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--color-text-secondary);
-    max-width: 44ch;
-    margin: 0 0 0 auto;
-  }
-
-  /* Tier 1: featured JOC */
-  .struktur-tier-1 {
-    margin-bottom: 0;
-  }
-
-  .struktur-card-featured {
-    background: var(--color-primary);
-    color: var(--color-background);
-    padding: 48px 56px;
-    border-radius: 4px;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 40px;
-    position: relative;
-  }
-
-  .struktur-card-featured-mark {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .struktur-card-featured-logo {
-    width: 64px;
-    height: 64px;
-    object-fit: contain;
-    background: var(--color-background);
-    border-radius: 4px;
-    padding: 8px;
-  }
-
-  .struktur-card-featured-code {
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-style: italic;
-    font-size: 36px;
-    font-weight: 400;
-    color: var(--color-background);
-  }
-
-  .struktur-card-featured-name {
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-size: 22px;
-    font-weight: 500;
-    letter-spacing: -0.015em;
-    margin-bottom: 4px;
-  }
-
-  .struktur-card-featured-desc {
-    font-size: 13px;
-    color: var(--color-primary-lighter);
-    letter-spacing: 0.02em;
-  }
-
-  .struktur-card-featured-num {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    color: var(--color-primary-lighter);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  /* Connectors */
-  .struktur-connector {
-    display: flex;
-    justify-content: center;
-    padding: 24px 0;
-  }
-
-  .struktur-connector-line {
-    width: 1px;
-    height: 48px;
-    background: var(--color-primary);
-    opacity: 0.3;
-  }
-
-  /* Tier 2 + 3 cards */
-  .struktur-tier-2,
-  .struktur-tier-3 {
-    display: grid;
-    gap: 24px;
-  }
-
-  .struktur-tier-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .struktur-tier-3 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .struktur-card {
-    background: var(--color-surface);
-    padding: 36px 32px;
-    border-radius: 4px;
-    text-align: center;
-    position: relative;
-    transition:
-      transform 0.4s,
-      box-shadow 0.4s;
-  }
-
-  .struktur-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(42, 46, 37, 0.08);
-  }
-
-  .struktur-card-num {
-    position: absolute;
-    top: 20px;
-    right: 24px;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 10.5px;
-    color: var(--color-text-tertiary);
-    letter-spacing: 0.1em;
-  }
-
-  .struktur-card-mark {
-    margin: 0 auto 20px;
-    width: fit-content;
-  }
-
-  .struktur-card-logo {
-    width: 56px;
-    height: 56px;
-    object-fit: contain;
-    background: var(--color-sand);
-    border-radius: 4px;
-    padding: 6px;
-    margin: 0 auto 12px;
-  }
-
-  .struktur-card-code {
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-style: italic;
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--color-primary);
-    letter-spacing: 0.05em;
-  }
-
-  .struktur-card-name {
-    font-family: "Fraunces", "Times New Roman", serif;
-    font-size: 17px;
-    font-weight: 500;
-    color: var(--color-text-primary);
-    margin-bottom: 6px;
-  }
-
-  .struktur-card-desc {
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--color-text-secondary);
-  }
-
-  @media (max-width: 960px) {
-    .struktur {
-      padding: 64px 24px;
-    }
-
-    .struktur-head {
-      margin-bottom: 48px;
-    }
-
-    .struktur-head-grid {
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
-
-    .struktur-intro {
-      margin-left: 0;
-    }
-
-    .struktur-card-featured {
-      grid-template-columns: 1fr;
-      gap: 20px;
-      padding: 32px 24px;
-      text-align: center;
-    }
-
-    .struktur-card-featured-mark {
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .struktur-card-featured-num {
-      position: static;
-    }
-
-    .struktur-tier-2,
-    .struktur-tier-3 {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>

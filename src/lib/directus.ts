@@ -164,6 +164,177 @@ export interface PreloaderContent extends PreloaderContentTranslation {
   translations?: PreloaderContentTranslation[];
 }
 
+export interface AboutHeaderContent {
+  id?: number | string;
+  eyebrow?: string;
+  Eyebrow?: string;
+  title?: string;
+  Title?: string;
+  subtitle?: string;
+  Subtitle?: string;
+  desc?: string;
+  Desc?: string;
+  image?: string | null;
+  Image?: string | null;
+  image_alt?: string;
+  Image_Alt?: string;
+  'Image Alt'?: string;
+  [key: string]: unknown;
+}
+
+export interface AboutProfileTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  eyebrow?: string;
+  Eyebrow?: string;
+  title?: string;
+  Title?: string;
+  stroked?: string;
+  Stroked?: string;
+  desc_1?: string;
+  Desc_1?: string;
+  'Desc 1'?: string;
+  desc_2?: string;
+  Desc_2?: string;
+  'Desc 2'?: string;
+  image_alt_1?: string;
+  Image_Alt_1?: string;
+  'Image Alt 1'?: string;
+  image_alt_2?: string;
+  Image_Alt_2?: string;
+  'Image Alt 2'?: string;
+  signature_title?: string;
+  Signature_Title?: string;
+  'Signature Title'?: string;
+  signature_subtitle?: string;
+  Signature_Subtitle?: string;
+  'Signature Subtitle'?: string;
+  stat_label?: string;
+  Stat_Label?: string;
+  'Stat Label'?: string;
+  [key: string]: unknown;
+}
+
+export interface AboutProfileContent extends AboutProfileTranslation {
+  id?: number | string;
+  image_1?: string | null;
+  Image_1?: string | null;
+  'Image 1'?: string | null;
+  image_2?: string | null;
+  Image_2?: string | null;
+  'Image 2'?: string | null;
+  signature_initial?: string;
+  Signature_Initial?: string;
+  'Signature Initial'?: string;
+  stat?: string;
+  Stat?: string;
+  translations?: AboutProfileTranslation[];
+}
+
+export interface AboutPillarsTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  eyebrow?: string;
+  Eyebrow?: string;
+  title?: string;
+  Title?: string;
+  intro?: string;
+  Intro?: string;
+  [key: string]: unknown;
+}
+
+export interface AboutPillarsContent extends AboutPillarsTranslation {
+  id?: number | string;
+  translations?: AboutPillarsTranslation[];
+}
+
+export interface AboutVisionTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  eyebrow?: string;
+  title?: string;
+  vision_eyebrow?: string;
+  vision_quote?: string;
+  mission_eyebrow?: string;
+  [key: string]: unknown;
+}
+
+export interface AboutVisionContent extends AboutVisionTranslation {
+  id?: number | string;
+  vision_attr?: string;
+  translations?: AboutVisionTranslation[];
+}
+
+export interface AboutMissionItemTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  title?: string;
+  Title?: string;
+  desc?: string;
+  Desc?: string;
+  [key: string]: unknown;
+}
+
+export interface AboutMissionItem extends AboutMissionItemTranslation {
+  id?: number | string;
+  sort?: number | null;
+  translations?: AboutMissionItemTranslation[];
+}
+
+export interface OrganizationStructureTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  eyebrow?: string;
+  Eyebrow?: string;
+  subeyebrow?: string;
+  Subeyebrow?: string;
+  title?: string;
+  Title?: string;
+  subtitle?: string;
+  Subtitle?: string;
+  label?: string;
+  Label?: string;
+  [key: string]: unknown;
+}
+
+export interface OrganizationStructureContent extends OrganizationStructureTranslation {
+  id?: number | string;
+  translations?: OrganizationStructureTranslation[];
+}
+
+export interface OrganizationStructureItemTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  code?: string;
+  Code?: string;
+  name?: string;
+  Name?: string;
+  desc?: string;
+  Desc?: string;
+  [key: string]: unknown;
+}
+
+export interface OrganizationStructureItem extends OrganizationStructureItemTranslation {
+  id?: number | string;
+  sort?: number | null;
+  icon?: string | null;
+  Icon?: string | null;
+  initial?: string;
+  Initial?: string;
+  translations?: OrganizationStructureItemTranslation[];
+}
+
+export interface AboutPillarItemTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  name?: string;
+  Name?: string;
+  desc?: string;
+  Desc?: string;
+  [key: string]: unknown;
+}
+
+export interface AboutPillarItem extends AboutPillarItemTranslation {
+  id?: number | string;
+  sort?: number | null;
+  initial?: string;
+  Initial?: string;
+  translations?: AboutPillarItemTranslation[];
+}
+
 export interface NewsItemTranslation {
   languages_code?: string | { code?: string; name?: string };
   category?: string;
@@ -276,7 +447,7 @@ export async function isDirectusHealthy(): Promise<boolean> {
   }
 }
 
-const CACHE_TTL_MS = 60_000;
+const CACHE_TTL_MS = 30_000;
 const _cache = new Map<string, { value: unknown; expires: number }>();
 
 function cacheGet<T>(key: string): T | null {
@@ -311,6 +482,9 @@ function getTranslationCode(
     | FooterContentTranslation
     | AnnouncementContentTranslation
     | PreloaderContentTranslation
+    | AboutProfileTranslation
+    | AboutPillarsTranslation
+    | AboutPillarItemTranslation
     | NewsItemTranslation
 ): string {
   const raw = translation.languages_code;
@@ -670,6 +844,915 @@ export async function getPreloaderContentWithFallback(
     ...FALLBACK_PRELOADER_CONTENT,
     ...fromCms,
   };
+}
+
+function getStringField(
+  content: Record<string, unknown>,
+  keys: string[]
+): string | undefined {
+  for (const key of keys) {
+    const value = content[key];
+    if (typeof value === 'string' && value.trim()) return value;
+  }
+  return undefined;
+}
+
+function normalizeAboutHeaderContent(
+  content: AboutHeaderContent
+): AboutHeaderContent {
+  return {
+    ...content,
+    eyebrow: getStringField(content, ['eyebrow', 'Eyebrow']),
+    title: getStringField(content, ['title', 'Title']),
+    subtitle: getStringField(content, ['subtitle', 'Subtitle']),
+    desc: getStringField(content, ['desc', 'Desc']),
+    image: (content.image ?? content.Image ?? null) as string | null,
+    image_alt: getStringField(content, ['image_alt', 'Image_Alt', 'Image Alt']),
+  };
+}
+
+export const FALLBACK_ABOUT_HEADER_CONTENT: AboutHeaderContent = {
+  id: 1,
+  eyebrow: 'Tentang Journal Ocean',
+  title: 'Journal Ocean',
+  subtitle: 'Membangun Peradaban Melalui Integrasi Ilmu dan Wahyu',
+  desc: 'Lembaga sosial-keagamaan dan pendidikan yang berkomitmen untuk berperan aktif dalam pengembangan peradaban melalui penguatan pendidikan, penelitian, dan pengabdian kepada masyarakat.',
+  image:
+    'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1920&h=1080&fit=crop',
+  image_alt: 'Journal Ocean',
+};
+
+export async function getAboutHeaderContent(): Promise<AboutHeaderContent | null> {
+  const cacheKey = 'about-header:v1';
+  const cached = cacheGet<AboutHeaderContent>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) {
+    console.warn(
+      '[directus] DIRECTUS_URL not set, returning empty about header'
+    );
+    return null;
+  }
+
+  try {
+    const item = await client.request(
+      (readItems as any)('about_header', {
+        fields: ['*'],
+        limit: 1,
+      })
+    );
+
+    const content = Array.isArray(item) ? item[0] : item;
+    if (!content) return null;
+
+    const result = normalizeAboutHeaderContent(content as AboutHeaderContent);
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      '[directus] getAboutHeaderContent failed:',
+      e instanceof Error ? e.message : e
+    );
+    return null;
+  }
+}
+
+export async function getAboutHeaderContentWithFallback(): Promise<AboutHeaderContent> {
+  const fromCms = await getAboutHeaderContent();
+  return {
+    ...FALLBACK_ABOUT_HEADER_CONTENT,
+    ...fromCms,
+    image: directusAssetUrl(
+      fromCms?.image ?? FALLBACK_ABOUT_HEADER_CONTENT.image
+    ),
+  };
+}
+
+function normalizeAboutProfileContent(
+  content: AboutProfileContent
+): AboutProfileContent {
+  return {
+    ...content,
+    eyebrow: getStringField(content, ['eyebrow', 'Eyebrow']),
+    title: getStringField(content, ['title', 'Title']),
+    stroked: getStringField(content, ['stroked', 'Stroked']),
+    desc_1: getStringField(content, ['desc_1', 'Desc_1', 'Desc 1']),
+    desc_2: getStringField(content, ['desc_2', 'Desc_2', 'Desc 2']),
+    image_1: (content.image_1 ??
+      content.Image_1 ??
+      content['Image 1'] ??
+      null) as string | null,
+    image_alt_1: getStringField(content, [
+      'image_alt_1',
+      'Image_Alt_1',
+      'Image Alt 1',
+    ]),
+    image_2: (content.image_2 ??
+      content.Image_2 ??
+      content['Image 2'] ??
+      null) as string | null,
+    image_alt_2: getStringField(content, [
+      'image_alt_2',
+      'Image_Alt_2',
+      'Image Alt 2',
+    ]),
+    signature_initial: getStringField(content, [
+      'signature_initial',
+      'Signature_Initial',
+      'Signature Initial',
+    ]),
+    signature_title: getStringField(content, [
+      'signature_title',
+      'Signature_Title',
+      'Signature Title',
+    ]),
+    signature_subtitle: getStringField(content, [
+      'signature_subtitle',
+      'Signature_Subtitle',
+      'Signature Subtitle',
+    ]),
+    stat: getStringField(content, ['stat', 'Stat']),
+    stat_label: getStringField(content, [
+      'stat_label',
+      'Stat_Label',
+      'Stat Label',
+    ]),
+  };
+}
+
+function applyAboutProfileTranslation(
+  content: AboutProfileContent,
+  language: SiteLanguage
+): AboutProfileContent {
+  const base = normalizeAboutProfileContent(content);
+  if (language === 'id' || !Array.isArray(content.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = content.translations.find((item) =>
+    languageCodes.includes(getTranslationCode(item))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeAboutProfileContent(
+    translation as AboutProfileContent
+  );
+  return {
+    ...base,
+    eyebrow: translated.eyebrow || base.eyebrow,
+    title: translated.title || base.title,
+    stroked: translated.stroked || base.stroked,
+    desc_1: translated.desc_1 || base.desc_1,
+    desc_2: translated.desc_2 || base.desc_2,
+    image_alt_1: translated.image_alt_1 || base.image_alt_1,
+    image_alt_2: translated.image_alt_2 || base.image_alt_2,
+    signature_title: translated.signature_title || base.signature_title,
+    signature_subtitle:
+      translated.signature_subtitle || base.signature_subtitle,
+    stat_label: translated.stat_label || base.stat_label,
+  };
+}
+
+export const FALLBACK_ABOUT_PROFILE_CONTENT: AboutProfileContent = {
+  id: 1,
+  eyebrow: 'Profil Lengkap',
+  title: 'Selamat datang di',
+  stroked: 'Journal Ocean',
+  desc_1:
+    "Journal Ocean didirikan atas kesadaran bahwa kemajuan umat dan bangsa harus dibangun di atas fondasi ilmu pengetahuan yang kokoh, berlandaskan nilai-nilai ilahiah yang bersumber dari Al-Qur'an dan Hadis Nabi Muhammad.",
+  desc_2:
+    'Dalam menjalankan kiprahnya, organisasi mengintegrasikan ilmu pengetahuan kontemporer dengan khazanah keilmuan Islam secara harmonis dan berkelanjutan. Pendekatan integratif ini diarahkan untuk melahirkan insan berilmu, berakhlak mulia, serta memiliki kemampuan adaptif terhadap dinamika perkembangan zaman, tanpa kehilangan jati diri keislamannya.',
+  image_1:
+    'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=1000&fit=crop',
+  image_alt_1: 'image_profile_1',
+  image_2:
+    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=400&fit=crop',
+  image_alt_2: 'image_profile_2',
+  signature_initial: 'J',
+  signature_title: 'Para pendiri Journal Ocean',
+  signature_subtitle: 'Bersama Membangun Kebaikan',
+  stat: '12+',
+  stat_label: 'Tahun Pengabdian',
+};
+
+export async function getAboutProfileContent(
+  language: SiteLanguage = 'id'
+): Promise<AboutProfileContent | null> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `about-profile:v1:${normalizedLanguage}`;
+  const cached = cacheGet<AboutProfileContent>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) {
+    console.warn(
+      '[directus] DIRECTUS_URL not set, returning empty about profile'
+    );
+    return null;
+  }
+
+  try {
+    const item = await client.request(
+      (readItems as any)('about_profile', {
+        fields: ['*', 'translations.*'],
+        limit: 1,
+      })
+    );
+
+    const content = Array.isArray(item) ? item[0] : item;
+    if (!content) return null;
+
+    const result = applyAboutProfileTranslation(
+      content as AboutProfileContent,
+      normalizedLanguage
+    );
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getAboutProfileContent failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return null;
+  }
+}
+
+export async function getAboutProfileContentWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<AboutProfileContent> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const fromCms = await getAboutProfileContent(normalizedLanguage);
+  return {
+    ...FALLBACK_ABOUT_PROFILE_CONTENT,
+    ...fromCms,
+    image_1: directusAssetUrl(
+      fromCms?.image_1 ?? FALLBACK_ABOUT_PROFILE_CONTENT.image_1
+    ),
+    image_2: directusAssetUrl(
+      fromCms?.image_2 ?? FALLBACK_ABOUT_PROFILE_CONTENT.image_2
+    ),
+  };
+}
+
+function normalizeAboutPillarsContent(
+  content: AboutPillarsContent
+): AboutPillarsContent {
+  return {
+    ...content,
+    eyebrow: getStringField(content, ['eyebrow', 'Eyebrow']),
+    title: getStringField(content, ['title', 'Title']),
+    intro: getStringField(content, ['intro', 'Intro']),
+  };
+}
+
+function applyAboutPillarsTranslation(
+  content: AboutPillarsContent,
+  language: SiteLanguage
+): AboutPillarsContent {
+  const base = normalizeAboutPillarsContent(content);
+  if (language === 'id' || !Array.isArray(content.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = content.translations.find((item) =>
+    languageCodes.includes(getTranslationCode(item))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeAboutPillarsContent(
+    translation as AboutPillarsContent
+  );
+  return {
+    ...base,
+    eyebrow: translated.eyebrow || base.eyebrow,
+    title: translated.title || base.title,
+    intro: translated.intro || base.intro,
+  };
+}
+
+function normalizeAboutPillarItem(item: AboutPillarItem): AboutPillarItem {
+  return {
+    ...item,
+    initial: getStringField(item, ['initial', 'Initial']),
+    name: getStringField(item, ['name', 'Name']),
+    desc: getStringField(item, ['desc', 'Desc']),
+  };
+}
+
+function applyAboutPillarItemTranslation(
+  item: AboutPillarItem,
+  language: SiteLanguage
+): AboutPillarItem {
+  const base = normalizeAboutPillarItem(item);
+  if (language === 'id' || !Array.isArray(item.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = item.translations.find((translationItem) =>
+    languageCodes.includes(getTranslationCode(translationItem))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeAboutPillarItem(translation as AboutPillarItem);
+  return {
+    ...base,
+    name: translated.name || base.name,
+    desc: translated.desc || base.desc,
+  };
+}
+
+export const FALLBACK_ABOUT_PILLARS_CONTENT: AboutPillarsContent = {
+  id: 1,
+  eyebrow: 'Arah Pengembangan',
+  title: 'Tiga pilar <em>utama</em> pengembangan.',
+  intro:
+    'Komitmen kami dalam membangun peradaban yang unggul melalui tiga pilar utama yang saling terintegrasi.',
+};
+
+export const FALLBACK_ABOUT_PILLAR_ITEMS: AboutPillarItem[] = [
+  {
+    id: 1,
+    initial: 'P',
+    name: 'Pendidikan',
+    desc: 'Menyelenggarakan pendidikan yang menekankan keseimbangan antara kecerdasan intelektual, spiritual, emosional, dan sosial dengan budaya berpikir kritis dan inovatif.',
+  },
+  {
+    id: 2,
+    initial: 'R',
+    name: 'Penelitian',
+    desc: 'Mendorong riset yang berorientasi pada pemecahan masalah umat dengan memadukan pendekatan ilmiah modern dan perspektif keislaman untuk pembangunan berkelanjutan.',
+  },
+  {
+    id: 3,
+    initial: 'M',
+    name: 'Pengabdian',
+    desc: "Menghadirkan solusi dan pemberdayaan berbasis nilai-nilai Islam melalui pendidikan, pendampingan, dan penguatan nilai keagamaan yang rahmatan lil 'alamin.",
+  },
+];
+
+export async function getAboutPillarsContent(
+  language: SiteLanguage = 'id'
+): Promise<AboutPillarsContent | null> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `about-pillars:v1:${normalizedLanguage}`;
+  const cached = cacheGet<AboutPillarsContent>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) {
+    console.warn(
+      '[directus] DIRECTUS_URL not set, returning empty about pillars'
+    );
+    return null;
+  }
+
+  try {
+    const item = await client.request(
+      (readItems as any)('about_pillars', {
+        fields: ['*', 'translations.*'],
+        limit: 1,
+      })
+    );
+
+    const content = Array.isArray(item) ? item[0] : item;
+    if (!content) return null;
+
+    const result = applyAboutPillarsTranslation(
+      content as AboutPillarsContent,
+      normalizedLanguage
+    );
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getAboutPillarsContent failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return null;
+  }
+}
+
+export async function getAboutPillarsContentWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<AboutPillarsContent> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const fromCms = await getAboutPillarsContent(normalizedLanguage);
+  return {
+    ...FALLBACK_ABOUT_PILLARS_CONTENT,
+    ...fromCms,
+  };
+}
+
+function normalizeAboutVisionContent(
+  content: AboutVisionContent
+): AboutVisionContent {
+  return {
+    ...content,
+    eyebrow: getStringField(content, ['eyebrow', 'Eyebrow']),
+    title: getStringField(content, ['title', 'Title']),
+    vision_eyebrow: getStringField(content, [
+      'vision_eyebrow',
+      'Vision_Eyebrow',
+      'Vision Eyebrow',
+    ]),
+    vision_quote: getStringField(content, [
+      'vision_quote',
+      'Vision_Quote',
+      'Vision Quote',
+    ]),
+    vision_attr: getStringField(content, [
+      'vision_attr',
+      'Vision_Attr',
+      'Vision Attr',
+    ]),
+    mission_eyebrow: getStringField(content, [
+      'mission_eyebrow',
+      'Mission_Eyebrow',
+      'Mission Eyebrow',
+      'mision_eyebrow',
+      'Mision_Eyebrow',
+      'Mision Eyebrow',
+    ]),
+  };
+}
+
+function applyAboutVisionTranslation(
+  content: AboutVisionContent,
+  language: SiteLanguage
+): AboutVisionContent {
+  const base = normalizeAboutVisionContent(content);
+  if (language === 'id' || !Array.isArray(content.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = content.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeAboutVisionContent(
+    translation as AboutVisionContent
+  );
+  return {
+    ...base,
+    eyebrow: translated.eyebrow || base.eyebrow,
+    title: translated.title || base.title,
+    vision_eyebrow: translated.vision_eyebrow || base.vision_eyebrow,
+    vision_quote: translated.vision_quote || base.vision_quote,
+    mission_eyebrow: translated.mission_eyebrow || base.mission_eyebrow,
+  };
+}
+
+export const FALLBACK_ABOUT_VISION_CONTENT: AboutVisionContent = {
+  id: 1,
+  eyebrow: 'Visi & Misi',
+  title: 'Arah dan <em>tujuan</em> pengembangan peradaban.',
+  vision_eyebrow: 'Visi',
+  vision_quote:
+    "Menjadi organisasi unggulan dalam pengembangan pendidikan, penelitian, dan pengabdian kepada masyarakat yang berlandaskan integrasi ilmu pengetahuan kontemporer dengan Al-Qur'an dan Hadis untuk membangun peradaban yang beriman, berilmu, dan berakhlak mulia.",
+  vision_attr: 'Journal Ocean',
+  mission_eyebrow: 'Misi',
+};
+
+export async function getAboutVisionContent(
+  language: SiteLanguage = 'id'
+): Promise<AboutVisionContent | null> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `about-vision:v1:${normalizedLanguage}`;
+  const cached = cacheGet<AboutVisionContent>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) return null;
+
+  try {
+    const item = await client.request(
+      (readItems as any)('about_vision', {
+        fields: ['*', 'translations.*'],
+        limit: 1,
+      })
+    );
+
+    const content = Array.isArray(item) ? item[0] : item;
+    if (!content) return null;
+
+    const result = applyAboutVisionTranslation(
+      content as AboutVisionContent,
+      normalizedLanguage
+    );
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getAboutVisionContent failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return null;
+  }
+}
+
+export async function getAboutVisionContentWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<AboutVisionContent> {
+  const fromCms = await getAboutVisionContent(language);
+  return {
+    ...FALLBACK_ABOUT_VISION_CONTENT,
+    ...fromCms,
+  };
+}
+
+function normalizeOrganizationStructureContent(
+  content: OrganizationStructureContent
+): OrganizationStructureContent {
+  return {
+    ...content,
+    eyebrow: getStringField(content, ['eyebrow', 'Eyebrow']),
+    subeyebrow: getStringField(content, ['subeyebrow', 'Subeyebrow']),
+    title: getStringField(content, ['title', 'Title']),
+    subtitle: getStringField(content, ['subtitle', 'Subtitle']),
+    label: getStringField(content, ['label', 'Label']),
+  };
+}
+
+function applyOrganizationStructureTranslation(
+  content: OrganizationStructureContent,
+  language: SiteLanguage
+): OrganizationStructureContent {
+  const base = normalizeOrganizationStructureContent(content);
+  if (language === 'id' || !Array.isArray(content.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = content.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeOrganizationStructureContent(
+    translation as OrganizationStructureContent
+  );
+  return {
+    ...base,
+    eyebrow: translated.eyebrow || base.eyebrow,
+    subeyebrow: translated.subeyebrow || base.subeyebrow,
+    title: translated.title || base.title,
+    subtitle: translated.subtitle || base.subtitle,
+    label: translated.label || base.label,
+  };
+}
+
+function normalizeOrganizationStructureItem(
+  item: OrganizationStructureItem
+): OrganizationStructureItem {
+  return {
+    ...item,
+    icon: (item.icon ?? item.Icon ?? null) as string | null,
+    initial: getStringField(item, ['initial', 'Initial']),
+    code: getStringField(item, ['code', 'Code']),
+    name: getStringField(item, ['name', 'Name']),
+    desc: getStringField(item, ['desc', 'Desc']),
+  };
+}
+
+function applyOrganizationStructureItemTranslation(
+  item: OrganizationStructureItem,
+  language: SiteLanguage
+): OrganizationStructureItem {
+  const base = normalizeOrganizationStructureItem(item);
+  if (language === 'id' || !Array.isArray(item.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = item.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeOrganizationStructureItem(
+    translation as OrganizationStructureItem
+  );
+  return {
+    ...base,
+    code: translated.code || base.code,
+    name: translated.name || base.name,
+    desc: translated.desc || base.desc,
+  };
+}
+
+export const FALLBACK_ORGANIZATION_STRUCTURE_CONTENT: OrganizationStructureContent =
+  {
+    id: 1,
+    eyebrow: 'Struktur Organisasi',
+    subeyebrow: 'Tata kelola yang rapi, hirarkis, dan akuntabel.',
+    title: 'Peta kerja yang <em>tertata</em> dari arah hingga eksekusi.',
+    subtitle:
+      'Struktur ini menempatkan arah strategis, pengawasan, dan operasional dalam relasi yang jelas, sehingga setiap program Journal Ocean berjalan dengan disiplin, integritas, dan kesinambungan.',
+    label: 'Pelaksana',
+  };
+
+export const FALLBACK_ORGANIZATION_STRUCTURE_ITEMS: OrganizationStructureItem[] =
+  [
+    {
+      id: 1,
+      sort: 1,
+      initial: 'J',
+      code: 'JOC',
+      name: 'Journal Ocean',
+      desc: 'Badan pengelola tertinggi organisasi',
+      icon: null,
+    },
+    {
+      id: 2,
+      sort: 2,
+      initial: 'P',
+      code: 'PEMBINA',
+      name: 'Pembina Journal Ocean',
+      desc: 'Memberikan arahan strategis',
+      icon: null,
+    },
+    {
+      id: 3,
+      sort: 3,
+      initial: 'P',
+      code: 'PENGAWAS',
+      name: 'Pengawas Journal Ocean',
+      desc: 'Mengawasi jalannya organisasi',
+      icon: null,
+    },
+    {
+      id: 4,
+      sort: 4,
+      initial: 'K',
+      code: 'KETUA',
+      name: 'Ketua Journal Ocean',
+      desc: 'Memimpin operasional harian',
+      icon: null,
+    },
+    {
+      id: 5,
+      sort: 5,
+      initial: 'S',
+      code: 'SEKRETARIS',
+      name: 'Sekretaris Journal Ocean',
+      desc: 'Mengelola administrasi',
+      icon: null,
+    },
+    {
+      id: 6,
+      sort: 6,
+      initial: 'B',
+      code: 'BENDAHARA',
+      name: 'Bendahara Journal Ocean',
+      desc: 'Mengelola keuangan organisasi',
+      icon: null,
+    },
+  ];
+
+export async function getOrganizationStructureContent(
+  language: SiteLanguage = 'id'
+): Promise<OrganizationStructureContent | null> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `organization-structure:v1:${normalizedLanguage}`;
+  const cached = cacheGet<OrganizationStructureContent>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) return null;
+
+  try {
+    const item = await client.request(
+      (readItems as any)('organization_structure', {
+        fields: ['*', 'translations.*'],
+        limit: 1,
+      })
+    );
+
+    const content = Array.isArray(item) ? item[0] : item;
+    if (!content) return null;
+
+    const result = applyOrganizationStructureTranslation(
+      content as OrganizationStructureContent,
+      normalizedLanguage
+    );
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getOrganizationStructureContent failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return null;
+  }
+}
+
+export async function getOrganizationStructureContentWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<OrganizationStructureContent> {
+  const fromCms = await getOrganizationStructureContent(language);
+  return {
+    ...FALLBACK_ORGANIZATION_STRUCTURE_CONTENT,
+    ...fromCms,
+  };
+}
+
+export async function getOrganizationStructureItems(
+  language: SiteLanguage = 'id'
+): Promise<OrganizationStructureItem[]> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `organization-structure-items:v1:${normalizedLanguage}`;
+  const cached = cacheGet<OrganizationStructureItem[]>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) return [];
+
+  try {
+    const items = await client.request(
+      (readItems as any)('organization_structure_list', {
+        fields: ['*', 'translations.*'],
+        sort: ['sort', 'id'],
+      })
+    );
+
+    const result = (Array.isArray(items) ? items : [])
+      .map((item) =>
+        applyOrganizationStructureItemTranslation(
+          item as OrganizationStructureItem,
+          normalizedLanguage
+        )
+      )
+      .filter((item) => item.code && item.name && item.desc);
+
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getOrganizationStructureItems failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return [];
+  }
+}
+
+export async function getOrganizationStructureItemsWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<OrganizationStructureItem[]> {
+  const items = await getOrganizationStructureItems(language);
+  return items.length > 0 ? items : FALLBACK_ORGANIZATION_STRUCTURE_ITEMS;
+}
+
+function normalizeAboutMissionItem(item: AboutMissionItem): AboutMissionItem {
+  return {
+    ...item,
+    title: getStringField(item, ['title', 'Title']),
+    desc: getStringField(item, ['desc', 'Desc']),
+  };
+}
+
+function applyAboutMissionItemTranslation(
+  item: AboutMissionItem,
+  language: SiteLanguage
+): AboutMissionItem {
+  const base = normalizeAboutMissionItem(item);
+  if (language === 'id' || !Array.isArray(item.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = item.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeAboutMissionItem(translation as AboutMissionItem);
+  return {
+    ...base,
+    title: translated.title || base.title,
+    desc: translated.desc || base.desc,
+  };
+}
+
+export const FALLBACK_ABOUT_MISSION_ITEMS: AboutMissionItem[] = [
+  {
+    id: 1,
+    sort: 1,
+    title: 'Pendidikan Berkualitas',
+    desc: 'Menyelenggarakan dan mengembangkan pendidikan yang berkualitas dengan mengintegrasikan ilmu pengetahuan modern dan nilai-nilai Islam.',
+  },
+  {
+    id: 2,
+    sort: 2,
+    title: 'Penelitian Integratif',
+    desc: 'Mendorong dan mengembangkan penelitian integratif yang berorientasi pada pengembangan keilmuan dan pemecahan masalah umat.',
+  },
+  {
+    id: 3,
+    sort: 3,
+    title: 'Pengabdian Masyarakat',
+    desc: "Melaksanakan pengabdian kepada masyarakat berbasis pemberdayaan, edukasi, dan nilai-nilai keislaman yang rahmatan lil 'alamin.",
+  },
+  {
+    id: 4,
+    sort: 4,
+    title: 'Budaya Inovasi',
+    desc: 'Menumbuhkan budaya keilmuan, inovasi, dan kolaborasi dalam rangka menjawab tantangan global dan lokal.',
+  },
+  {
+    id: 5,
+    sort: 5,
+    title: 'Karakter Unggul',
+    desc: 'Menguatkan karakter insan yang beriman, berakhlak mulia, bertanggung jawab, dan berkontribusi aktif bagi kemajuan bangsa.',
+  },
+];
+
+export async function getAboutMissionItems(
+  language: SiteLanguage = 'id'
+): Promise<AboutMissionItem[]> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `about-mission-items:v1:${normalizedLanguage}`;
+  const cached = cacheGet<AboutMissionItem[]>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) return [];
+
+  try {
+    const items = await client.request(
+      (readItems as any)('about_mission', {
+        fields: ['*', 'translations.*'],
+        sort: ['sort', 'id'],
+      })
+    );
+
+    const result = (Array.isArray(items) ? items : [])
+      .map((item) =>
+        applyAboutMissionItemTranslation(
+          item as AboutMissionItem,
+          normalizedLanguage
+        )
+      )
+      .filter((item) => item.title && item.desc);
+
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getAboutMissionItems failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return [];
+  }
+}
+
+export async function getAboutMissionItemsWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<AboutMissionItem[]> {
+  const items = await getAboutMissionItems(language);
+  return items.length > 0 ? items : FALLBACK_ABOUT_MISSION_ITEMS;
+}
+
+export async function getAboutPillarItems(
+  language: SiteLanguage = 'id'
+): Promise<AboutPillarItem[]> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `about-pillar-items:v1:${normalizedLanguage}`;
+  const cached = cacheGet<AboutPillarItem[]>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) {
+    console.warn(
+      '[directus] DIRECTUS_URL not set, returning empty about pillar items'
+    );
+    return [];
+  }
+
+  try {
+    const items = await client.request(
+      (readItems as any)('about_pillar_items', {
+        fields: ['*', 'translations.*'],
+        sort: ['sort', 'id'],
+      })
+    );
+
+    const result = (Array.isArray(items) ? items : [])
+      .map((item) =>
+        applyAboutPillarItemTranslation(
+          item as AboutPillarItem,
+          normalizedLanguage
+        )
+      )
+      .filter((item) => item.name && item.desc);
+
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getAboutPillarItems failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return [];
+  }
+}
+
+export async function getAboutPillarItemsWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<AboutPillarItem[]> {
+  const items = await getAboutPillarItems(language);
+  return items.length > 0 ? items : FALLBACK_ABOUT_PILLAR_ITEMS;
 }
 
 function applyFooterTranslation(

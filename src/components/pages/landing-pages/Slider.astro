@@ -1,17 +1,24 @@
 ---
-import { getHeroSlides, directusAssetUrl, normalizeSiteLanguage } from "../../../lib/directus";
-import type { HeroSlide } from "../../../lib/directus";
+import {
+  getHeroSlides,
+  directusAssetUrl,
+  normalizeSiteLanguage,
+} from '../../../lib/directus';
+import type { HeroSlide } from '../../../lib/directus';
 
 export type Slide = HeroSlide;
 
-const language = normalizeSiteLanguage(Astro.url.searchParams.get("lang"));
+const language = normalizeSiteLanguage(Astro.url.searchParams.get('lang'));
 const slides: Slide[] = await getHeroSlides(language);
 const totalSlides = slides.length;
-const heroTag = language === "en" ? "Core Value" : "Nilai Utama";
+const heroTag = language === 'en' ? 'Core Value' : 'Nilai Utama';
 
-const formatSlideNumber = (value: string | number | undefined, index: number) => {
+const formatSlideNumber = (
+  value: string | number | undefined,
+  index: number
+) => {
   const raw = String(value ?? index + 1).trim();
-  return raw.padStart(2, "0");
+  return raw.padStart(2, '0');
 };
 
 const resolvedSlides = slides.map((s, index) => ({
@@ -23,34 +30,47 @@ const resolvedSlides = slides.map((s, index) => ({
 
 <section
   id="hero"
-  class="hero relative w-full overflow-hidden bg-brand-primary text-brand-background"
+  class="relative h-[88vh] min-h-160 w-full overflow-hidden bg-brand-primary text-brand-background max-[640px]:h-auto max-[640px]:min-h-dvh"
   aria-roledescription="carousel"
 >
-  <!-- Track (semua slide disusun flex) -->
-  <div class="hero-track" id="heroTrack">
+  <div
+    class="absolute inset-0 flex transition-transform duration-1000 [cubic-bezier(0.65,0,0.35,1)]"
+    id="heroTrack"
+  >
     {
       resolvedSlides.map((slide) => (
         <div
-          class="hero-slide min-w-full h-full shrink-0 relative flex items-center"
+          class="relative flex h-full min-w-full shrink-0 items-center"
           role="group"
           aria-roledescription="slide"
         >
           <div
-            class="hero-img absolute inset-0 bg-cover bg-center"
+            class="pointer-events-none absolute inset-0 bg-cover bg-center brightness-[0.7] saturate-[0.7]"
             style={`background-image: url('${slide.image}');`}
-          ></div>
-          <div class="hero-overlay absolute inset-0 pointer-events-none"></div>
+          />
+          <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(74,93,63,0.85)_0%,rgba(42,46,37,0.65)_100%)]" />
 
-          <div class="hero-content relative z-2 w-full">
+          <div class="relative z-2 mx-auto grid w-full max-w-7xl grid-cols-[1.4fr_1fr] items-center gap-16 px-8 max-[960px]:grid-cols-1 max-[960px]:gap-8 max-[960px]:px-6 max-[640px]:px-6 max-[640px]:pt-24 max-[640px]:pb-36">
             <div>
-              <div class="hero-num">{slide.number}</div>
-              <div class="hero-tag">{heroTag}</div>
-              <h1 class="hero-headline" set:html={slide.headline}></h1>
+              <div class="mb-6 font-serif text-[clamp(80px,12vw,160px)] font-light italic leading-none tracking-[-0.04em] opacity-40 max-[640px]:text-[clamp(40px,10vw,72px)]">
+                {slide.number}
+              </div>
+              <div class="mb-5 inline-flex items-center gap-2.5 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary-lighter before:h-px before:w-7 before:bg-brand-primary-lighter before:content-['']">
+                {heroTag}
+              </div>
+              <h1
+                class="m-0 max-w-[18ch] font-serif text-[clamp(36px,4.5vw,60px)] font-normal leading-[1.1] tracking-[-0.02em] max-[640px]:text-[clamp(40px,10vw,72px)] [&_em]:font-light [&_em]:italic [&_em]:text-brand-primary-lighter"
+                set:html={slide.headline}
+              />
             </div>
 
-            <div class="hero-side">
-              <p class="hero-side-quote">{slide.quote}</p>
-              <p class="hero-side-attr">— {slide.quote_attr ?? "Journal Ocean"}</p>
+            <div class="border-l border-brand-background/25 pl-8 max-[960px]:border-l-0 max-[960px]:border-t max-[960px]:border-brand-background/25 max-[960px]:pl-0 max-[960px]:pt-6">
+              <p class="m-0 mb-5 max-w-[28ch] font-serif text-lg italic leading-normal text-brand-background/85">
+                {slide.quote}
+              </p>
+              <p class="m-0 text-[11.5px] font-medium uppercase tracking-[0.15em] text-brand-primary-lighter">
+                — {slide.quote_attr ?? 'Journal Ocean'}
+              </p>
             </div>
           </div>
         </div>
@@ -58,218 +78,39 @@ const resolvedSlides = slides.map((s, index) => ({
     }
   </div>
 
-  <!-- Bottom progress bar -->
-  <div class="hero-bottom">
-    <span class="hero-counter" id="heroCounter">01 / {String(totalSlides).padStart(2, "0")}</span>
-    <div class="hero-progress" id="heroProgress"></div>
+  <div
+    class="absolute bottom-8 left-0 right-0 z-3 mx-auto flex w-full max-w-7xl items-center gap-6 px-8 max-[960px]:bottom-6 max-[640px]:bottom-4 max-[640px]:px-6"
+  >
+    <span
+      class="font-mono text-xs tracking-wider text-brand-primary-lighter"
+      id="heroCounter">01 / {String(totalSlides).padStart(2, '0')}</span
+    >
+    <div class="flex flex-1 gap-1.5" id="heroProgress"></div>
   </div>
 </section>
-
-<style>
-  .hero {
-    position: relative;
-    height: 88vh;
-    min-height: 640px;
-    overflow: hidden;
-  }
-
-  /* Track & Slide */
-  .hero-track {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1);
-  }
-
-  .hero-slide {
-    min-width: 100%;
-    height: 100%;
-  }
-
-  .hero-img {
-    filter: saturate(0.7) brightness(0.7);
-  }
-
-  /* Overlay gradasi */
-  .hero-overlay {
-    background: linear-gradient(135deg,
-      rgba(74, 93, 63, 0.85) 0%,
-      rgba(42, 46, 37, 0.65) 100%);
-  }
-
-  /* Konten utama dalam slide */
-  .hero-content {
-    max-width: 1280px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 32px;
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 64px;
-    align-items: center;
-  }
-
-  /* Angka besar (01, 02, dst) */
-  .hero-num {
-    font-family: 'Fraunces', 'Times New Roman', serif;
-    font-style: italic;
-    font-size: clamp(80px, 12vw, 160px);
-    font-weight: 300;
-    line-height: 1;
-    opacity: 0.4;
-    letter-spacing: -0.04em;
-    margin-bottom: 24px;
-  }
-
-  /* Tag kecil di atas judul */
-  .hero-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 11.5px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-primary-lighter);
-    margin-bottom: 20px;
-  }
-
-  .hero-tag::before {
-    content: '';
-    width: 28px;
-    height: 1px;
-    background: var(--color-primary-lighter);
-  }
-
-  /* Headline utama */
-  .hero-headline {
-    font-family: 'Fraunces', 'Times New Roman', serif;
-    font-weight: 400;
-    font-size: clamp(36px, 4.5vw, 60px);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    max-width: 18ch;
-    margin: 0;
-  }
-
-  .hero-headline :global(em) {
-    font-style: italic;
-    font-weight: 300;
-    color: var(--color-primary-lighter);
-  }
-
-  /* Side quote column */
-  .hero-side {
-    border-left: 1px solid rgba(247, 242, 231, 0.25);
-    padding-left: 32px;
-  }
-
-  .hero-side-quote {
-    font-family: 'Fraunces', 'Times New Roman', serif;
-    font-style: italic;
-    font-size: 18px;
-    line-height: 1.5;
-    color: rgba(247, 242, 231, 0.85);
-    max-width: 28ch;
-    margin: 0 0 20px 0;
-  }
-
-  .hero-side-attr {
-    font-size: 11.5px;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--color-primary-lighter);
-    margin: 0;
-  }
-
-  /* Bottom progress bar */
-  .hero-bottom {
-    position: absolute;
-    bottom: 32px;
-    left: 0;
-    right: 0;
-    z-index: 3;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 32px;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-  }
-
-  .hero-counter {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--color-primary-lighter);
-    letter-spacing: 0.05em;
-  }
-
-  .hero-progress {
-    flex: 1;
-    display: flex;
-    gap: 6px;
-  }
-
-  .hero-progress div {
-    flex: 1;
-    height: 2px;
-    background: rgba(247, 242, 231, 0.2);
-    position: relative;
-    overflow: hidden;
-    border-radius: 2px;
-  }
-
-  .hero-progress div.active::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--color-primary-lighter);
-    animation: heroProgress 6s linear forwards;
-  }
-
-  @keyframes heroProgress {
-    from { transform: translateX(-100%); }
-    to   { transform: translateX(0); }
-  }
-
-  /* Responsive */
-  @media (max-width: 960px) {
-    .hero-content {
-      grid-template-columns: 1fr;
-      gap: 32px;
-    }
-
-    .hero-side {
-      border-left: none;
-      border-top: 1px solid rgba(247, 242, 231, 0.25);
-      padding-left: 0;
-      padding-top: 24px;
-    }
-  }
-</style>
 
 <script define:vars={{ totalSlides }}>
   (function () {
     const track = document.getElementById('heroTrack');
-    const hero  = document.getElementById('hero');
+    const hero = document.getElementById('hero');
     const progress = document.getElementById('heroProgress');
-    const counter  = document.getElementById('heroCounter');
+    const counter = document.getElementById('heroCounter');
     if (!track || !progress || !counter || !hero) return;
 
-    const slides = track.querySelectorAll('.hero-slide');
-    const total  = slides.length || totalSlides;
+    const slides = track.querySelectorAll('[role="group"]');
+    const total = slides.length || totalSlides;
     if (total <= 0) return;
 
-    // Build progress bars
     for (let i = 0; i < total; i++) {
       const d = document.createElement('div');
+      d.className =
+        'flex-1 h-[2px] relative overflow-hidden rounded-[2px] bg-brand-background/20';
       if (i === 0) d.classList.add('active');
       progress.appendChild(d);
     }
 
     let current = 0;
-    let timer   = null;
+    let timer = null;
 
     const go = (n) => {
       current = (n + total) % total;

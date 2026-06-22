@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
-@import "@fontsource-variable/merriweather-sans";
+@import '@fontsource-variable/merriweather-sans';
 
 :root {
   /* ============================================
@@ -11,29 +11,29 @@
      ============================================ */
 
   /* Primary — Deep Moss Green */
-  --color-primary: #4A5D3F;
-  --color-primary-dark: #3A4A32;
-  --color-primary-darker: #2A3625;
-  --color-primary-light: #6B7A5A;
-  --color-primary-lighter: #A4B293;
+  --color-primary: #4a5d3f;
+  --color-primary-dark: #3a4a32;
+  --color-primary-darker: #2a3625;
+  --color-primary-light: #6b7a5a;
+  --color-primary-lighter: #a4b293;
 
   /* Secondary — Mid Sage */
-  --color-secondary: #6B7A5A;
-  --color-secondary-light: #A4B293;
-  --color-secondary-dark: #4A5D3F;
+  --color-secondary: #6b7a5a;
+  --color-secondary-light: #a4b293;
+  --color-secondary-dark: #4a5d3f;
 
   /* Accent */
-  --color-accent-orange: #B8704A;   /* earthy rust */
-  --color-accent-gold: #A4B293;     /* pale sage as warm gold substitute */
+  --color-accent-orange: #b8704a; /* earthy rust */
+  --color-accent-gold: #a4b293; /* pale sage as warm gold substitute */
 
   /* Neutrals — Warm Earth Palette */
-  --color-background: #F7F2E7;      /* ivory */
-  --color-surface: #FBF6EE;         /* paper */
-  --color-sand: #EBE3D2;            /* warm sand */
-  --color-sand-2: #DDD2B8;          /* deeper sand */
-  --color-text-primary: #2A2E25;    /* forest dark */
-  --color-text-secondary: #55584C;
-  --color-text-tertiary: #8A8C7E;
+  --color-background: #f7f2e7; /* ivory */
+  --color-surface: #fbf6ee; /* paper */
+  --color-sand: #ebe3d2; /* warm sand */
+  --color-sand-2: #ddd2b8; /* deeper sand */
+  --color-text-primary: #2a2e25; /* forest dark */
+  --color-text-secondary: #55584c;
+  --color-text-tertiary: #8a8c7e;
   --color-border: rgba(42, 46, 37, 0.1);
 
   /* Semantic Selection */
@@ -43,17 +43,38 @@
   --color-selection-text-inverse: var(--color-text-primary);
 
   /* Gradients */
-  --gradient-primary: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-darker) 100%);
-  --gradient-primary-hover: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
-  --gradient-primary-active: linear-gradient(180deg, var(--color-primary-darker) 0%, var(--color-primary-dark) 100%);
-  --gradient-brand: linear-gradient(to right, var(--color-primary), var(--color-secondary), var(--color-accent-orange));
-  --gradient-brand-alt: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+  --gradient-primary: linear-gradient(
+    180deg,
+    var(--color-primary) 0%,
+    var(--color-primary-darker) 100%
+  );
+  --gradient-primary-hover: linear-gradient(
+    180deg,
+    var(--color-primary-light) 0%,
+    var(--color-primary) 100%
+  );
+  --gradient-primary-active: linear-gradient(
+    180deg,
+    var(--color-primary-darker) 0%,
+    var(--color-primary-dark) 100%
+  );
+  --gradient-brand: linear-gradient(
+    to right,
+    var(--color-primary),
+    var(--color-secondary),
+    var(--color-accent-orange)
+  );
+  --gradient-brand-alt: linear-gradient(
+    to right,
+    var(--color-primary),
+    var(--color-secondary)
+  );
 }
 
 @theme {
-  --font-merriweather-sans: "Merriweather Sans Variable", "sans-serif";
-  --font-serif: "Fraunces", "Times New Roman", serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-merriweather-sans: 'Merriweather Sans Variable', 'sans-serif';
+  --font-serif: 'Fraunces', 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
   /* Tailwind Color Extensions */
   --color-brand-primary: var(--color-primary);
@@ -90,7 +111,10 @@ body {
 }
 
 body {
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    sans-serif;
   color: var(--color-text-primary);
   background: var(--color-background);
   line-height: 1.6;
@@ -107,60 +131,60 @@ body {
   color: var(--color-selection-text);
 }
 
-[class*="bg-[#4A5D3F"]::selection,
-[class*="bg-brand-primary"]::selection,
-[style*="background-color: #4A5D3F"]::selection,
-[style*="background-color:#4A5D3F"]::selection {
+[class*='bg-[#4A5D3F']::selection,
+[class*='bg-brand-primary']::selection,
+[style*='background-color: #4A5D3F']::selection,
+[style*='background-color:#4A5D3F']::selection {
   background-color: var(--color-selection-bg-inverse) !important;
   color: var(--color-selection-text-inverse) !important;
 }
 
-[class*="bg-[#4A5D3F"]::-moz-selection,
-[class*="bg-brand-primary"]::-moz-selection,
-[style*="background-color: #4A5D3F"]::-moz-selection,
-[style*="background-color:#4A5D3F"]::-moz-selection {
+[class*='bg-[#4A5D3F']::-moz-selection,
+[class*='bg-brand-primary']::-moz-selection,
+[style*='background-color: #4A5D3F']::-moz-selection,
+[style*='background-color:#4A5D3F']::-moz-selection {
   background-color: var(--color-selection-bg-inverse) !important;
   color: var(--color-selection-text-inverse) !important;
 }
 
-nav[class*="bg-[#4A5D3F]"],
+nav[class*='bg-[#4A5D3F]'],
 nav.bg-brand-primary,
-footer[class*="bg-[#4A5D3F]"],
+footer[class*='bg-[#4A5D3F]'],
 footer.bg-brand-primary,
-section[class*="bg-[#4A5D3F]"],
-section[class*="bg-brand-primary"] {
+section[class*='bg-[#4A5D3F]'],
+section[class*='bg-brand-primary'] {
   --selection-bg: var(--color-selection-bg-inverse);
   --selection-color: var(--color-selection-text-inverse);
 }
 
-nav[class*="bg-[#4A5D3F]"] *::selection,
+nav[class*='bg-[#4A5D3F]'] *::selection,
 nav.bg-brand-primary *::selection,
-footer[class*="bg-[#4A5D3F]"] *::selection,
+footer[class*='bg-[#4A5D3F]'] *::selection,
 footer.bg-brand-primary *::selection,
-section[class*="bg-[#4A5D3F]"] *::selection,
-section[class*="bg-brand-primary"] *::selection {
+section[class*='bg-[#4A5D3F]'] *::selection,
+section[class*='bg-brand-primary'] *::selection {
   background-color: var(--color-selection-bg-inverse) !important;
   color: var(--color-selection-text-inverse) !important;
 }
 
-nav[class*="bg-[#4A5D3F]"] *::-moz-selection,
+nav[class*='bg-[#4A5D3F]'] *::-moz-selection,
 nav.bg-brand-primary *::-moz-selection,
-footer[class*="bg-[#4A5D3F]"] *::-moz-selection,
+footer[class*='bg-[#4A5D3F]'] *::-moz-selection,
 footer.bg-brand-primary *::-moz-selection,
-section[class*="bg-[#4A5D3F]"] *::-moz-selection,
-section[class*="bg-brand-primary"] *::-moz-selection {
+section[class*='bg-[#4A5D3F]'] *::-moz-selection,
+section[class*='bg-brand-primary'] *::-moz-selection {
   background-color: var(--color-selection-bg-inverse) !important;
   color: var(--color-selection-text-inverse) !important;
 }
 
-[class*="bg-[#4A5D3F"] *::selection,
-[class*="bg-brand-primary"] *::selection {
+[class*='bg-[#4A5D3F'] *::selection,
+[class*='bg-brand-primary'] *::selection {
   background-color: var(--color-selection-bg-inverse) !important;
   color: var(--color-selection-text-inverse) !important;
 }
 
-[class*="bg-[#4A5D3F"] *::-moz-selection,
-[class*="bg-brand-primary"] *::-moz-selection {
+[class*='bg-[#4A5D3F'] *::-moz-selection,
+[class*='bg-brand-primary'] *::-moz-selection {
   background-color: var(--color-selection-bg-inverse) !important;
   color: var(--color-selection-text-inverse) !important;
 }
@@ -199,4 +223,64 @@ section[class*="bg-brand-primary"] *::-moz-selection {
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+}
+
+@keyframes heroProgress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+#heroProgress div.active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-primary-lighter);
+  animation: heroProgress 6s linear forwards;
+}
+
+@keyframes preloader-drift {
+  from {
+    transform: translate3d(-0.75rem, 0.35rem, 0) scale(1);
+  }
+  to {
+    transform: translate3d(0.9rem, -0.8rem, 0) scale(1.08);
+  }
+}
+
+@keyframes preloader-breathe {
+  0%,
+  100% {
+    transform: scale(0.98);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes preloader-compass {
+  0% {
+    transform: rotate(-18deg);
+  }
+  45% {
+    transform: rotate(204deg);
+  }
+  70% {
+    transform: rotate(174deg);
+  }
+  100% {
+    transform: rotate(342deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader *,
+  .preloader *::before,
+  .preloader *::after {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
 }
