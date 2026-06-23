@@ -1,77 +1,39 @@
 ---
-const sectionTitle = 'Program Kemanusiaan <em>Journal Ocean</em>.';
-const sectionSubtitle =
-  'Program-program kemanusiaan untuk membantu masyarakat yang terdampak bencana dan membutuhkan bantuan darurat.';
+import {
+  getHumanitarianProgramContentWithFallback,
+  normalizeSiteLanguage,
+} from '../../../lib/directus';
+
+const language = normalizeSiteLanguage(Astro.url.searchParams.get('lang'));
+const humanitarianProgram =
+  await getHumanitarianProgramContentWithFallback(language);
+
+const sectionTitle = humanitarianProgram.title;
+const sectionSubtitle = humanitarianProgram.subtitle;
 
 const programFeature = {
-  eyebrow: 'Program Prioritas',
-  category: 'Program Kemanusiaan',
-  title: 'Bantuan Bencana Alam',
-  desc: 'Penyaluran bantuan cepat untuk korban bencana alam berupa makanan, pakaian, tempat tinggal sementara, dan kebutuhan darurat lainnya. Tim kami siap memberikan respon cepat di lokasi bencana.',
-  image:
-    'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&h=800&fit=crop',
-  imageAlt: 'Bantuan Bencana Alam',
-  stat: { num: '24/7', label: 'Siaga Tim' },
-  bullets: [
-    'Distribusi bantuan logistik dan kebutuhan pokok',
-    'Pendirian posko bantuan darurat',
-    'Dukungan psikologis untuk korban bencana',
-  ],
+  eyebrow: humanitarianProgram.program_eyebrow,
+  category: humanitarianProgram.category,
+  title: humanitarianProgram.program_title,
+  desc: humanitarianProgram.program_desc,
+  image: humanitarianProgram.image,
+  imageAlt: humanitarianProgram.image_alt ?? humanitarianProgram.program_title,
+  stat: {
+    num: humanitarianProgram.stat_num,
+    label: humanitarianProgram.stat_label,
+  },
+  bullets: (humanitarianProgram.program_bullets ?? [])
+    .map((item) => item.text)
+    .filter(Boolean),
 };
 
-const programCards = [
-  {
-    icon: 'R',
-    title: 'Rumah Layak Huni',
-    desc: 'Program pembangunan dan renovasi rumah untuk keluarga yang tidak memiliki tempat tinggal layak atau rumahnya rusak.',
-    image:
-      'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=800&h=600&fit=crop',
-    imageAlt: 'Rumah Layak Huni',
-  },
-  {
-    icon: 'M',
-    title: 'Bantuan Medis Darurat',
-    desc: 'Program bantuan medis darurat untuk korban bencana dan masyarakat yang membutuhkan perawatan kesehatan mendesak.',
-    image:
-      'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=600&fit=crop',
-    imageAlt: 'Bantuan Medis Darurat',
-  },
-  {
-    icon: 'A',
-    title: 'Perlindungan Anak',
-    desc: 'Program perlindungan dan pemenuhan hak-hak anak, termasuk bantuan pendidikan, kesehatan, dan kebutuhan dasar anak-anak terlantar.',
-    image:
-      'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop',
-    imageAlt: 'Perlindungan Anak',
-  },
-  {
-    icon: 'P',
-    title: 'Bantuan Pengungsi',
-    desc: 'Program bantuan untuk pengungsi dan masyarakat yang terpaksa mengungsi akibat konflik atau bencana, termasuk kebutuhan dasar dan dukungan psikologis.',
-    image:
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop',
-    imageAlt: 'Bantuan Pengungsi',
-  },
-  {
-    icon: 'T',
-    title: 'Rapid Response Team',
-    desc: 'Tim respons cepat yang siap dikerahkan untuk memberikan bantuan darurat di lokasi bencana atau situasi darurat lainnya.',
-    image:
-      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=600&fit=crop',
-    imageAlt: 'Rapid Response Team',
-  },
-  {
-    icon: 'H',
-    title: 'Program Rehabilitasi',
-    desc: 'Program rehabilitasi pasca bencana untuk membantu masyarakat membangun kembali kehidupan mereka dengan lebih baik.',
-    image:
-      'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=600&fit=crop',
-    imageAlt: 'Program Rehabilitasi',
-  },
-];
-
-const responseCards = programCards.slice(0, 3);
-const recoveryCards = programCards.slice(3);
+const programCards = (humanitarianProgram.list_program ?? []).map((item) => ({
+  icon: item.icon ?? item.title?.slice(0, 1),
+  title: item.title ?? '',
+  desc: item.desc ?? '',
+  image: item.image,
+  imageAlt: item.image_alt ?? item.title,
+}));
 ---
 
 <section
@@ -80,9 +42,13 @@ const recoveryCards = programCards.slice(3);
   class="bg-brand-sand/45 px-4 py-18 sm:px-6 sm:py-20 lg:px-8 lg:py-28"
 >
   <div class="mx-auto max-w-7xl">
-    <header class="mb-10 grid gap-5 border-b border-brand-border pb-10 sm:mb-12 sm:gap-6 sm:pb-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-end lg:gap-14 lg:pb-16">
+    <header
+      class="mb-10 grid gap-5 border-b border-brand-border pb-10 sm:mb-12 sm:gap-6 sm:pb-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-end lg:gap-14 lg:pb-16"
+    >
       <div>
-        <div class="mb-4 inline-flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.22em] text-brand-rust sm:text-[11px]">
+        <div
+          class="mb-4 inline-flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.22em] text-brand-rust sm:text-[11px]"
+        >
           <span class="h-px w-7 bg-brand-rust sm:w-8"></span>
           <span>{programFeature.category}</span>
         </div>
@@ -93,27 +59,43 @@ const recoveryCards = programCards.slice(3);
           <Fragment set:html={sectionTitle} />
         </h2>
       </div>
-      <p class="m-0 max-w-[60ch] text-[14px] leading-6 text-brand-ink-soft sm:text-[15px] sm:leading-7 lg:text-[16px]">
+      <p
+        class="m-0 max-w-[60ch] text-[14px] leading-6 text-brand-ink-soft sm:text-[15px] sm:leading-7 lg:text-[16px]"
+      >
         {sectionSubtitle}
       </p>
     </header>
 
     <div class="grid gap-5 sm:gap-6 lg:grid-cols-[0.92fr_1.08fr] lg:gap-6">
-      <aside class="rounded-[24px] border border-brand-ink/10 bg-brand-primary px-5 py-6 text-brand-background shadow-[0_20px_60px_rgba(42,46,37,0.12)] sm:rounded-[28px] sm:px-7 sm:py-7 lg:sticky lg:top-24">
-        <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] text-white/82">
+      <aside
+        class="rounded-3xl border border-brand-ink/10 bg-brand-primary px-5 py-6 text-brand-background shadow-[0_20px_60px_rgba(42,46,37,0.12)] sm:rounded-[28px] sm:px-7 sm:py-7 lg:sticky lg:top-24"
+      >
+        <div
+          class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] text-white/82"
+        >
           <span class="h-1.5 w-1.5 rounded-full bg-brand-rust"></span>
           <span>{programFeature.eyebrow}</span>
         </div>
 
         <div class="grid gap-5 border-b border-white/12 pb-5 sm:gap-6 sm:pb-6">
           <div>
-            <div class="font-serif text-[44px] leading-none sm:text-[58px]">{programFeature.stat.num}</div>
-            <div class="mt-2 text-[10px] uppercase tracking-[0.18em] text-white/70">{programFeature.stat.label}</div>
+            <div class="font-serif text-[44px] leading-none sm:text-[58px]">
+              {programFeature.stat.num}
+            </div>
+            <div
+              class="mt-2 text-[10px] uppercase tracking-[0.18em] text-white/70"
+            >
+              {programFeature.stat.label}
+            </div>
           </div>
-          <h3 class="m-0 max-w-[12ch] font-serif text-[clamp(26px,6vw,42px)] font-normal leading-[1.02] tracking-[-0.03em] text-white">
+          <h3
+            class="m-0 max-w-[12ch] font-serif text-[clamp(26px,6vw,42px)] font-normal leading-[1.02] tracking-[-0.03em] text-white"
+          >
             {programFeature.title}
           </h3>
-          <p class="m-0 text-[14px] leading-6 text-white/76 sm:text-[15px] sm:leading-7">
+          <p
+            class="m-0 text-[14px] leading-6 text-white/76 sm:text-[15px] sm:leading-7"
+          >
             {programFeature.desc}
           </p>
         </div>
@@ -135,98 +117,61 @@ const recoveryCards = programCards.slice(3);
       </aside>
 
       <div class="grid gap-5 sm:gap-6">
-        <article class="overflow-hidden rounded-[24px] border border-brand-border bg-brand-surface shadow-[0_18px_48px_rgba(42,46,37,0.08)] sm:rounded-[28px]">
-          <div class="relative min-h-[300px] sm:min-h-[360px] lg:min-h-[420px]">
-            <img
-              src={programFeature.image}
-              alt={programFeature.imageAlt}
-              class="absolute inset-0 h-full w-full object-cover saturate-[0.82]"
-              loading="lazy"
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/18 to-transparent"></div>
-            <div class="absolute inset-x-4 bottom-4 grid gap-4 sm:inset-x-6 sm:bottom-6 lg:grid-cols-[1fr_auto] lg:items-end">
-              <div>
-                <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[9px] uppercase tracking-[0.18em] text-white backdrop-blur-sm sm:text-[10px]">
-                  <span class="h-1.5 w-1.5 rounded-full bg-brand-rust"></span>
-                  <span>Field Response</span>
+        {
+          programFeature.image && (
+            <article class="overflow-hidden rounded-3xl border border-brand-border bg-brand-surface shadow-[0_18px_48px_rgba(42,46,37,0.08)] sm:rounded-[28px]">
+              <div class="relative min-h-75 sm:min-h-90 lg:min-h-105">
+                <img
+                  src={programFeature.image}
+                  alt={programFeature.imageAlt}
+                  class="absolute inset-0 h-full w-full object-cover saturate-[0.82]"
+                  loading="lazy"
+                />
+                <div class="absolute inset-0 bg-linear-to-t from-black/60 via-black/18 to-transparent" />
+                <div class="absolute inset-x-4 bottom-4 sm:inset-x-6 sm:bottom-6">
+                  <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[9px] uppercase tracking-[0.18em] text-white backdrop-blur-sm sm:text-[10px]">
+                    <span class="h-1.5 w-1.5 rounded-full bg-brand-rust" />
+                    <span>{programFeature.category}</span>
+                  </div>
                 </div>
-                <h3 class="m-0 max-w-[14ch] font-serif text-[clamp(26px,6vw,46px)] font-normal leading-[1.02] tracking-[-0.03em] text-white">
-                  Intervensi cepat, pemulihan bertahap.
-                </h3>
               </div>
-              <div class="rounded-[18px] border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-sm sm:px-5">
-                <div class="text-[10px] uppercase tracking-[0.18em] text-white/68">Pendekatan</div>
-                <div class="mt-1 max-w-[20ch] text-[13.5px] leading-6 text-white/88">Mendahulukan kebutuhan darurat lalu menata pemulihan yang manusiawi.</div>
-              </div>
-            </div>
-          </div>
-        </article>
+            </article>
+          )
+        }
 
         <div class="grid gap-4 xl:grid-cols-3">
           {
-            responseCards.map((program, idx) => (
-              <article class="group overflow-hidden rounded-[22px] border border-brand-border bg-brand-surface transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_38px_rgba(42,46,37,0.08)] sm:rounded-[24px]">
-                <div class="relative aspect-[4/3] overflow-hidden">
-                  <img
-                    src={program.image}
-                    alt={program.imageAlt}
-                    class="h-full w-full object-cover saturate-[0.84] transition duration-700 group-hover:scale-[1.04]"
-                    loading="lazy"
-                  />
-                  <div class="absolute inset-x-3 top-3 flex items-start justify-between gap-3 sm:inset-x-4 sm:top-4">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/25 font-serif text-lg italic text-white backdrop-blur-sm">
-                      {program.icon}
-                    </span>
-                    <span class="rounded-full bg-brand-background px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-brand-rust">
-                      {String(idx + 1).padStart(2, '0')}
-                    </span>
+            programCards
+              .filter((p) => p.image)
+              .map((program, idx) => (
+                <article class="group overflow-hidden rounded-3xl border border-brand-border bg-brand-surface transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_38px_rgba(42,46,37,0.08)] sm:rounded-3xl">
+                  <div class="relative aspect-4/3 overflow-hidden">
+                    <img
+                      src={program.image}
+                      alt={program.imageAlt}
+                      class="h-full w-full object-cover saturate-[0.84] transition duration-700 group-hover:scale-[1.04]"
+                      loading="lazy"
+                    />
+                    <div class="absolute inset-x-3 top-3 flex items-start justify-between gap-3 sm:inset-x-4 sm:top-4">
+                      <span class="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/25 font-serif text-lg italic text-white backdrop-blur-sm">
+                        {program.icon}
+                      </span>
+                      <span class="rounded-full bg-brand-background px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-brand-rust">
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div class="px-4 py-4 sm:px-5 sm:py-5">
-                  <h4 class="m-0 font-serif text-[20px] leading-[1.08] tracking-[-0.02em] text-brand-ink">
-                    {program.title}
-                  </h4>
-                  <p class="mt-3 text-[13.5px] leading-6 text-brand-ink-soft sm:text-[14px]">
-                    {program.desc}
-                  </p>
-                </div>
-              </article>
-            ))
-          }
-        </div>
-
-        <div class="rounded-[24px] border border-brand-border bg-brand-surface/80 p-4 sm:rounded-[28px] sm:p-5">
-          <div class="mb-4 flex items-center justify-between gap-3 border-b border-brand-border pb-4">
-            <div>
-              <div class="text-[10px] uppercase tracking-[0.18em] text-brand-rust">Tahap Lanjut</div>
-              <h3 class="mt-1 font-serif text-[24px] leading-[1.04] tracking-[-0.02em] text-brand-ink">Pemulihan & pendampingan</h3>
-            </div>
-            <div class="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-brand-rust/70 sm:block">03–05</div>
-          </div>
-          <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 sm:gap-4">
-            {
-              recoveryCards.map((program, idx) => (
-                <article class="grid min-h-[180px] gap-4 rounded-[20px] border border-brand-border bg-brand-background/72 p-4 sm:rounded-[22px] sm:p-5">
-                  <div class="flex items-center justify-between gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-rust/12 font-serif text-lg italic text-brand-rust sm:h-11 sm:w-11">
-                      {program.icon}
-                    </span>
-                    <span class="font-mono text-[10px] uppercase tracking-[0.16em] text-brand-rust/70">
-                      {String(idx + 4).padStart(2, '0')}
-                    </span>
-                  </div>
-                  <div>
-                    <h4 class="m-0 font-serif text-[18px] leading-[1.1] tracking-[-0.02em] text-brand-ink sm:text-[20px]">
+                  <div class="px-4 py-4 sm:px-5 sm:py-5">
+                    <h4 class="m-0 font-serif text-[20px] leading-[1.08] tracking-[-0.02em] text-brand-ink">
                       {program.title}
                     </h4>
-                    <p class="mt-2 text-[13px] leading-6 text-brand-ink-soft sm:text-[13.5px]">
+                    <p class="mt-3 text-[13.5px] leading-6 text-brand-ink-soft sm:text-[14px]">
                       {program.desc}
                     </p>
                   </div>
                 </article>
               ))
-            }
-          </div>
+          }
         </div>
       </div>
     </div>

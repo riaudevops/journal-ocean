@@ -8,24 +8,22 @@ const language = normalizeSiteLanguage(Astro.url.searchParams.get('lang'));
 const socialProgram = await getSocialProgramContentWithFallback(language);
 
 const sectionTitle =
-  socialProgram.title ?? 'Program Sosial <em>Journal Ocean</em>.';
+  socialProgram.title;
 const sectionSubtitle =
-  socialProgram.subtitle ??
-  'Program-program sosial yang bertujuan untuk membantu dan memberdayakan masyarakat yang membutuhkan.';
+  socialProgram.subtitle;
 
 const programFeature = {
-  eyebrow: socialProgram.program_eyebrow ?? 'Program Unggulan',
-  category: socialProgram.category ?? 'Program Sosial',
-  title: socialProgram.program_title ?? 'Program Beasiswa',
+  eyebrow: socialProgram.program_eyebrow,
+  category: socialProgram.category,
+  title: socialProgram.program_title,
   desc:
-    socialProgram.program_desc ??
-    'Memberikan beasiswa untuk siswa berprestasi dan keluarga kurang mampu untuk melanjutkan pendidikan ke jenjang yang lebih tinggi. Program ini bertujuan untuk memberikan kesempatan pendidikan yang lebih baik bagi generasi penerus bangsa.',
+    socialProgram.program_desc,
   image: socialProgram.image,
   imageAlt:
-    socialProgram.image_alt ?? socialProgram.program_title ?? 'Program Sosial',
+    socialProgram.image_alt ?? socialProgram.program_title,
   stat: {
-    num: socialProgram.stat_num ?? '150+',
-    label: socialProgram.stat_label ?? 'Penerima Beasiswa',
+    num: socialProgram.stat_num,
+    label: socialProgram.stat_label,
   },
   bullets: (socialProgram.program_bullets ?? [])
     .map((item) => item.text)
@@ -38,7 +36,7 @@ const programCards = (socialProgram.list_program ?? []).map((item, idx) => ({
   title: item.title ?? '',
   desc: item.desc ?? '',
   image: item.image,
-  imageAlt: item.image_alt ?? item.title ?? 'Program Sosial',
+  imageAlt: item.image_alt ?? item.title,
 }));
 
 const spotlightCards = programCards.slice(0, 2);
@@ -86,7 +84,7 @@ const hasArchiveCards = archiveCards.length > 0;
           <span
             class="rounded-full border border-brand-border bg-brand-surface px-3 py-1.5"
           >
-            {programCards.length} program aktif
+            {programCards.length}
           </span>
         </div>
       </div>
@@ -127,15 +125,6 @@ const hasArchiveCards = archiveCards.length > 0;
                 >
                   {programFeature.stat.label}
                 </div>
-              </div>
-            </div>
-            <div class="absolute inset-x-4 bottom-4 sm:inset-x-7 sm:bottom-7">
-              <div
-                class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[9px] uppercase tracking-[0.18em] text-white backdrop-blur-sm sm:text-[10px]"
-              >
-                <span class="h-1.5 w-1.5 rounded-full bg-brand-primary-lighter"
-                ></span>
-                <span>Fokus utama</span>
               </div>
             </div>
           </div>

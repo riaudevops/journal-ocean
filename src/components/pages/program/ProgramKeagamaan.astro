@@ -1,77 +1,41 @@
 ---
-const sectionTitle = 'Program Keagamaan <em>Journal Ocean</em>.';
-const sectionSubtitle =
-  'Program-program keagamaan untuk memperdalam pemahaman agama dan memperkuat nilai-nilai spiritual masyarakat.';
+import {
+  getReligiousProgramContentWithFallback,
+  normalizeSiteLanguage,
+} from '../../../lib/directus';
+
+const language = normalizeSiteLanguage(Astro.url.searchParams.get('lang'));
+const religiousProgram = await getReligiousProgramContentWithFallback(language);
+
+const sectionTitle = religiousProgram.title;
+const sectionSubtitle = religiousProgram.subtitle;
 
 const programFeature = {
-  eyebrow: 'Program Rutin',
-  category: 'Program Keagamaan',
-  title: 'Kajian Keagamaan Rutin',
-  desc: 'Kajian keagamaan yang diadakan secara rutin setiap bulan, terbuka untuk umum, dengan tema-tema aktual dan relevan dengan kehidupan sehari-hari. Program ini bertujuan untuk memperdalam pemahaman keagamaan dan memperkuat ukhuwah islamiyah.',
-  image:
-    'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1200&h=800&fit=crop',
-  imageAlt: 'Kajian Keagamaan Rutin',
-  stat: { num: '12+', label: 'Kajian per Tahun' },
-  bullets: [
-    'Kajian bulanan dengan tema yang beragam',
-    'Dibawakan oleh ustadz dan ustadzah berpengalaman',
-    'Sesi tanya jawab dan diskusi interaktif',
-  ],
+  eyebrow: religiousProgram.program_eyebrow,
+  category: religiousProgram.category,
+  title: religiousProgram.program_title,
+  desc: religiousProgram.program_desc,
+  image: religiousProgram.image,
+  imageAlt: religiousProgram.image_alt ?? religiousProgram.program_title,
+  stat: {
+    num: religiousProgram.stat_num,
+    label: religiousProgram.stat_label,
+  },
+  bullets: (religiousProgram.program_bullets ?? [])
+    .map((item) => item.text)
+    .filter(Boolean),
 };
 
-const programCards = [
-  {
-    icon: 'R',
-    title: 'Program Ramadhan',
-    desc: 'Berbagai kegiatan keagamaan selama bulan Ramadhan, termasuk buka puasa bersama, tarawih, tadarus, dan program-program khusus Ramadhan lainnya.',
-    image:
-      'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=600&fit=crop',
-    imageAlt: 'Program Ramadhan',
-  },
-  {
-    icon: 'M',
-    title: 'Pembinaan Remaja Masjid',
-    desc: 'Program pembinaan untuk remaja masjid melalui kegiatan keagamaan, sosial, dan pengembangan karakter untuk generasi muda yang lebih baik.',
-    image:
-      'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=600&fit=crop',
-    imageAlt: 'Pembinaan Remaja Masjid',
-  },
-  {
-    icon: 'Z',
-    title: 'Penyaluran Zakat',
-    desc: 'Program penyaluran zakat fitrah dan zakat mal kepada mustahik yang berhak, dengan sistem yang transparan dan terpercaya.',
-    image:
-      'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop',
-    imageAlt: 'Penyaluran Zakat',
-  },
-  {
-    icon: 'T',
-    title: 'Tahfidz Al-Quran',
-    desc: 'Program menghafal Al-Quran untuk anak-anak dan remaja, dengan metode yang menyenangkan dan efektif untuk memudahkan proses menghafal.',
-    image:
-      'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop',
-    imageAlt: 'Tahfidz Al-Quran',
-  },
-  {
-    icon: 'A',
-    title: 'Kelas Mengaji',
-    desc: 'Program belajar membaca Al-Quran untuk berbagai usia, dari anak-anak hingga dewasa, dengan pengajar yang berpengalaman dan sabar.',
-    image:
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop',
-    imageAlt: 'Kelas Mengaji',
-  },
-  {
-    icon: 'H',
-    title: 'Hari Besar Islam',
-    desc: "Kegiatan keagamaan dalam rangka memperingati hari-hari besar Islam seperti Maulid Nabi, Isra Mi'raj, dan hari-hari penting lainnya.",
-    image:
-      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=600&fit=crop',
-    imageAlt: 'Hari Besar Islam',
-  },
-];
+const programCards = (religiousProgram.list_program ?? []).map((item) => ({
+  icon: item.icon ?? item.title?.slice(0, 1),
+  title: item.title ?? '',
+  desc: item.desc ?? '',
+  image: item.image,
+  imageAlt: item.image_alt ?? item.title,
+}));
 
-const featureCards = programCards.slice(0, 2);
-const archiveCards = programCards.slice(2);
+const featureCards = programCards.filter((p) => p.image).slice(0, 2);
+const archiveCards = programCards.filter((p) => p.image).slice(2);
 ---
 
 <section
@@ -81,7 +45,9 @@ const archiveCards = programCards.slice(2);
 >
   <div class="mx-auto max-w-7xl">
     <header class="mx-auto mb-10 max-w-4xl text-center sm:mb-12 lg:mb-16">
-      <div class="mb-4 inline-flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.22em] text-brand-primary sm:text-[11px]">
+      <div
+        class="mb-4 inline-flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.22em] text-brand-primary sm:text-[11px]"
+      >
         <span class="h-px w-7 bg-brand-primary sm:w-8"></span>
         <span>{programFeature.category}</span>
         <span class="h-px w-7 bg-brand-primary sm:w-8"></span>
@@ -92,28 +58,52 @@ const archiveCards = programCards.slice(2);
       >
         <Fragment set:html={sectionTitle} />
       </h2>
-      <p class="mx-auto mt-4 max-w-[60ch] text-[14px] leading-6 text-brand-ink-soft sm:mt-5 sm:text-[15px] sm:leading-7 lg:text-[16px]">
+      <p
+        class="mx-auto mt-4 max-w-[60ch] text-[14px] leading-6 text-brand-ink-soft sm:mt-5 sm:text-[15px] sm:leading-7 lg:text-[16px]"
+      >
         {sectionSubtitle}
       </p>
     </header>
 
-    <article class="overflow-hidden rounded-[24px] border border-brand-border bg-brand-surface shadow-[0_18px_48px_rgba(42,46,37,0.08)] sm:rounded-[30px]">
+    <article
+      class="overflow-hidden rounded-3xl border border-brand-border bg-brand-surface shadow-[0_18px_48px_rgba(42,46,37,0.08)] sm:rounded-[30px]"
+    >
       <div class="grid lg:grid-cols-[0.9fr_1.1fr]">
-        <div class="border-b border-brand-border px-5 py-6 sm:px-8 sm:py-8 lg:border-b-0 lg:border-r lg:px-9 lg:py-10">
-          <div class="mb-3 text-[10px] font-medium uppercase tracking-[0.2em] text-brand-primary sm:text-[11px]">
+        <div
+          class="border-b border-brand-border px-5 py-6 sm:px-8 sm:py-8 lg:border-b-0 lg:border-r lg:px-9 lg:py-10"
+        >
+          <div
+            class="mb-3 text-[10px] font-medium uppercase tracking-[0.2em] text-brand-primary sm:text-[11px]"
+          >
             {programFeature.eyebrow}
           </div>
-          <h3 class="m-0 max-w-[13ch] font-serif text-[clamp(26px,6vw,46px)] font-normal leading-[1.03] tracking-[-0.03em] text-brand-ink">
+          <h3
+            class="m-0 max-w-[13ch] font-serif text-[clamp(26px,6vw,46px)] font-normal leading-[1.03] tracking-[-0.03em] text-brand-ink"
+          >
             {programFeature.title}
           </h3>
-          <p class="mt-4 text-[14px] leading-6 text-brand-ink-soft sm:mt-5 sm:text-base sm:leading-7">
+          <p
+            class="mt-4 text-[14px] leading-6 text-brand-ink-soft sm:mt-5 sm:text-base sm:leading-7"
+          >
             {programFeature.desc}
           </p>
 
-          <div class="mt-6 grid gap-3 border-t border-brand-border pt-5 sm:mt-8 sm:pt-6">
-            <div class="rounded-[18px] bg-brand-background px-4 py-4 sm:rounded-[20px]">
-              <div class="font-serif text-[38px] leading-none text-brand-primary sm:text-[52px]">{programFeature.stat.num}</div>
-              <div class="mt-2 text-[10px] uppercase tracking-[0.18em] text-brand-primary/75">{programFeature.stat.label}</div>
+          <div
+            class="mt-6 grid gap-3 border-t border-brand-border pt-5 sm:mt-8 sm:pt-6"
+          >
+            <div
+              class="rounded-[18px] bg-brand-background px-4 py-4 sm:rounded-[20px]"
+            >
+              <div
+                class="font-serif text-[38px] leading-none text-brand-primary sm:text-[52px]"
+              >
+                {programFeature.stat.num}
+              </div>
+              <div
+                class="mt-2 text-[10px] uppercase tracking-[0.18em] text-brand-primary/75"
+              >
+                {programFeature.stat.label}
+              </div>
             </div>
             <ul class="m-0 grid list-none gap-2.5 p-0 sm:gap-3">
               {
@@ -122,7 +112,9 @@ const archiveCards = programCards.slice(2);
                     <span class="pt-0.5 font-mono text-[10px] tracking-[0.14em] text-brand-primary sm:text-[11px]">
                       {String(idx + 1).padStart(2, '0')}
                     </span>
-                    <span class="text-[13.5px] leading-6 text-brand-ink sm:text-[14px]">{bullet}</span>
+                    <span class="text-[13.5px] leading-6 text-brand-ink sm:text-[14px]">
+                      {bullet}
+                    </span>
                   </li>
                 ))
               }
@@ -131,27 +123,31 @@ const archiveCards = programCards.slice(2);
         </div>
 
         <div class="grid gap-0 lg:grid-rows-[minmax(320px,420px)_auto]">
-          <div class="relative min-h-[280px] border-b border-brand-border sm:min-h-[340px]">
-            <img
-              src={programFeature.image}
-              alt={programFeature.imageAlt}
-              class="absolute inset-0 h-full w-full object-cover saturate-[0.82]"
-              loading="lazy"
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent"></div>
-            <div class="absolute bottom-0 left-0 right-0 p-5 sm:p-7">
-              <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[9px] uppercase tracking-[0.18em] text-white backdrop-blur-sm sm:text-[10px]">
-                <span class="h-1.5 w-1.5 rounded-full bg-brand-primary-lighter"></span>
-                <span>Majelis & Pembinaan</span>
+          {
+            programFeature.image && (
+              <div class="relative min-h-70 border-b border-brand-border sm:min-h-85">
+                <img
+                  src={programFeature.image}
+                  alt={programFeature.imageAlt}
+                  class="absolute inset-0 h-full w-full object-cover saturate-[0.82]"
+                  loading="lazy"
+                />
+                <div class="absolute inset-0 bg-linear-to-t from-black/45 via-black/10 to-transparent" />
+                <div class="absolute bottom-0 left-0 right-0 p-5 sm:p-7">
+                  <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[9px] uppercase tracking-[0.18em] text-white backdrop-blur-sm sm:text-[10px]">
+                    <span class="h-1.5 w-1.5 rounded-full bg-brand-primary-lighter" />
+                    <span>{programFeature.category}</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            )
+          }
 
           <div class="grid gap-4 p-4 sm:p-5 xl:grid-cols-2">
             {
               featureCards.map((program, idx) => (
                 <article class="group overflow-hidden rounded-[22px] border border-brand-border bg-brand-background/72 transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(42,46,37,0.08)]">
-                  <div class="relative aspect-[4/3] overflow-hidden">
+                  <div class="relative aspect-4/3 overflow-hidden">
                     <img
                       src={program.image}
                       alt={program.imageAlt}
@@ -183,49 +179,43 @@ const archiveCards = programCards.slice(2);
       </div>
     </article>
 
-    <div class="mt-6 rounded-[24px] border border-brand-border bg-brand-surface/75 p-4 sm:mt-8 sm:rounded-[28px] sm:p-5 lg:p-6">
-      <div class="mb-4 flex items-center justify-between gap-3 border-b border-brand-border pb-4">
-        <div>
-          <div class="text-[10px] uppercase tracking-[0.18em] text-brand-primary/75">Ruang Program</div>
-          <h3 class="mt-1 font-serif text-[24px] leading-[1.04] tracking-[-0.02em] text-brand-ink">Arsip kegiatan pembinaan</h3>
-        </div>
-        <div class="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-brand-primary/65 sm:block">03–06</div>
-      </div>
-
-      <div class="grid gap-3 sm:gap-4 lg:grid-cols-2">
-        {
-          archiveCards.map((program, idx) => (
-            <article class="grid gap-4 rounded-[20px] border border-brand-border bg-brand-background/72 p-4 sm:grid-cols-[160px_1fr] sm:rounded-[22px] sm:p-5">
-              <div class="relative aspect-[4/3] overflow-hidden rounded-[16px] sm:h-full sm:min-h-[140px] sm:aspect-auto">
-                <img
-                  src={program.image}
-                  alt={program.imageAlt}
-                  class="h-full w-full object-cover saturate-[0.84]"
-                  loading="lazy"
-                />
-                <div class="absolute left-3 top-3 rounded-full bg-brand-surface px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-brand-primary">
-                  {String(idx + 3).padStart(2, '0')}
-                </div>
-              </div>
-              <div class="flex flex-col justify-between gap-3">
-                <div>
-                  <div class="mb-3 flex items-center gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary/12 font-serif text-lg italic text-brand-primary">
-                      {program.icon}
-                    </span>
-                    <h4 class="m-0 font-serif text-[18px] leading-[1.08] tracking-[-0.02em] text-brand-ink sm:text-[20px]">
-                      {program.title}
-                    </h4>
+    {
+      archiveCards.length > 0 && (
+        <div class="mt-6 rounded-3xl border border-brand-border bg-brand-surface/75 p-4 sm:mt-8 sm:rounded-[28px] sm:p-5 lg:p-6">
+          <div class="grid gap-3 sm:gap-4 lg:grid-cols-2">
+            {archiveCards.map((program, idx) => (
+              <article class="grid gap-4 rounded-[20px] border border-brand-border bg-brand-background/72 p-4 sm:grid-cols-[160px_1fr] sm:rounded-[22px] sm:p-5">
+                <div class="relative aspect-4/3 overflow-hidden rounded-2xl sm:h-full sm:min-h-35 sm:aspect-auto">
+                  <img
+                    src={program.image}
+                    alt={program.imageAlt}
+                    class="h-full w-full object-cover saturate-[0.84]"
+                    loading="lazy"
+                  />
+                  <div class="absolute left-3 top-3 rounded-full bg-brand-surface px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-brand-primary">
+                    {String(idx + 3).padStart(2, '0')}
                   </div>
-                  <p class="m-0 text-[13px] leading-6 text-brand-ink-soft sm:text-[13.5px]">
-                    {program.desc}
-                  </p>
                 </div>
-              </div>
-            </article>
-          ))
-        }
-      </div>
-    </div>
+                <div class="flex flex-col justify-between gap-3">
+                  <div>
+                    <div class="mb-3 flex items-center gap-3">
+                      <span class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary/12 font-serif text-lg italic text-brand-primary">
+                        {program.icon}
+                      </span>
+                      <h4 class="m-0 font-serif text-[18px] leading-[1.08] tracking-[-0.02em] text-brand-ink sm:text-[20px]">
+                        {program.title}
+                      </h4>
+                    </div>
+                    <p class="m-0 text-[13px] leading-6 text-brand-ink-soft sm:text-[13.5px]">
+                      {program.desc}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      )
+    }
   </div>
 </section>

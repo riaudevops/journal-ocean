@@ -10,8 +10,11 @@ const language = normalizeSiteLanguage(Astro.url.searchParams.get('lang'));
 const announcement = await getAnnouncementContentWithFallback(language);
 const pengumumanData = await getHomeNews(language, 5);
 const headerTitle = announcement.title ?? 'Berita & Pengumuman';
-const headerSubtitle = announcement.subtitle ?? 'Kabar terbaru dari Journal Ocean.';
-const headerQuote = announcement.quote ?? '"Cerita-cerita kecil yang membentuk dampak yang lebih besar."';
+const headerSubtitle =
+  announcement.subtitle ?? 'Kabar terbaru dari Journal Ocean.';
+const headerQuote =
+  announcement.quote ??
+  '"Cerita-cerita kecil yang membentuk dampak yang lebih besar."';
 const headerViewAll = announcement.view_all ?? 'Lihat Semua Berita';
 const linkHref = '/berita';
 const readMoreLabel = language === 'en' ? 'Read More' : 'Baca Selengkapnya';
@@ -22,76 +25,148 @@ const featuredNews = pengumumanData[0];
 const sideNews = pengumumanData.slice(1, 5);
 ---
 
-<section class="bg-brand-background px-8 py-32 max-[640px]:px-5 max-[640px]:py-22">
-  <div class="mx-auto max-w-[1320px]">
-    <div class="mb-[72px] grid grid-cols-[1.5fr_1fr] items-end gap-12 border-b border-brand-border pb-8 max-[960px]:grid-cols-1 max-[960px]:mb-12 max-[960px]:gap-6">
+<section
+  class="bg-brand-background px-8 py-32 max-[640px]:px-5 max-[640px]:py-22"
+>
+  <div class="mx-auto max-w-330">
+    <div
+      class="mb-18 grid grid-cols-[1.5fr_1fr] items-end gap-12 border-b border-brand-border pb-8 max-[960px]:grid-cols-1 max-[960px]:mb-12 max-[960px]:gap-6"
+    >
       <div>
-        <div class="mb-5 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">{headerTitle}</div>
-        <h2 class="m-0 max-w-[14ch] font-serif text-[clamp(40px,5vw,64px)] font-normal leading-[1.05] tracking-[-0.025em] text-brand-ink [&_em]:italic [&_em]:text-brand-primary">
+        <div
+          class="mb-5 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary"
+        >
+          {headerTitle}
+        </div>
+        <h2
+          class="m-0 max-w-[14ch] font-serif text-[clamp(40px,5vw,64px)] font-normal leading-[1.05] tracking-tight text-brand-ink [&_em]:italic [&_em]:text-brand-primary"
+        >
           {headerSubtitle}
         </h2>
       </div>
-      <div class="max-w-[36ch] font-serif text-right text-lg italic leading-[1.5] text-brand-ink-soft max-[960px]:text-left">
+      <div
+        class="max-w-[36ch] font-serif text-right text-lg italic leading-normal text-brand-ink-soft max-[960px]:text-left"
+      >
         <p class="m-0 mb-4">{headerQuote}</p>
-        <a href={`${linkHref}${langQuery}`} class="inline-flex items-center gap-2 border-b-[1.5px] border-brand-primary pb-1 font-sans text-xs font-semibold uppercase tracking-[0.15em] text-brand-primary no-underline transition-all duration-300 hover:gap-3.5">
+        <a
+          href={`${linkHref}${langQuery}`}
+          class="inline-flex items-center gap-2 border-b-[1.5px] border-brand-primary pb-1 font-sans text-xs font-semibold uppercase tracking-[0.15em] text-brand-primary no-underline transition-all duration-300 hover:gap-3.5"
+        >
           {headerViewAll}
           <ArrowRight class="h-3.5 w-3.5" />
         </a>
       </div>
     </div>
 
-    {featuredNews && (
-      <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] items-stretch gap-8 max-[960px]:grid-cols-1 max-[960px]:gap-12">
-        <article class="flex min-w-0 flex-col">
-          <a href={`/berita/${featuredNews.slug}${langQuery}`} class="relative mb-6 block overflow-hidden rounded">
-            {featuredNews.url_thumbnail ? (
-              <img src={featuredNews.url_thumbnail} alt={featuredNews.image_alt ?? featuredNews.judul} class="aspect-[4/5] w-full object-cover saturate-[0.85] transition-transform duration-600 hover:scale-[1.04]" loading="lazy" />
-            ) : (
-              <div class="flex aspect-[4/5] w-full items-center justify-center bg-[linear-gradient(135deg,var(--color-sand),var(--color-surface))] font-serif text-lg tracking-[0.08em] uppercase text-brand-primary" aria-hidden="true">
-                <span>{featuredNews.category}</span>
-              </div>
-            )}
-          </a>
-          <div class="mb-2.5 flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.12em] text-brand-primary">
-            <span>{new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(featuredNews.date_created ?? ''))}</span>
-            <span class="h-1 w-1 rounded-full bg-brand-primary"></span>
-            <span>{featuredNews.reading_time ?? 3} {minuteLabel}</span>
-          </div>
-          <h3 class="m-0 mb-3 font-serif text-[32px] font-medium leading-[1.2] tracking-[-0.015em] text-brand-ink">
-            <a href={`/berita/${featuredNews.slug}${langQuery}`} class="text-brand-ink no-underline transition-colors hover:text-brand-primary">{featuredNews.judul}</a>
-          </h3>
-          <p class="m-0 mb-4 text-[14.5px] leading-[1.6] text-brand-ink-soft">{featuredNews.excerpt.substring(0, 200)}...</p>
-          <a href={`/berita/${featuredNews.slug}${langQuery}`} class="mt-auto inline-flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-[0.15em] text-brand-primary transition-all duration-300 hover:gap-3">
-            {readMoreLabel}
-            <ArrowRight class="h-3.5 w-3.5" />
-          </a>
-        </article>
-
-        <div class="grid grid-cols-2 gap-7 gap-y-8 max-[640px]:grid-cols-1 max-[640px]:gap-9">
-          {sideNews.map((pengumuman) => (
-            <article class="group relative flex min-w-0 flex-col">
-              <a href={`/berita/${pengumuman.slug}${langQuery}`} class="relative mb-4 block overflow-hidden rounded">
-                {pengumuman.url_thumbnail ? (
-                  <img src={pengumuman.url_thumbnail} alt={pengumuman.image_alt ?? pengumuman.judul} class="aspect-[16/10] w-full object-cover saturate-[0.85] transition-transform duration-600 group-hover:scale-[1.04]" loading="lazy" />
-                ) : (
-                  <div class="flex aspect-[16/10] w-full items-center justify-center bg-[linear-gradient(135deg,var(--color-sand),var(--color-surface))] font-serif text-lg tracking-[0.08em] uppercase text-brand-primary" aria-hidden="true">
-                    <span>{pengumuman.category}</span>
-                  </div>
-                )}
+    {
+      featuredNews && (
+        <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] items-stretch gap-8 max-[960px]:grid-cols-1 max-[960px]:gap-12">
+          <article class="flex min-w-0 flex-col">
+            <a
+              href={`/berita/${featuredNews.slug}${langQuery}`}
+              class="relative mb-6 block overflow-hidden rounded"
+            >
+              {featuredNews.url_thumbnail ? (
+                <img
+                  src={featuredNews.url_thumbnail}
+                  alt={featuredNews.image_alt ?? featuredNews.judul}
+                  class="aspect-4/5 w-full object-cover saturate-[0.85] transition-transform duration-600 hover:scale-[1.04]"
+                  loading="lazy"
+                />
+              ) : (
+                <div
+                  class="flex aspect-4/5 w-full items-center justify-center bg-[linear-gradient(135deg,var(--color-sand),var(--color-surface))] font-serif text-lg tracking-[0.08em] uppercase text-brand-primary"
+                  aria-hidden="true"
+                >
+                  <span>{featuredNews.category}</span>
+                </div>
+              )}
+            </a>
+            <div class="mb-2.5 flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.12em] text-brand-primary">
+              <span>
+                {new Intl.DateTimeFormat(locale, {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                }).format(new Date(featuredNews.date_created ?? ''))}
+              </span>
+              <span class="h-1 w-1 rounded-full bg-brand-primary" />
+              <span>
+                {featuredNews.reading_time ?? 3} {minuteLabel}
+              </span>
+            </div>
+            <h3 class="m-0 mb-3 font-serif text-[32px] font-medium leading-[1.2] tracking-[-0.015em] text-brand-ink">
+              <a
+                href={`/berita/${featuredNews.slug}${langQuery}`}
+                class="text-brand-ink no-underline transition-colors hover:text-brand-primary"
+              >
+                {featuredNews.judul}
               </a>
-              <div class="mb-2 flex flex-wrap items-center gap-2 text-[10px] font-medium tracking-[0.09em] uppercase text-brand-primary">
-                <span>{new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(pengumuman.date_created ?? ''))}</span>
-                <span class="h-1 w-1 rounded-full bg-brand-primary"></span>
-                <span>{pengumuman.reading_time ?? 3} {minuteLabel}</span>
-              </div>
-              <h3 class="m-0 mb-2 font-serif text-[clamp(18px,1.8vw,22px)] font-medium leading-[1.2] tracking-[-0.015em] text-brand-ink">
-                <a href={`/berita/${pengumuman.slug}${langQuery}`} class="text-brand-ink no-underline transition-colors hover:text-brand-primary">{pengumuman.judul}</a>
-              </h3>
-              <p class="m-0 text-[13.5px] leading-[1.55] text-brand-ink-soft">{pengumuman.excerpt.substring(0, 92)}...</p>
-            </article>
-          ))}
+            </h3>
+            <p class="m-0 mb-4 text-[14.5px] leading-[1.6] text-brand-ink-soft">
+              {featuredNews.excerpt.substring(0, 200)}...
+            </p>
+            <a
+              href={`/berita/${featuredNews.slug}${langQuery}`}
+              class="mt-auto inline-flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-[0.15em] text-brand-primary transition-all duration-300 hover:gap-3"
+            >
+              {readMoreLabel}
+              <ArrowRight class="h-3.5 w-3.5" />
+            </a>
+          </article>
+
+          <div class="grid grid-cols-2 gap-7 gap-y-8 max-[640px]:grid-cols-1 max-[640px]:gap-9">
+            {sideNews.map((pengumuman) => (
+              <article class="group relative flex min-w-0 flex-col">
+                <a
+                  href={`/berita/${pengumuman.slug}${langQuery}`}
+                  class="relative mb-4 block overflow-hidden rounded"
+                >
+                  {pengumuman.url_thumbnail ? (
+                    <img
+                      src={pengumuman.url_thumbnail}
+                      alt={pengumuman.image_alt ?? pengumuman.judul}
+                      class="aspect-16/10 w-full object-cover saturate-[0.85] transition-transform duration-600 group-hover:scale-[1.04]"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div
+                      class="flex aspect-16/10 w-full items-center justify-center bg-[linear-gradient(135deg,var(--color-sand),var(--color-surface))] font-serif text-lg tracking-[0.08em] uppercase text-brand-primary"
+                      aria-hidden="true"
+                    >
+                      <span>{pengumuman.category}</span>
+                    </div>
+                  )}
+                </a>
+                <div class="mb-2 flex flex-wrap items-center gap-2 text-[10px] font-medium tracking-[0.09em] uppercase text-brand-primary">
+                  <span>
+                    {new Intl.DateTimeFormat(locale, {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    }).format(new Date(pengumuman.date_created ?? ''))}
+                  </span>
+                  <span class="h-1 w-1 rounded-full bg-brand-primary" />
+                  <span>
+                    {pengumuman.reading_time ?? 3} {minuteLabel}
+                  </span>
+                </div>
+                <h3 class="m-0 mb-2 font-serif text-[clamp(18px,1.8vw,22px)] font-medium leading-[1.2] tracking-[-0.015em] text-brand-ink">
+                  <a
+                    href={`/berita/${pengumuman.slug}${langQuery}`}
+                    class="text-brand-ink no-underline transition-colors hover:text-brand-primary"
+                  >
+                    {pengumuman.judul}
+                  </a>
+                </h3>
+                <p class="m-0 text-[13.5px] leading-[1.55] text-brand-ink-soft">
+                  {pengumuman.excerpt.substring(0, 92)}...
+                </p>
+              </article>
+            ))}
+          </div>
         </div>
-      </div>
-    )}
+      )
+    }
   </div>
 </section>

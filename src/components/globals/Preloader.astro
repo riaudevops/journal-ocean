@@ -3,9 +3,9 @@
 import {
   getPreloaderContentWithFallback,
   normalizeSiteLanguage,
-} from "../../lib/directus";
+} from '../../lib/directus';
 
-const language = normalizeSiteLanguage(Astro.url.searchParams.get("lang"));
+const language = normalizeSiteLanguage(Astro.url.searchParams.get('lang'));
 const preloaderContent = await getPreloaderContentWithFallback(language);
 ---
 
@@ -312,8 +312,6 @@ const preloaderContent = await getPreloaderContentWithFallback(language);
     transition: width 180ms ease;
   }
 
-
-
   @media (max-width: 720px) {
     .preloader__card {
       min-height: min(620px, calc(100dvh - 1.5rem));
@@ -430,8 +428,6 @@ const preloaderContent = await getPreloaderContentWithFallback(language);
       height: 0.34rem;
     }
   }
-
-
 </style>
 
 <script>

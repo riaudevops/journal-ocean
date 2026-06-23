@@ -14,54 +14,124 @@ const strokedText = profileContent.highlight_title ?? 'Journal Ocean';
 const description1 = profileContent.description_1 ?? '';
 const description2 = profileContent.description_2 ?? '';
 
-const img1Src = directusAssetUrl(profileContent.image_1) || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=1000&fit=crop';
+const img1Src =
+  directusAssetUrl(profileContent.image_1) ||
+  'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=1000&fit=crop';
 const img1Alt = profileContent.image_1_alt ?? strokedText;
-const img2Src = directusAssetUrl(profileContent.image_2) || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=400&h=400&fit=crop';
+const img2Src =
+  directusAssetUrl(profileContent.image_2) ||
+  'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=400&h=400&fit=crop';
 const img2Alt = profileContent.image_2_alt ?? 'Program Kemanusiaan';
 const statNumber = profileContent.stat_number ?? '12+';
 const statLabel = profileContent.stat_label ?? 'Tahun Pengabdian';
 const signatureAvatar = profileContent.signature_avatar ?? 'S';
-const signatureText = profileContent.signature_text ?? 'Para pendiri Journal Ocean';
-const signatureSubtext = profileContent.signature_subtext ?? 'Bersama Membangun Kebaikan';
+const signatureText =
+  profileContent.signature_text ?? 'Para pendiri Journal Ocean';
+const signatureSubtext =
+  profileContent.signature_subtext ?? 'Bersama Membangun Kebaikan';
 const pillarsEyebrow = profileContent.pillars_eyebrow ?? 'Bidang Kegiatan';
-const pillarsTitle = profileContent.pillars_title ?? 'Empat pilar <em>utama</em> yang kami jalankan.';
+const pillarsTitle =
+  profileContent.pillars_title ??
+  'Empat pilar <em>utama</em> yang kami jalankan.';
 const pillarsIntro = profileContent.pillars_intro ?? '';
 
 const facilitiesList = [
-  { name: profileContent.pillar_1_name ?? 'Program Sosial', initial: profileContent.pillar_1_initial ?? 'A', desc: profileContent.pillar_1_desc ?? '' },
-  { name: profileContent.pillar_2_name ?? 'Program Kemanusiaan', initial: profileContent.pillar_2_initial ?? 'B', desc: profileContent.pillar_2_desc ?? '' },
-  { name: profileContent.pillar_3_name ?? 'Program Keagamaan', initial: profileContent.pillar_3_initial ?? 'C', desc: profileContent.pillar_3_desc ?? '' },
-  { name: profileContent.pillar_4_name ?? 'Kegiatan Rutin', initial: profileContent.pillar_4_initial ?? 'D', desc: profileContent.pillar_4_desc ?? '' },
+  {
+    name: profileContent.pillar_1_name ?? 'Program Sosial',
+    initial: profileContent.pillar_1_initial ?? 'A',
+    desc: profileContent.pillar_1_desc ?? '',
+  },
+  {
+    name: profileContent.pillar_2_name ?? 'Program Kemanusiaan',
+    initial: profileContent.pillar_2_initial ?? 'B',
+    desc: profileContent.pillar_2_desc ?? '',
+  },
+  {
+    name: profileContent.pillar_3_name ?? 'Program Keagamaan',
+    initial: profileContent.pillar_3_initial ?? 'C',
+    desc: profileContent.pillar_3_desc ?? '',
+  },
+  {
+    name: profileContent.pillar_4_name ?? 'Kegiatan Rutin',
+    initial: profileContent.pillar_4_initial ?? 'D',
+    desc: profileContent.pillar_4_desc ?? '',
+  },
 ];
 ---
 
 <section id="profile" class="bg-brand-background">
-  <div class="mx-auto max-w-[1320px] px-8 py-32 max-[960px]:px-6 max-[960px]:py-16">
-    <div class="grid grid-cols-[1.1fr_1fr] items-center gap-24 max-[960px]:grid-cols-1 max-[960px]:gap-12">
-      <div class="relative aspect-[4/5]">
-        <img src={img1Src} alt={img1Alt} class="h-full w-full rounded object-cover saturate-[0.85]" loading="lazy" />
-        <div class="absolute -left-6 top-6 rounded bg-brand-primary px-6 py-5 text-brand-background shadow-[0_8px_24px_rgba(42,46,37,0.15)] max-[960px]:left-4">
-          <div class="font-serif text-[40px] font-normal leading-none">{statNumber}</div>
-          <div class="mt-1.5 text-[10.5px] font-medium uppercase tracking-[0.15em] text-brand-primary-lighter">{statLabel}</div>
+  <div class="mx-auto max-w-330 px-8 py-32 max-[960px]:px-6 max-[960px]:py-16">
+    <div
+      class="grid grid-cols-[1.1fr_1fr] items-center gap-24 max-[960px]:grid-cols-1 max-[960px]:gap-12"
+    >
+      <div class="relative aspect-4/5">
+        <img
+          src={img1Src}
+          alt={img1Alt}
+          class="h-full w-full rounded object-cover saturate-[0.85]"
+          loading="lazy"
+        />
+        <div
+          class="absolute -left-6 top-6 rounded bg-brand-primary px-6 py-5 text-brand-background shadow-[0_8px_24px_rgba(42,46,37,0.15)] max-[960px]:left-4"
+        >
+          <div class="font-serif text-[40px] font-normal leading-none">
+            {statNumber}
+          </div>
+          <div
+            class="mt-1.5 text-[10.5px] font-medium uppercase tracking-[0.15em] text-brand-primary-lighter"
+          >
+            {statLabel}
+          </div>
         </div>
-        <img src={img2Src} alt={img2Alt} class="absolute -bottom-8 -right-8 aspect-square w-1/2 rounded border-[6px] border-brand-background object-cover shadow-[0_12px_40px_rgba(42,46,37,0.15)] max-[960px]:-bottom-4 max-[960px]:-right-4" loading="lazy" />
+        <img
+          src={img2Src}
+          alt={img2Alt}
+          class="absolute -bottom-8 -right-8 aspect-square w-1/2 rounded border-[6px] border-brand-background object-cover shadow-[0_12px_40px_rgba(42,46,37,0.15)] max-[960px]:-bottom-4 max-[960px]:-right-4"
+          loading="lazy"
+        />
       </div>
 
       <div>
-        <div class="mb-6 inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">
+        <div
+          class="mb-6 inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary"
+        >
           <span class="h-px w-8 bg-brand-primary"></span>
           <span>{subTitle}</span>
         </div>
-        <h2 class="m-0 mb-8 font-serif text-[clamp(40px,5vw,68px)] font-normal leading-[1.05] tracking-[-0.025em] text-brand-ink [&_em]:font-light [&_em]:italic [&_em]:text-brand-primary">
-          {mainTitle} <em>{strokedText}</em>
+        <h2
+          class="m-0 mb-8 font-serif text-[clamp(40px,5vw,68px)] font-normal leading-[1.05] tracking-tight text-brand-ink [&_em]:font-light [&_em]:italic [&_em]:text-brand-primary"
+        >
+          {mainTitle}
+          <em>{strokedText}</em>
         </h2>
-        {description1 && <p class="m-0 mb-6 max-w-[52ch] text-[17px] leading-[1.7] text-brand-ink-soft">{description1}</p>}
-        {description2 && <p class="m-0 mb-6 max-w-[52ch] text-[17px] leading-[1.7] text-brand-ink-soft">{description2}</p>}
-        <div class="mt-8 flex items-center gap-4 border-t border-brand-border pt-8">
-          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-primary font-serif text-[22px] italic text-brand-background">{signatureAvatar}</div>
+        {
+          description1 && (
+            <p class="m-0 mb-6 max-w-[52ch] text-[17px] leading-[1.7] text-brand-ink-soft">
+              {description1}
+            </p>
+          )
+        }
+        {
+          description2 && (
+            <p class="m-0 mb-6 max-w-[52ch] text-[17px] leading-[1.7] text-brand-ink-soft">
+              {description2}
+            </p>
+          )
+        }
+        <div
+          class="mt-8 flex items-center gap-4 border-t border-brand-border pt-8"
+        >
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-primary font-serif text-[22px] italic text-brand-background"
+          >
+            {signatureAvatar}
+          </div>
           <div class="font-serif italic text-brand-ink">
             {signatureText}
-            <small class="mt-1 block font-sans text-[11px] not-italic uppercase tracking-[0.1em] text-brand-ink-faint">{signatureSubtext}</small>
+            <small
+              class="mt-1 block font-sans text-[11px] not-italic uppercase tracking-widest text-brand-ink-faint"
+              >{signatureSubtext}</small
+            >
           </div>
         </div>
       </div>
@@ -69,23 +139,50 @@ const facilitiesList = [
   </div>
 </section>
 
-<section class="border-y border-brand-border bg-brand-sand px-8 py-24 max-[960px]:px-6 max-[960px]:py-16">
-  <div class="mx-auto max-w-[1320px]">
-    <div class="mb-16 grid grid-cols-[1fr_1fr] items-end gap-16 max-[960px]:grid-cols-1 max-[960px]:gap-6">
+<section
+  class="border-y border-brand-border bg-brand-sand px-8 py-24 max-[960px]:px-6 max-[960px]:py-16"
+>
+  <div class="mx-auto max-w-330">
+    <div
+      class="mb-16 grid grid-cols-[1fr_1fr] items-end gap-16 max-[960px]:grid-cols-1 max-[960px]:gap-6"
+    >
       <div>
-        <div class="mb-5 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">{pillarsEyebrow}</div>
-        <h3 class="m-0 max-w-[20ch] font-serif text-[clamp(36px,4.5vw,56px)] font-normal leading-[1.05] tracking-[-0.025em] text-brand-ink [&_em]:italic [&_em]:text-brand-primary" set:html={pillarsTitle} />
+        <div
+          class="mb-5 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary"
+        >
+          {pillarsEyebrow}
+        </div>
+        <h3
+          class="m-0 max-w-[20ch] font-serif text-[clamp(36px,4.5vw,56px)] font-normal leading-[1.05] tracking-tight text-brand-ink [&_em]:italic [&_em]:text-brand-primary"
+          set:html={pillarsTitle}
+        />
       </div>
-      {pillarsIntro && <p class="m-0 ml-auto max-w-[44ch] text-[15px] leading-[1.6] text-brand-ink-soft max-[960px]:ml-0">{pillarsIntro}</p>}
+      {
+        pillarsIntro && (
+          <p class="m-0 ml-auto max-w-[44ch] text-[15px] leading-[1.6] text-brand-ink-soft max-[960px]:ml-0">
+            {pillarsIntro}
+          </p>
+        )
+      }
     </div>
-    <div class="grid grid-cols-4 gap-6 max-[960px]:grid-cols-2 max-[640px]:grid-cols-1">
+    <div
+      class="grid grid-cols-4 gap-6 max-[960px]:grid-cols-2 max-[640px]:grid-cols-1"
+    >
       {
         facilitiesList.map((item, idx) => (
           <div class="relative min-w-0 rounded bg-brand-surface px-8 py-9 transition duration-400 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(42,46,37,0.08)]">
-            <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary font-serif text-[22px] italic text-brand-background">{item.initial}</div>
-            <div class="absolute right-6 top-6 font-mono text-[11px] text-brand-ink-faint">0{idx + 1}</div>
-            <div class="mb-3 font-serif text-[22px] font-medium tracking-[-0.015em] text-brand-ink">{item.name}</div>
-            <div class="text-sm leading-[1.6] text-brand-ink-soft">{item.desc}</div>
+            <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary font-serif text-[22px] italic text-brand-background">
+              {item.initial}
+            </div>
+            <div class="absolute right-6 top-6 font-mono text-[11px] text-brand-ink-faint">
+              0{idx + 1}
+            </div>
+            <div class="mb-3 font-serif text-[22px] font-medium tracking-[-0.015em] text-brand-ink">
+              {item.name}
+            </div>
+            <div class="text-sm leading-[1.6] text-brand-ink-soft">
+              {item.desc}
+            </div>
           </div>
         ))
       }

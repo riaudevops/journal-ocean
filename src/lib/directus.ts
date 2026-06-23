@@ -1463,6 +1463,775 @@ export async function getSocialProgramContentWithFallback(
   };
 }
 
+// == Humanitarian Program ==
+
+export interface HumanitarianProgramTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  title?: string;
+  Title?: string;
+  subtitle?: string;
+  Subtitle?: string;
+  image_alt?: string;
+  Image_Alt?: string;
+  category?: string;
+  Category?: string;
+  program_eyebrow?: string;
+  Program_Eyebrow?: string;
+  program_title?: string;
+  Program_Title?: string;
+  program_desc?: string;
+  Program_Desc?: string;
+  stat_label?: string;
+  Stat_Label?: string;
+  [key: string]: unknown;
+}
+
+export interface HumanitarianProgramBulletTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  text?: string;
+  Text?: string;
+  [key: string]: unknown;
+}
+
+export interface HumanitarianProgramBullet extends HumanitarianProgramBulletTranslation {
+  id?: number | string;
+  sort?: number | null;
+  translations?: HumanitarianProgramBulletTranslation[];
+}
+
+export interface HumanitarianProgramItemTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  icon?: string;
+  Icon?: string;
+  title?: string;
+  Title?: string;
+  desc?: string;
+  Desc?: string;
+  image_alt?: string;
+  Image_Alt?: string;
+  [key: string]: unknown;
+}
+
+export interface HumanitarianProgramItem extends HumanitarianProgramItemTranslation {
+  id?: number | string;
+  sort?: number | null;
+  image?: string | null;
+  Image?: string | null;
+  translations?: HumanitarianProgramItemTranslation[];
+}
+
+export interface HumanitarianProgramContent extends HumanitarianProgramTranslation {
+  id?: number | string;
+  image?: string | null;
+  Image?: string | null;
+  stat_num?: string;
+  Stat_Num?: string;
+  program_bullets?: HumanitarianProgramBullet[];
+  list_program?: HumanitarianProgramItem[];
+  translations?: HumanitarianProgramTranslation[];
+}
+
+function normalizeHumanitarianProgramContent(
+  content: HumanitarianProgramContent
+): HumanitarianProgramContent {
+  return {
+    ...content,
+    title: getStringField(content, ['title', 'Title']),
+    subtitle: getStringField(content, ['subtitle', 'Subtitle']),
+    image: (content.image ?? content.Image ?? null) as string | null,
+    image_alt: getStringField(content, ['image_alt', 'Image_Alt']),
+    category: getStringField(content, ['category', 'Category']),
+    program_eyebrow: getStringField(content, [
+      'program_eyebrow',
+      'Program_Eyebrow',
+    ]),
+    program_title: getStringField(content, ['program_title', 'Program_Title']),
+    program_desc: getStringField(content, ['program_desc', 'Program_Desc']),
+    stat_num: getStringField(content, ['stat_num', 'Stat_Num']),
+    stat_label: getStringField(content, ['stat_label', 'Stat_Label']),
+    program_bullets: Array.isArray(content.program_bullets)
+      ? content.program_bullets
+      : [],
+    list_program: Array.isArray(content.list_program)
+      ? content.list_program
+      : [],
+  };
+}
+
+function normalizeHumanitarianProgramBullet(
+  item: HumanitarianProgramBullet
+): HumanitarianProgramBullet {
+  return {
+    ...item,
+    text: getStringField(item, ['text', 'Text']),
+  };
+}
+
+function normalizeHumanitarianProgramItem(
+  item: HumanitarianProgramItem
+): HumanitarianProgramItem {
+  return {
+    ...item,
+    icon: getStringField(item, ['icon', 'Icon']),
+    title: getStringField(item, ['title', 'Title']),
+    desc: getStringField(item, ['desc', 'Desc']),
+    image: (item.image ?? item.Image ?? null) as string | null,
+    image_alt: getStringField(item, ['image_alt', 'Image_Alt']),
+  };
+}
+
+function applyHumanitarianProgramBulletTranslation(
+  item: HumanitarianProgramBullet,
+  language: SiteLanguage
+): HumanitarianProgramBullet {
+  const base = normalizeHumanitarianProgramBullet(item);
+  if (language === 'id' || !Array.isArray(item.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = item.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeHumanitarianProgramBullet(
+    translation as HumanitarianProgramBullet
+  );
+  return {
+    ...base,
+    text: translated.text || base.text,
+  };
+}
+
+function applyHumanitarianProgramItemTranslation(
+  item: HumanitarianProgramItem,
+  language: SiteLanguage
+): HumanitarianProgramItem {
+  const base = normalizeHumanitarianProgramItem(item);
+  if (language === 'id' || !Array.isArray(item.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = item.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeHumanitarianProgramItem(
+    translation as HumanitarianProgramItem
+  );
+  return {
+    ...base,
+    icon: translated.icon || base.icon,
+    title: translated.title || base.title,
+    desc: translated.desc || base.desc,
+    image_alt: translated.image_alt || base.image_alt,
+  };
+}
+
+function applyHumanitarianProgramTranslation(
+  content: HumanitarianProgramContent,
+  language: SiteLanguage
+): HumanitarianProgramContent {
+  const base = normalizeHumanitarianProgramContent(content);
+  if (language === 'id' || !Array.isArray(content.translations)) {
+    return {
+      ...base,
+      program_bullets: (base.program_bullets ?? []).map((item) =>
+        normalizeHumanitarianProgramBullet(item)
+      ),
+      list_program: (base.list_program ?? []).map((item) =>
+        normalizeHumanitarianProgramItem(item)
+      ),
+    };
+  }
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = content.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+
+  const translated = translation
+    ? normalizeHumanitarianProgramContent(
+        translation as HumanitarianProgramContent
+      )
+    : null;
+
+  return {
+    ...base,
+    title: translated?.title || base.title,
+    subtitle: translated?.subtitle || base.subtitle,
+    image_alt: translated?.image_alt || base.image_alt,
+    category: translated?.category || base.category,
+    program_eyebrow: translated?.program_eyebrow || base.program_eyebrow,
+    program_title: translated?.program_title || base.program_title,
+    program_desc: translated?.program_desc || base.program_desc,
+    stat_label: translated?.stat_label || base.stat_label,
+    program_bullets: (base.program_bullets ?? [])
+      .map((item) => applyHumanitarianProgramBulletTranslation(item, language))
+      .filter((item) => item.text),
+    list_program: (base.list_program ?? [])
+      .map((item) => applyHumanitarianProgramItemTranslation(item, language))
+      .filter((item) => item.title && item.desc),
+  };
+}
+
+export const FALLBACK_HUMANITARIAN_PROGRAM_CONTENT: HumanitarianProgramContent =
+  {
+    id: 1,
+    title: 'Program Kemanusiaan <em>Journal Ocean</em>.',
+    subtitle:
+      'Program-program kemanusiaan untuk membantu masyarakat yang terdampak bencana dan membutuhkan bantuan darurat.',
+    image:
+      'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&h=800&fit=crop',
+    image_alt: 'Bantuan Bencana Alam',
+    category: 'Program Kemanusiaan',
+    program_eyebrow: 'Program Prioritas',
+    program_title: 'Bantuan Bencana Alam',
+    program_desc:
+      'Penyaluran bantuan cepat untuk korban bencana alam berupa makanan, pakaian, tempat tinggal sementara, dan kebutuhan darurat lainnya. Tim kami siap memberikan respon cepat di lokasi bencana.',
+    stat_num: '24/7',
+    stat_label: 'Siaga Tim',
+    program_bullets: [
+      {
+        id: 1,
+        sort: 1,
+        text: 'Distribusi bantuan logistik dan kebutuhan pokok',
+      },
+      {
+        id: 2,
+        sort: 2,
+        text: 'Pendirian posko bantuan darurat',
+      },
+      {
+        id: 3,
+        sort: 3,
+        text: 'Dukungan psikologis untuk korban bencana',
+      },
+    ],
+    list_program: [
+      {
+        id: 1,
+        sort: 1,
+        icon: 'R',
+        title: 'Rumah Layak Huni',
+        desc: 'Program pembangunan dan renovasi rumah untuk keluarga yang tidak memiliki tempat tinggal layak atau rumahnya rusak.',
+        image:
+          'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=800&h=600&fit=crop',
+        image_alt: 'Rumah Layak Huni',
+      },
+      {
+        id: 2,
+        sort: 2,
+        icon: 'M',
+        title: 'Bantuan Medis Darurat',
+        desc: 'Program bantuan medis darurat untuk korban bencana dan masyarakat yang membutuhkan perawatan kesehatan mendesak.',
+        image:
+          'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=600&fit=crop',
+        image_alt: 'Bantuan Medis Darurat',
+      },
+      {
+        id: 3,
+        sort: 3,
+        icon: 'A',
+        title: 'Perlindungan Anak',
+        desc: 'Program perlindungan dan pemenuhan hak-hak anak, termasuk bantuan pendidikan, kesehatan, dan kebutuhan dasar anak-anak terlantar.',
+        image:
+          'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop',
+        image_alt: 'Perlindungan Anak',
+      },
+      {
+        id: 4,
+        sort: 4,
+        icon: 'P',
+        title: 'Bantuan Pengungsi',
+        desc: 'Program bantuan untuk pengungsi dan masyarakat yang terpaksa mengungsi akibat konflik atau bencana, termasuk kebutuhan dasar dan dukungan psikologis.',
+        image:
+          'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop',
+        image_alt: 'Bantuan Pengungsi',
+      },
+      {
+        id: 5,
+        sort: 5,
+        icon: 'T',
+        title: 'Rapid Response Team',
+        desc: 'Tim respons cepat yang siap dikerahkan untuk memberikan bantuan darurat di lokasi bencana atau situasi darurat lainnya.',
+        image:
+          'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=600&fit=crop',
+        image_alt: 'Rapid Response Team',
+      },
+      {
+        id: 6,
+        sort: 6,
+        icon: 'H',
+        title: 'Program Rehabilitasi',
+        desc: 'Program rehabilitasi pasca bencana untuk membantu masyarakat membangun kembali kehidupan mereka dengan lebih baik.',
+        image:
+          'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=600&fit=crop',
+        image_alt: 'Program Rehabilitasi',
+      },
+    ],
+  };
+
+export async function getHumanitarianProgramContent(
+  language: SiteLanguage = 'id'
+): Promise<HumanitarianProgramContent | null> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `humanitarian-program:v1:${normalizedLanguage}`;
+  const cached = cacheGet<HumanitarianProgramContent>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) return null;
+
+  try {
+    const item = await client.request(
+      (readItems as any)('humanitarian_program', {
+        fields: [
+          '*',
+          'translations.*',
+          'program_bullets.*',
+          'program_bullets.translations.*',
+          'list_program.*',
+          'list_program.translations.*',
+        ],
+        limit: 1,
+      })
+    );
+
+    const content = Array.isArray(item) ? item[0] : item;
+    if (!content) return null;
+
+    const result = applyHumanitarianProgramTranslation(
+      content as HumanitarianProgramContent,
+      normalizedLanguage
+    );
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getHumanitarianProgramContent failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return null;
+  }
+}
+
+export async function getHumanitarianProgramContentWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<HumanitarianProgramContent> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const fromCms = await getHumanitarianProgramContent(normalizedLanguage);
+  const merged = {
+    ...FALLBACK_HUMANITARIAN_PROGRAM_CONTENT,
+    ...fromCms,
+  } as HumanitarianProgramContent;
+
+  return {
+    ...merged,
+    image: directusAssetUrl(
+      merged.image ?? FALLBACK_HUMANITARIAN_PROGRAM_CONTENT.image
+    ),
+    program_bullets:
+      merged.program_bullets && merged.program_bullets.length > 0
+        ? merged.program_bullets
+        : FALLBACK_HUMANITARIAN_PROGRAM_CONTENT.program_bullets,
+    list_program:
+      merged.list_program && merged.list_program.length > 0
+        ? merged.list_program.map((item) => ({
+            ...item,
+            image: directusAssetUrl(item.image),
+          }))
+        : (FALLBACK_HUMANITARIAN_PROGRAM_CONTENT.list_program ?? []).map(
+            (item) => ({
+              ...item,
+              image: directusAssetUrl(item.image),
+            })
+          ),
+  };
+}
+
+// == Religious Program ==
+
+export interface ReligiousProgramTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  title?: string;
+  Title?: string;
+  subtitle?: string;
+  Subtitle?: string;
+  image_alt?: string;
+  Image_Alt?: string;
+  category?: string;
+  Category?: string;
+  program_eyebrow?: string;
+  Program_Eyebrow?: string;
+  program_title?: string;
+  Program_Title?: string;
+  program_desc?: string;
+  Program_Desc?: string;
+  stat_label?: string;
+  Stat_Label?: string;
+  [key: string]: unknown;
+}
+
+export interface ReligiousProgramBulletTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  text?: string;
+  Text?: string;
+  [key: string]: unknown;
+}
+
+export interface ReligiousProgramBullet extends ReligiousProgramBulletTranslation {
+  id?: number | string;
+  sort?: number | null;
+  translations?: ReligiousProgramBulletTranslation[];
+}
+
+export interface ReligiousProgramItemTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  icon?: string;
+  Icon?: string;
+  title?: string;
+  Title?: string;
+  desc?: string;
+  Desc?: string;
+  image_alt?: string;
+  Image_Alt?: string;
+  [key: string]: unknown;
+}
+
+export interface ReligiousProgramItem extends ReligiousProgramItemTranslation {
+  id?: number | string;
+  sort?: number | null;
+  image?: string | null;
+  Image?: string | null;
+  translations?: ReligiousProgramItemTranslation[];
+}
+
+export interface ReligiousProgramContent extends ReligiousProgramTranslation {
+  id?: number | string;
+  image?: string | null;
+  Image?: string | null;
+  stat_num?: string;
+  Stat_Num?: string;
+  program_bullets?: ReligiousProgramBullet[];
+  list_program?: ReligiousProgramItem[];
+  translations?: ReligiousProgramTranslation[];
+}
+
+function normalizeReligiousProgramContent(
+  content: ReligiousProgramContent
+): ReligiousProgramContent {
+  return {
+    ...content,
+    title: getStringField(content, ['title', 'Title']),
+    subtitle: getStringField(content, ['subtitle', 'Subtitle']),
+    image: (content.image ?? content.Image ?? null) as string | null,
+    image_alt: getStringField(content, ['image_alt', 'Image_Alt']),
+    category: getStringField(content, ['category', 'Category']),
+    program_eyebrow: getStringField(content, [
+      'program_eyebrow',
+      'Program_Eyebrow',
+    ]),
+    program_title: getStringField(content, ['program_title', 'Program_Title']),
+    program_desc: getStringField(content, ['program_desc', 'Program_Desc']),
+    stat_num: getStringField(content, ['stat_num', 'Stat_Num']),
+    stat_label: getStringField(content, ['stat_label', 'Stat_Label']),
+    program_bullets: Array.isArray(content.program_bullets)
+      ? content.program_bullets
+      : [],
+    list_program: Array.isArray(content.list_program)
+      ? content.list_program
+      : [],
+  };
+}
+
+function normalizeReligiousProgramBullet(
+  item: ReligiousProgramBullet
+): ReligiousProgramBullet {
+  return {
+    ...item,
+    text: getStringField(item, ['text', 'Text']),
+  };
+}
+
+function normalizeReligiousProgramItem(
+  item: ReligiousProgramItem
+): ReligiousProgramItem {
+  return {
+    ...item,
+    icon: getStringField(item, ['icon', 'Icon']),
+    title: getStringField(item, ['title', 'Title']),
+    desc: getStringField(item, ['desc', 'Desc']),
+    image: (item.image ?? item.Image ?? null) as string | null,
+    image_alt: getStringField(item, ['image_alt', 'Image_Alt']),
+  };
+}
+
+function applyReligiousProgramBulletTranslation(
+  item: ReligiousProgramBullet,
+  language: SiteLanguage
+): ReligiousProgramBullet {
+  const base = normalizeReligiousProgramBullet(item);
+  if (language === 'id' || !Array.isArray(item.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = item.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeReligiousProgramBullet(
+    translation as ReligiousProgramBullet
+  );
+  return {
+    ...base,
+    text: translated.text || base.text,
+  };
+}
+
+function applyReligiousProgramItemTranslation(
+  item: ReligiousProgramItem,
+  language: SiteLanguage
+): ReligiousProgramItem {
+  const base = normalizeReligiousProgramItem(item);
+  if (language === 'id' || !Array.isArray(item.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = item.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeReligiousProgramItem(
+    translation as ReligiousProgramItem
+  );
+  return {
+    ...base,
+    icon: translated.icon || base.icon,
+    title: translated.title || base.title,
+    desc: translated.desc || base.desc,
+    image_alt: translated.image_alt || base.image_alt,
+  };
+}
+
+function applyReligiousProgramTranslation(
+  content: ReligiousProgramContent,
+  language: SiteLanguage
+): ReligiousProgramContent {
+  const base = normalizeReligiousProgramContent(content);
+  if (language === 'id' || !Array.isArray(content.translations)) {
+    return {
+      ...base,
+      program_bullets: (base.program_bullets ?? []).map((item) =>
+        normalizeReligiousProgramBullet(item)
+      ),
+      list_program: (base.list_program ?? []).map((item) =>
+        normalizeReligiousProgramItem(item)
+      ),
+    };
+  }
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = content.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+
+  const translated = translation
+    ? normalizeReligiousProgramContent(translation as ReligiousProgramContent)
+    : null;
+
+  return {
+    ...base,
+    title: translated?.title || base.title,
+    subtitle: translated?.subtitle || base.subtitle,
+    image_alt: translated?.image_alt || base.image_alt,
+    category: translated?.category || base.category,
+    program_eyebrow: translated?.program_eyebrow || base.program_eyebrow,
+    program_title: translated?.program_title || base.program_title,
+    program_desc: translated?.program_desc || base.program_desc,
+    stat_label: translated?.stat_label || base.stat_label,
+    program_bullets: (base.program_bullets ?? [])
+      .map((item) => applyReligiousProgramBulletTranslation(item, language))
+      .filter((item) => item.text),
+    list_program: (base.list_program ?? [])
+      .map((item) => applyReligiousProgramItemTranslation(item, language))
+      .filter((item) => item.title && item.desc),
+  };
+}
+
+export const FALLBACK_RELIGIOUS_PROGRAM_CONTENT: ReligiousProgramContent = {
+  id: 1,
+  title: 'Program Keagamaan <em>Journal Ocean</em>.',
+  subtitle:
+    'Program-program keagamaan untuk memperdalam pemahaman agama dan memperkuat nilai-nilai spiritual masyarakat.',
+  image:
+    'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1200&h=800&fit=crop',
+  image_alt: 'Kajian Keagamaan Rutin',
+  category: 'Program Keagamaan',
+  program_eyebrow: 'Program Rutin',
+  program_title: 'Kajian Keagamaan Rutin',
+  program_desc:
+    'Kajian keagamaan yang diadakan secara rutin setiap bulan, terbuka untuk umum, dengan tema-tema aktual dan relevan dengan kehidupan sehari-hari. Program ini bertujuan untuk memperdalam pemahaman keagamaan dan memperkuat ukhuwah islamiyah.',
+  stat_num: '12+',
+  stat_label: 'Kajian per Tahun',
+  program_bullets: [
+    {
+      id: 1,
+      sort: 1,
+      text: 'Kajian bulanan dengan tema yang beragam',
+    },
+    {
+      id: 2,
+      sort: 2,
+      text: 'Dibawakan oleh ustadz dan ustadzah berpengalaman',
+    },
+    {
+      id: 3,
+      sort: 3,
+      text: 'Sesi tanya jawab dan diskusi interaktif',
+    },
+  ],
+  list_program: [
+    {
+      id: 1,
+      sort: 1,
+      icon: 'R',
+      title: 'Program Ramadhan',
+      desc: 'Berbagai kegiatan keagamaan selama bulan Ramadhan, termasuk buka puasa bersama, tarawih, tadarus, dan program-program khusus Ramadhan lainnya.',
+      image:
+        'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=600&fit=crop',
+      image_alt: 'Program Ramadhan',
+    },
+    {
+      id: 2,
+      sort: 2,
+      icon: 'M',
+      title: 'Pembinaan Remaja Masjid',
+      desc: 'Program pembinaan untuk remaja masjid melalui kegiatan keagamaan, sosial, dan pengembangan karakter untuk generasi muda yang lebih baik.',
+      image:
+        'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=600&fit=crop',
+      image_alt: 'Pembinaan Remaja Masjid',
+    },
+    {
+      id: 3,
+      sort: 3,
+      icon: 'Z',
+      title: 'Penyaluran Zakat',
+      desc: 'Program penyaluran zakat fitrah dan zakat mal kepada mustahik yang berhak, dengan sistem yang transparan dan terpercaya.',
+      image:
+        'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&h=600&fit=crop',
+      image_alt: 'Penyaluran Zakat',
+    },
+    {
+      id: 4,
+      sort: 4,
+      icon: 'T',
+      title: 'Tahfidz Al-Quran',
+      desc: 'Program menghafal Al-Quran untuk anak-anak dan remaja, dengan metode yang menyenangkan dan efektif untuk memudahkan proses menghafal.',
+      image:
+        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop',
+      image_alt: 'Tahfidz Al-Quran',
+    },
+    {
+      id: 5,
+      sort: 5,
+      icon: 'A',
+      title: 'Kelas Mengaji',
+      desc: 'Program belajar membaca Al-Quran untuk berbagai usia, dari anak-anak hingga dewasa, dengan pengajar yang berpengalaman dan sabar.',
+      image:
+        'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop',
+      image_alt: 'Kelas Mengaji',
+    },
+    {
+      id: 6,
+      sort: 6,
+      icon: 'H',
+      title: 'Hari Besar Islam',
+      desc: "Kegiatan keagamaan dalam rangka memperingati hari-hari besar Islam seperti Maulid Nabi, Isra Mi'raj, dan hari-hari penting lainnya.",
+      image:
+        'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=600&fit=crop',
+      image_alt: 'Hari Besar Islam',
+    },
+  ],
+};
+
+export async function getReligiousProgramContent(
+  language: SiteLanguage = 'id'
+): Promise<ReligiousProgramContent | null> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `religious-program:v1:${normalizedLanguage}`;
+  const cached = cacheGet<ReligiousProgramContent>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) return null;
+
+  try {
+    const item = await client.request(
+      (readItems as any)('religious_program', {
+        fields: [
+          '*',
+          'translations.*',
+          'program_bullets.*',
+          'program_bullets.translations.*',
+          'list_program.*',
+          'list_program.translations.*',
+        ],
+        limit: 1,
+      })
+    );
+
+    const content = Array.isArray(item) ? item[0] : item;
+    if (!content) return null;
+
+    const result = applyReligiousProgramTranslation(
+      content as ReligiousProgramContent,
+      normalizedLanguage
+    );
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getReligiousProgramContent failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return null;
+  }
+}
+
+export async function getReligiousProgramContentWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<ReligiousProgramContent> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const fromCms = await getReligiousProgramContent(normalizedLanguage);
+  const merged = {
+    ...FALLBACK_RELIGIOUS_PROGRAM_CONTENT,
+    ...fromCms,
+  } as ReligiousProgramContent;
+
+  return {
+    ...merged,
+    image: directusAssetUrl(
+      merged.image ?? FALLBACK_RELIGIOUS_PROGRAM_CONTENT.image
+    ),
+    program_bullets:
+      merged.program_bullets && merged.program_bullets.length > 0
+        ? merged.program_bullets
+        : FALLBACK_RELIGIOUS_PROGRAM_CONTENT.program_bullets,
+    list_program:
+      merged.list_program && merged.list_program.length > 0
+        ? merged.list_program.map((item) => ({
+            ...item,
+            image: directusAssetUrl(item.image),
+          }))
+        : (FALLBACK_RELIGIOUS_PROGRAM_CONTENT.list_program ?? []).map(
+            (item) => ({
+              ...item,
+              image: directusAssetUrl(item.image),
+            })
+          ),
+  };
+}
+
 function normalizeAboutPillarsContent(
   content: AboutPillarsContent
 ): AboutPillarsContent {

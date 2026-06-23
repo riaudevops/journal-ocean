@@ -10,11 +10,7 @@ const deployTarget =
 const adapter =
   deployTarget === 'netlify' ? netlify() : node({ mode: 'standalone' });
 
-// https://astro.build/config
 export default defineConfig({
-  // SSR output. Adapter is selected by DEPLOY_TARGET:
-  // - DEPLOY_TARGET=netlify → Netlify Functions
-  // - DEPLOY_TARGET=docker/node or unset locally → standalone Node server
   output: 'server',
 
   adapter,

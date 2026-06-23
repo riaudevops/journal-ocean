@@ -1,5 +1,14 @@
 ---
-import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Twitter, Youtube } from 'lucide-astro';
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Facebook,
+  Instagram,
+  Twitter,
+  Youtube,
+} from 'lucide-astro';
 import {
   getFooterContentWithFallback,
   normalizeSiteLanguage,
@@ -12,122 +21,256 @@ const footerContent = await getFooterContentWithFallback(language);
 const formatFooterText = (value?: string) =>
   (value ?? '').replace(/\r\n/g, '\n').split('\n');
 
-const copyrightText = (footerContent.copyright_text ?? 'Journal Ocean ©{year}. All rights reserved.').replace(
-  '{year}',
-  String(currentYear)
-);
+const copyrightText = (
+  footerContent.copyright_text ?? 'Journal Ocean ©{year}. All rights reserved.'
+).replace('{year}', String(currentYear));
 
 const aboutLinks = [
-  { label: footerContent.about_link_1_label ?? 'Profil Journal Ocean', href: footerContent.about_link_1_href ?? '/profil' },
-  { label: footerContent.about_link_2_label ?? 'Visi & Misi', href: footerContent.about_link_2_href ?? '/profil#visi-misi' },
-  { label: footerContent.about_link_3_label ?? 'Struktur', href: footerContent.about_link_3_href ?? '/profil#struktur' },
+  {
+    label: footerContent.about_link_1_label ?? 'Profil Journal Ocean',
+    href: footerContent.about_link_1_href ?? '/profil',
+  },
+  {
+    label: footerContent.about_link_2_label ?? 'Visi & Misi',
+    href: footerContent.about_link_2_href ?? '/profil#visi-misi',
+  },
+  {
+    label: footerContent.about_link_3_label ?? 'Struktur',
+    href: footerContent.about_link_3_href ?? '/profil#struktur',
+  },
 ].filter((item) => item.label);
 
 const programLinks = [
-  { label: footerContent.program_link_1_label ?? 'Sosial', href: footerContent.program_link_1_href ?? '/program#sosial' },
-  { label: footerContent.program_link_2_label ?? 'Kemanusiaan', href: footerContent.program_link_2_href ?? '/program#kemanusiaan' },
-  { label: footerContent.program_link_3_label ?? 'Keagamaan', href: footerContent.program_link_3_href ?? '/program#keagamaan' },
+  {
+    label: footerContent.program_link_1_label ?? 'Sosial',
+    href: footerContent.program_link_1_href ?? '/program#sosial',
+  },
+  {
+    label: footerContent.program_link_2_label ?? 'Kemanusiaan',
+    href: footerContent.program_link_2_href ?? '/program#kemanusiaan',
+  },
+  {
+    label: footerContent.program_link_3_label ?? 'Keagamaan',
+    href: footerContent.program_link_3_href ?? '/program#keagamaan',
+  },
 ].filter((item) => item.label);
 
 const normalizeExternalUrl = (value?: string) => {
   if (!value) return '';
-  if (value === '#' || value.startsWith('/') || /^(https?:|mailto:|tel:)/i.test(value)) return value;
+  if (
+    value === '#' ||
+    value.startsWith('/') ||
+    /^(https?:|mailto:|tel:)/i.test(value)
+  )
+    return value;
   return `https://${value}`;
 };
 
 const socialLinks = [
-  { label: footerContent.facebook_label, href: normalizeExternalUrl(footerContent.facebook_url), Icon: Facebook },
-  { label: footerContent.instagram_label, href: normalizeExternalUrl(footerContent.instagram_url), Icon: Instagram },
-  { label: footerContent.twitter_label, href: normalizeExternalUrl(footerContent.twitter_url), Icon: Twitter },
-  { label: footerContent.youtube_label, href: normalizeExternalUrl(footerContent.youtube_url), Icon: Youtube },
+  {
+    label: footerContent.facebook_label,
+    href: normalizeExternalUrl(footerContent.facebook_url),
+    Icon: Facebook,
+  },
+  {
+    label: footerContent.instagram_label,
+    href: normalizeExternalUrl(footerContent.instagram_url),
+    Icon: Instagram,
+  },
+  {
+    label: footerContent.twitter_label,
+    href: normalizeExternalUrl(footerContent.twitter_url),
+    Icon: Twitter,
+  },
+  {
+    label: footerContent.youtube_label,
+    href: normalizeExternalUrl(footerContent.youtube_url),
+    Icon: Youtube,
+  },
 ].filter((item) => item.label && item.href);
 
 const legalLinks = [
-  { label: footerContent.privacy_label ?? 'Kebijakan Privasi', href: footerContent.privacy_href ?? '#' },
-  { label: footerContent.terms_label ?? 'Syarat & Ketentuan', href: footerContent.terms_href ?? '#' },
+  {
+    label: footerContent.privacy_label ?? 'Kebijakan Privasi',
+    href: footerContent.privacy_href ?? '#',
+  },
+  {
+    label: footerContent.terms_label ?? 'Syarat & Ketentuan',
+    href: footerContent.terms_href ?? '#',
+  },
 ].filter((item) => item.label);
 ---
 
-<footer class="bg-brand-primary px-4 pt-16 pb-8 text-brand-background sm:px-6 sm:pt-20 lg:px-8 lg:pt-24">
-  <div class="mx-auto max-w-[1320px]">
-    <div class="mb-12 grid grid-cols-1 gap-10 border-b border-brand-primary-lighter/20 pb-12 sm:mb-14 sm:grid-cols-2 sm:gap-10 sm:pb-14 lg:mb-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-16 lg:pb-16">
+<footer
+  class="bg-brand-primary px-4 pt-16 pb-8 text-brand-background sm:px-6 sm:pt-20 lg:px-8 lg:pt-24"
+>
+  <div class="mx-auto max-w-330">
+    <div
+      class="mb-12 grid grid-cols-1 gap-10 border-b border-brand-primary-lighter/20 pb-12 sm:mb-14 sm:grid-cols-2 sm:gap-10 sm:pb-14 lg:mb-16 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-16 lg:pb-16"
+    >
       <div class="sm:col-span-2 lg:col-span-1">
-        <div class="mb-2 font-serif text-[30px] font-semibold tracking-[-0.02em] sm:text-[34px] lg:text-[36px]">{footerContent.brand_name ?? 'Journal Ocean'}</div>
-        <div class="mb-4 text-[10px] font-medium uppercase tracking-[0.18em] text-brand-primary-lighter sm:text-[11px] sm:tracking-[0.2em]">{footerContent.brand_subtitle ?? 'Jurnal · Sejak 2014'}</div>
-        <p class="m-0 max-w-[36ch] text-sm leading-[1.7] text-brand-background/75">{footerContent.tagline}</p>
+        <div
+          class="mb-2 font-serif text-[30px] font-semibold tracking-[-0.02em] sm:text-[34px] lg:text-[36px]"
+        >
+          {footerContent.brand_name ?? 'Journal Ocean'}
+        </div>
+        <div
+          class="mb-4 text-[10px] font-medium uppercase tracking-[0.18em] text-brand-primary-lighter sm:text-[11px] sm:tracking-[0.2em]"
+        >
+          {footerContent.brand_subtitle ?? 'Jurnal · Sejak 2014'}
+        </div>
+        <p
+          class="m-0 max-w-[36ch] text-sm leading-[1.7] text-brand-background/75"
+        >
+          {footerContent.tagline}
+        </p>
       </div>
 
       <div>
-        <h4 class="m-0 mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary-lighter">{footerContent.about_title ?? 'Tentang'}</h4>
+        <h4
+          class="m-0 mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary-lighter"
+        >
+          {footerContent.about_title ?? 'Tentang'}
+        </h4>
         <ul class="m-0 list-none p-0">
-          {aboutLinks.map((link) => (
-            <li class="mb-3"><a href={link.href} class="text-sm text-brand-background/80 no-underline transition-colors hover:text-brand-background">{link.label}</a></li>
-          ))}
+          {
+            aboutLinks.map((link) => (
+              <li class="mb-3">
+                <a
+                  href={link.href}
+                  class="text-sm text-brand-background/80 no-underline transition-colors hover:text-brand-background"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
         </ul>
       </div>
 
       <div>
-        <h4 class="m-0 mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary-lighter">{footerContent.program_title ?? 'Program'}</h4>
+        <h4
+          class="m-0 mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary-lighter"
+        >
+          {footerContent.program_title ?? 'Program'}
+        </h4>
         <ul class="m-0 list-none p-0">
-          {programLinks.map((link) => (
-            <li class="mb-3"><a href={link.href} class="text-sm text-brand-background/80 no-underline transition-colors hover:text-brand-background">{link.label}</a></li>
-          ))}
+          {
+            programLinks.map((link) => (
+              <li class="mb-3">
+                <a
+                  href={link.href}
+                  class="text-sm text-brand-background/80 no-underline transition-colors hover:text-brand-background"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
         </ul>
       </div>
 
       <div>
-        <h4 class="m-0 mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary-lighter">{footerContent.contact_title ?? 'Hubungi'}</h4>
+        <h4
+          class="m-0 mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-primary-lighter"
+        >
+          {footerContent.contact_title ?? 'Hubungi'}
+        </h4>
         <ul class="m-0 list-none p-0 text-sm text-brand-background/80">
           <li class="mb-3 flex items-start gap-2.5">
             <MapPin class="mt-1 h-4 w-4 shrink-0" />
-            <a href={footerContent.address_href ?? '#'} class="text-brand-background/80 no-underline transition-colors hover:text-brand-primary-lighter">
-              {formatFooterText(footerContent.address_text).map((line, index) => (
-                <>{index > 0 && <br />}{line}</>
-              ))}
+            <a
+              href={footerContent.address_href ?? '#'}
+              class="text-brand-background/80 no-underline transition-colors hover:text-brand-primary-lighter"
+            >
+              {
+                formatFooterText(footerContent.address_text).map(
+                  (line, index) => (
+                    <>
+                      {index > 0 && <br />}
+                      {line}
+                    </>
+                  )
+                )
+              }
             </a>
           </li>
           <li class="mb-3 flex items-center gap-2">
             <Phone class="h-4 w-4 shrink-0" />
-            <a href={footerContent.phone_href ?? '#'} class="text-brand-background/80 no-underline transition-colors hover:text-brand-primary-lighter">{footerContent.phone_label}</a>
+            <a
+              href={footerContent.phone_href ?? '#'}
+              class="text-brand-background/80 no-underline transition-colors hover:text-brand-primary-lighter"
+              >{footerContent.phone_label}</a
+            >
           </li>
           <li class="mb-3 flex items-center gap-2">
             <Mail class="h-4 w-4 shrink-0" />
-            <a href={footerContent.email_href ?? '#'} class="text-brand-background/80 no-underline transition-colors hover:text-brand-primary-lighter">{footerContent.email_label}</a>
+            <a
+              href={footerContent.email_href ?? '#'}
+              class="text-brand-background/80 no-underline transition-colors hover:text-brand-primary-lighter"
+              >{footerContent.email_label}</a
+            >
           </li>
           <li class="flex items-center gap-2">
             <Clock class="h-4 w-4 shrink-0" />
             <span>
-              {formatFooterText(footerContent.office_hours_text).map((line, index) => (
-                <>{index > 0 && <br />}{line}</>
-              ))}
+              {
+                formatFooterText(footerContent.office_hours_text).map(
+                  (line, index) => (
+                    <>
+                      {index > 0 && <br />}
+                      {line}
+                    </>
+                  )
+                )
+              }
             </span>
           </li>
         </ul>
       </div>
     </div>
 
-    <div class="flex flex-col items-start gap-4 border-b border-brand-primary-lighter/20 py-6 sm:py-8 lg:flex-row lg:items-center lg:justify-between">
+    <div
+      class="flex flex-col items-start gap-4 border-b border-brand-primary-lighter/20 py-6 sm:py-8 lg:flex-row lg:items-center lg:justify-between"
+    >
       <div class="flex items-center gap-2">
-        <span class="text-xs uppercase tracking-[0.1em] text-brand-background/60">{footerContent.social_label ?? 'Ikuti Kami:'}</span>
+        <span class="text-xs uppercase tracking-widest text-brand-background/60"
+          >{footerContent.social_label ?? 'Ikuti Kami:'}</span
+        >
       </div>
       <div class="flex flex-wrap gap-3">
-        {socialLinks.map(({ href, label, Icon }) => (
-          <a href={href} class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-background/10 text-brand-background transition-all hover:scale-105 hover:bg-brand-primary-lighter hover:text-brand-primary-darker" aria-label={label}>
-            <Icon class="h-5 w-5" />
-          </a>
-        ))}
+        {
+          socialLinks.map(({ href, label, Icon }) => (
+            <a
+              href={href}
+              class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-background/10 text-brand-background transition-all hover:scale-105 hover:bg-brand-primary-lighter hover:text-brand-primary-darker"
+              aria-label={label}
+            >
+              <Icon class="h-5 w-5" />
+            </a>
+          ))
+        }
       </div>
     </div>
 
-    <div class="flex flex-col gap-3 pt-6 text-xs text-brand-background/50 sm:pt-8 lg:flex-row lg:items-center lg:justify-between lg:gap-4">
+    <div
+      class="flex flex-col gap-3 pt-6 text-xs text-brand-background/50 sm:pt-8 lg:flex-row lg:items-center lg:justify-between lg:gap-4"
+    >
       <p class="m-0 max-w-[60ch] leading-[1.6]">{copyrightText}</p>
       <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-        {legalLinks.map((link, index) => (
-          <>
-            {index > 0 && <span>|</span>}
-            <a href={link.href} class="text-brand-background/50 no-underline transition-colors hover:text-brand-primary-lighter">{link.label}</a>
-          </>
-        ))}
+        {
+          legalLinks.map((link, index) => (
+            <>
+              {index > 0 && <span>|</span>}
+              <a
+                href={link.href}
+                class="text-brand-background/50 no-underline transition-colors hover:text-brand-primary-lighter"
+              >
+                {link.label}
+              </a>
+            </>
+          ))
+        }
       </div>
     </div>
   </div>

@@ -16,62 +16,130 @@ const { latestBerita, language = 'id' } = Astro.props;
 const locale = language === 'en' ? 'en-US' : 'id-ID';
 const eyebrowLabel = language === 'en' ? 'Latest News' : 'Berita Terbaru';
 const titleLead = language === 'en' ? 'Latest' : 'Update';
-const titleRest = language === 'en' ? 'from the organization.' : 'dari organisasi.';
+const titleRest =
+  language === 'en' ? 'from the organization.' : 'dari organisasi.';
 const ctaLabel = language === 'en' ? 'Read →' : 'Baca →';
 const langQuery = `?lang=${language}`;
 
 const formatDate = (dateStr: string | undefined) => {
   if (!dateStr) return '';
-  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(dateStr));
+  return new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(dateStr));
 };
 ---
 
-<section class="border-t border-brand-border bg-brand-sand px-8 py-24 max-[960px]:px-6 max-[960px]:py-16" aria-labelledby="news-latest-title">
+<section
+  class="border-t border-brand-border bg-brand-sand px-8 py-24 max-[960px]:px-6 max-[960px]:py-16"
+  aria-labelledby="news-latest-title"
+>
   <div class="mx-auto max-w-7xl">
-    <header class="mb-12 flex items-end justify-between gap-8 border-b border-brand-border pb-8 max-[960px]:flex-col max-[960px]:items-start max-[960px]:gap-6">
-      <div class="max-w-[720px]">
-        <div class="mb-4 inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">
+    <header
+      class="mb-12 flex items-end justify-between gap-8 border-b border-brand-border pb-8 max-[960px]:flex-col max-[960px]:items-start max-[960px]:gap-6"
+    >
+      <div class="max-w-180">
+        <div
+          class="mb-4 inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary"
+        >
           <span class="h-px w-8 bg-brand-primary"></span>
           <span>{eyebrowLabel}</span>
         </div>
-        <h2 id="news-latest-title" class="m-0 font-serif text-[clamp(36px,4.5vw,56px)] font-normal leading-[1.05] tracking-[-0.025em] text-brand-ink [&_em]:italic [&_em]:text-brand-primary">
-          {titleLead} <em>{language === 'en' ? 'updates' : 'terkini'}</em> {titleRest}
+        <h2
+          id="news-latest-title"
+          class="m-0 font-serif text-[clamp(36px,4.5vw,56px)] font-normal leading-[1.05] tracking-tight text-brand-ink [&_em]:italic [&_em]:text-brand-primary"
+        >
+          {titleLead}
+          <em>{language === 'en' ? 'updates' : 'terkini'}</em>
+          {titleRest}
         </h2>
       </div>
       <div class="flex shrink-0 gap-2">
-        <button class="embla__prev-latest flex h-11 w-11 cursor-pointer items-center justify-center rounded border border-brand-border bg-brand-surface text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-primary hover:text-brand-background disabled:cursor-not-allowed disabled:opacity-30" aria-label="Previous">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <button
+          class="embla__prev-latest flex h-11 w-11 cursor-pointer items-center justify-center rounded border border-brand-border bg-brand-surface text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-primary hover:text-brand-background disabled:cursor-not-allowed disabled:opacity-30"
+          aria-label="Previous"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4.5 w-4.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><polyline points="15 18 9 12 15 6"></polyline></svg
+          >
         </button>
-        <button class="embla__next-latest flex h-11 w-11 cursor-pointer items-center justify-center rounded border border-brand-border bg-brand-surface text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-primary hover:text-brand-background disabled:cursor-not-allowed disabled:opacity-30" aria-label="Next">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <button
+          class="embla__next-latest flex h-11 w-11 cursor-pointer items-center justify-center rounded border border-brand-border bg-brand-surface text-brand-primary transition-colors hover:border-brand-primary hover:bg-brand-primary hover:text-brand-background disabled:cursor-not-allowed disabled:opacity-30"
+          aria-label="Next"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4.5 w-4.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><polyline points="9 18 15 12 9 6"></polyline></svg
+          >
         </button>
       </div>
     </header>
 
     <div class="embla-carousel-latest overflow-visible">
-      <div class="embla__viewport-latest cursor-grab overflow-hidden active:cursor-grabbing">
+      <div
+        class="embla__viewport-latest cursor-grab overflow-hidden active:cursor-grabbing"
+      >
         <div class="embla__container-latest flex gap-6">
           {
             latestBerita.map((berita: BeritaItem, idx: number) => (
               <article class="embla__slide-latest flex min-w-0 shrink-0 basis-full flex-col rounded bg-brand-surface transition duration-400 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(42,46,37,0.1)] min-[768px]:basis-[calc((100%-24px)/2)] min-[1024px]:basis-[calc((100%-48px)/3)]">
-                <a href={`/berita/${berita.slug}${langQuery}`} class="flex h-full flex-col text-inherit no-underline">
-                  <div class="relative aspect-[4/3] overflow-hidden">
+                <a
+                  href={`/berita/${berita.slug}${langQuery}`}
+                  class="flex h-full flex-col text-inherit no-underline"
+                >
+                  <div class="relative aspect-4/3 overflow-hidden">
                     {berita.url_thumbnail || berita.thumbnail ? (
-                      <img src={berita.url_thumbnail || berita.thumbnail} alt={berita.image_alt ?? berita.judul} class="h-full w-full object-cover saturate-[0.85] transition-transform duration-600 group-hover:scale-[1.04]" loading="lazy" />
+                      <img
+                        src={berita.url_thumbnail || berita.thumbnail}
+                        alt={berita.image_alt ?? berita.judul}
+                        class="h-full w-full object-cover saturate-[0.85] transition-transform duration-600 group-hover:scale-[1.04]"
+                        loading="lazy"
+                      />
                     ) : (
-                      <div class="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,var(--color-sand),var(--color-background))] font-serif text-lg tracking-[0.08em] uppercase text-brand-primary" aria-hidden="true">
+                      <div
+                        class="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,var(--color-sand),var(--color-background))] font-serif text-lg tracking-[0.08em] uppercase text-brand-primary"
+                        aria-hidden="true"
+                      >
                         <span>{berita.category}</span>
                       </div>
                     )}
-                    <div class="absolute left-4 top-4 rounded bg-brand-background px-2.5 py-1.5 font-mono text-[11px] font-medium tracking-[0.1em] text-brand-primary">{String(idx + 1).padStart(2, '0')}</div>
+                    <div class="absolute left-4 top-4 rounded bg-brand-background px-2.5 py-1.5 font-mono text-[11px] font-medium tracking-widest text-brand-primary">
+                      {String(idx + 1).padStart(2, '0')}
+                    </div>
                   </div>
                   <div class="flex flex-1 flex-col p-7 pb-6">
-                    <div class="mb-3 text-[10.5px] font-medium uppercase tracking-[0.15em] text-brand-primary">{berita.category}</div>
-                    <h3 class="m-0 mb-3 font-serif text-[22px] font-medium leading-[1.25] tracking-[-0.015em] text-brand-ink transition-colors duration-300 hover:text-brand-primary">{berita.judul}</h3>
-                    <p class="m-0 mb-5 flex-1 overflow-hidden text-sm leading-[1.6] text-brand-ink-soft line-clamp-3">{berita.excerpt}</p>
+                    <div class="mb-3 text-[10.5px] font-medium uppercase tracking-[0.15em] text-brand-primary">
+                      {berita.category}
+                    </div>
+                    <h3 class="m-0 mb-3 font-serif text-[22px] font-medium leading-tight tracking-tight text-brand-ink transition-colors duration-300 hover:text-brand-primary">
+                      {berita.judul}
+                    </h3>
+                    <p class="m-0 mb-5 flex-1 overflow-hidden text-sm leading-[1.6] text-brand-ink-soft line-clamp-3">
+                      {berita.excerpt}
+                    </p>
                     <div class="mt-auto flex items-center justify-between border-t border-brand-border pt-4">
-                      <div class="text-xs text-brand-ink-faint">{berita.author} · {formatDate(berita.date_created)}</div>
-                      <span class="text-xs font-medium uppercase tracking-[0.05em] text-brand-primary">{ctaLabel}</span>
+                      <div class="text-xs text-brand-ink-faint">
+                        {berita.author} · {formatDate(berita.date_created)}
+                      </div>
+                      <span class="text-xs font-medium uppercase tracking-widest text-brand-primary">
+                        {ctaLabel}
+                      </span>
                     </div>
                   </div>
                 </a>
@@ -90,9 +158,15 @@ const formatDate = (dateStr: string | undefined) => {
   const emblaRoot = document.querySelector('.embla-carousel-latest');
 
   if (emblaRoot) {
-    const viewport = emblaRoot.querySelector<HTMLElement>('.embla__viewport-latest');
-    const prevBtn = emblaRoot.querySelector<HTMLButtonElement>('.embla__prev-latest');
-    const nextBtn = emblaRoot.querySelector<HTMLButtonElement>('.embla__next-latest');
+    const viewport = emblaRoot.querySelector<HTMLElement>(
+      '.embla__viewport-latest'
+    );
+    const prevBtn = emblaRoot.querySelector<HTMLButtonElement>(
+      '.embla__prev-latest'
+    );
+    const nextBtn = emblaRoot.querySelector<HTMLButtonElement>(
+      '.embla__next-latest'
+    );
 
     if (viewport && prevBtn && nextBtn) {
       const emblaApi = EmblaCarousel(viewport, {
@@ -110,8 +184,20 @@ const formatDate = (dateStr: string | undefined) => {
         nextBtn.disabled = !canScrollNext;
       };
 
-      prevBtn.addEventListener('click', () => { if (emblaApi.canScrollPrev()) emblaApi.scrollPrev(); }, false);
-      nextBtn.addEventListener('click', () => { if (emblaApi.canScrollNext()) emblaApi.scrollNext(); }, false);
+      prevBtn.addEventListener(
+        'click',
+        () => {
+          if (emblaApi.canScrollPrev()) emblaApi.scrollPrev();
+        },
+        false
+      );
+      nextBtn.addEventListener(
+        'click',
+        () => {
+          if (emblaApi.canScrollNext()) emblaApi.scrollNext();
+        },
+        false
+      );
 
       emblaApi.on('select', updateArrowButtons);
       emblaApi.on('reInit', updateArrowButtons);

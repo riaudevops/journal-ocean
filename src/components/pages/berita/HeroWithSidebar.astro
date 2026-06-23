@@ -22,65 +22,124 @@ const langQuery = `?lang=${language}`;
 
 const formatDate = (dateStr: string | undefined) => {
   if (!dateStr) return '';
-  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(dateStr));
+  return new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(dateStr));
 };
 ---
 
-<section class="bg-brand-background px-8 pb-16 pt-24 max-[960px]:px-6 max-[960px]:pt-16" aria-labelledby="news-head-title">
+<section
+  class="bg-brand-background px-8 pb-16 pt-24 max-[960px]:px-6 max-[960px]:pt-16"
+  aria-labelledby="news-head-title"
+>
   <div class="mx-auto max-w-7xl">
-    <div class="grid grid-cols-[1.4fr_1fr] items-start gap-16 max-[960px]:grid-cols-1 max-[960px]:gap-12">
+    <div
+      class="grid grid-cols-[1.4fr_1fr] items-start gap-16 max-[960px]:grid-cols-1 max-[960px]:gap-12"
+    >
       <article class="relative">
-        <a href={`/berita/${heroBerita.slug}${langQuery}`} class="block text-inherit no-underline">
-          <div class="mb-8 aspect-[16/10] overflow-hidden rounded">
-            {heroBerita.url_thumbnail || heroBerita.thumbnail ? (
-              <img
-                src={heroBerita.url_thumbnail || heroBerita.thumbnail}
-                alt={heroBerita.image_alt ?? heroBerita.judul}
-                class="h-full w-full object-cover saturate-[0.85] transition-transform duration-600 group-hover:scale-[1.03]"
-                loading="eager"
-              />
-            ) : (
-              <div class="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,var(--color-sand),var(--color-surface))] font-serif text-[22px] tracking-[0.1em] uppercase text-brand-primary" aria-hidden="true">
-                <span>{heroBerita.category}</span>
-              </div>
-            )}
+        <a
+          href={`/berita/${heroBerita.slug}${langQuery}`}
+          class="block text-inherit no-underline"
+        >
+          <div class="mb-8 aspect-16/10 overflow-hidden rounded">
+            {
+              heroBerita.url_thumbnail || heroBerita.thumbnail ? (
+                <img
+                  src={heroBerita.url_thumbnail || heroBerita.thumbnail}
+                  alt={heroBerita.image_alt ?? heroBerita.judul}
+                  class="h-full w-full object-cover saturate-[0.85] transition-transform duration-600 group-hover:scale-[1.03]"
+                  loading="eager"
+                />
+              ) : (
+                <div
+                  class="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,var(--color-sand),var(--color-surface))] font-serif text-[22px] tracking-widest uppercase text-brand-primary"
+                  aria-hidden="true"
+                >
+                  <span>{heroBerita.category}</span>
+                </div>
+              )
+            }
           </div>
           <div class="max-w-[56ch]">
             <div class="mb-4 flex items-center gap-4">
-              <span class="inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary before:h-px before:w-8 before:bg-brand-primary before:content-['']">{mainLabel}</span>
-              <span class="font-mono text-[11.5px] tracking-[0.05em] text-brand-ink-faint">{formatDate(heroBerita.date_created)}</span>
+              <span
+                class="inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary before:h-px before:w-8 before:bg-brand-primary before:content-['']"
+                >{mainLabel}</span
+              >
+              <span
+                class="font-mono text-[11.5px] tracking-widest text-brand-ink-faint"
+                >{formatDate(heroBerita.date_created)}</span
+              >
             </div>
-            <h1 id="news-head-title" class="m-0 mb-5 font-serif text-[clamp(32px,4vw,52px)] font-normal leading-[1.1] tracking-[-0.02em] text-brand-ink transition-colors duration-300 hover:text-brand-primary">
+            <h1
+              id="news-head-title"
+              class="m-0 mb-5 font-serif text-[clamp(32px,4vw,52px)] font-normal leading-[1.1] tracking-[-0.02em] text-brand-ink transition-colors duration-300 hover:text-brand-primary"
+            >
               {heroBerita.judul}
             </h1>
-            <p class="m-0 mb-6 text-[17px] leading-[1.6] text-brand-ink-soft">{heroBerita.excerpt}</p>
-            <div class="inline-flex items-center gap-2.5 text-[13px] font-medium uppercase tracking-[0.05em] text-brand-primary transition-all duration-300 group-hover:gap-4">
+            <p class="m-0 mb-6 text-[17px] leading-[1.6] text-brand-ink-soft">
+              {heroBerita.excerpt}
+            </p>
+            <div
+              class="inline-flex items-center gap-2.5 text-[13px] font-medium uppercase tracking-widest text-brand-primary transition-all duration-300 group-hover:gap-4"
+            >
               <span>{readMoreLabel}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><line x1="5" y1="12" x2="19" y2="12"></line><polyline
+                  points="12 5 19 12 12 19"></polyline></svg
+              >
             </div>
           </div>
         </a>
       </article>
 
       <aside class="sticky top-24 max-[960px]:static">
-        <div class="mb-6 flex items-center justify-between border-b border-brand-border pb-5">
-          <div class="inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">
+        <div
+          class="mb-6 flex items-center justify-between border-b border-brand-border pb-5"
+        >
+          <div
+            class="inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary"
+          >
             <span class="h-px w-6 bg-brand-primary"></span>
             <span>{sidebarLabel}</span>
           </div>
-          <span class="font-mono text-[11px] tracking-[0.05em] text-brand-ink-faint">— {sidebarBerita.length} {articleLabel}</span>
+          <span
+            class="font-mono text-[11px] tracking-widest text-brand-ink-faint"
+            >— {sidebarBerita.length} {articleLabel}</span
+          >
         </div>
 
         <ol class="m-0 list-none p-0">
           {
             sidebarBerita.map((berita: BeritaItem, idx: number) => (
               <li class="border-b border-brand-border">
-                <a href={`/berita/${berita.slug}${langQuery}`} class="grid grid-cols-[40px_1fr] gap-4 py-5 text-inherit no-underline transition-all duration-300 hover:pl-1">
-                  <span class="pt-1 font-mono text-xs tracking-[0.05em] text-brand-ink-faint">{String(idx + 1).padStart(2, '0')}</span>
+                <a
+                  href={`/berita/${berita.slug}${langQuery}`}
+                  class="grid grid-cols-[40px_1fr] gap-4 py-5 text-inherit no-underline transition-all duration-300 hover:pl-1"
+                >
+                  <span class="pt-1 font-mono text-xs tracking-widest text-brand-ink-faint">
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
                   <div>
-                    <div class="mb-1.5 text-[10.5px] font-medium uppercase tracking-[0.15em] text-brand-primary">{berita.category}</div>
-                    <h4 class="m-0 mb-2 font-serif text-[17px] font-medium leading-[1.3] tracking-[-0.01em] text-brand-ink transition-colors duration-300 hover:text-brand-primary">{berita.judul}</h4>
-                    <div class="text-xs text-brand-ink-faint">{berita.author} · {formatDate(berita.date_created)}</div>
+                    <div class="mb-1.5 text-[10.5px] font-medium uppercase tracking-[0.15em] text-brand-primary">
+                      {berita.category}
+                    </div>
+                    <h4 class="m-0 mb-2 font-serif text-[17px] font-medium leading-[1.3] tracking-[-0.01em] text-brand-ink transition-colors duration-300 hover:text-brand-primary">
+                      {berita.judul}
+                    </h4>
+                    <div class="text-xs text-brand-ink-faint">
+                      {berita.author} · {formatDate(berita.date_created)}
+                    </div>
                   </div>
                 </a>
               </li>
