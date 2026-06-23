@@ -1,116 +1,312 @@
 ---
+import {
+  getSocialProgramContentWithFallback,
+  normalizeSiteLanguage,
+} from '../../../lib/directus';
+
+const language = normalizeSiteLanguage(Astro.url.searchParams.get('lang'));
+const socialProgram = await getSocialProgramContentWithFallback(language);
+
+const sectionTitle =
+  socialProgram.title ?? 'Program Sosial <em>Journal Ocean</em>.';
+const sectionSubtitle =
+  socialProgram.subtitle ??
+  'Program-program sosial yang bertujuan untuk membantu dan memberdayakan masyarakat yang membutuhkan.';
+
 const programFeature = {
-  eyebrow: "Program Unggulan",
-  category: "Program Sosial",
-  title: "Program Beasiswa",
-  desc: "Memberikan beasiswa untuk siswa berprestasi dan keluarga kurang mampu untuk melanjutkan pendidikan ke jenjang yang lebih tinggi. Program ini bertujuan untuk memberikan kesempatan pendidikan yang lebih baik bagi generasi penerus bangsa.",
-  image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&h=800&fit=crop",
-  stat: { num: "150+", label: "Penerima Beasiswa" },
-  bullets: [
-    "Beasiswa untuk SD, SMP, SMA, dan Perguruan Tinggi",
-    "Bantuan biaya pendidikan dan kebutuhan sekolah",
-    "Pendampingan dan mentoring untuk penerima beasiswa",
-  ],
+  eyebrow: socialProgram.program_eyebrow ?? 'Program Unggulan',
+  category: socialProgram.category ?? 'Program Sosial',
+  title: socialProgram.program_title ?? 'Program Beasiswa',
+  desc:
+    socialProgram.program_desc ??
+    'Memberikan beasiswa untuk siswa berprestasi dan keluarga kurang mampu untuk melanjutkan pendidikan ke jenjang yang lebih tinggi. Program ini bertujuan untuk memberikan kesempatan pendidikan yang lebih baik bagi generasi penerus bangsa.',
+  image: socialProgram.image,
+  imageAlt:
+    socialProgram.image_alt ?? socialProgram.program_title ?? 'Program Sosial',
+  stat: {
+    num: socialProgram.stat_num ?? '150+',
+    label: socialProgram.stat_label ?? 'Penerima Beasiswa',
+  },
+  bullets: (socialProgram.program_bullets ?? [])
+    .map((item) => item.text)
+    .filter(Boolean),
 };
 
-const programCards = [
-  {
-    icon: "H",
-    title: "Bantuan Sosial",
-    desc: "Penyaluran bantuan sosial berupa sembako, pakaian, dan kebutuhan pokok lainnya untuk keluarga yang membutuhkan.",
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&h=600&fit=crop",
-  },
-  {
-    icon: "P",
-    title: "Pelatihan Keterampilan",
-    desc: "Program pelatihan keterampilan untuk meningkatkan kemampuan dan peluang ekonomi masyarakat, termasuk kerajinan, pertanian, dan wirausaha.",
-    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop",
-  },
-  {
-    icon: "K",
-    title: "Bantuan Kesehatan",
-    desc: "Program bantuan kesehatan gratis berupa pemeriksaan kesehatan, pengobatan, dan penyuluhan kesehatan untuk masyarakat.",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=600&fit=crop",
-  },
-  {
-    icon: "E",
-    title: "Pemberdayaan Perempuan",
-    desc: "Program khusus untuk memberdayakan perempuan melalui pelatihan, pendampingan, dan dukungan untuk meningkatkan kualitas hidup.",
-    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop",
-  },
-  {
-    icon: "L",
-    title: "Bantuan Lansia",
-    desc: "Program bantuan khusus untuk lansia berupa kebutuhan pokok, kesehatan, dan kegiatan sosial untuk meningkatkan kesejahteraan mereka.",
-    image: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=600&fit=crop",
-  },
-  {
-    icon: "M",
-    title: "Pemberdayaan Masyarakat",
-    desc: "Program komprehensif untuk memberdayakan masyarakat melalui berbagai kegiatan sosial, ekonomi, dan pendidikan yang terintegrasi.",
-    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop",
-  },
-];
+const programCards = (socialProgram.list_program ?? []).map((item, idx) => ({
+  index: idx + 1,
+  icon: item.icon ?? item.title?.slice(0, 1) ?? 'J',
+  title: item.title ?? '',
+  desc: item.desc ?? '',
+  image: item.image,
+  imageAlt: item.image_alt ?? item.title ?? 'Program Sosial',
+}));
+
+const spotlightCards = programCards.slice(0, 2);
+const archiveCards = programCards.slice(2);
+const hasArchiveCards = archiveCards.length > 0;
 ---
 
-<section id="sosial" class="bg-brand-background px-8 py-32 max-[960px]:px-6 max-[960px]:py-16" aria-labelledby="sosial-title">
+<section
+  id="sosial"
+  aria-labelledby="sosial-title"
+  class="bg-brand-background px-4 py-18 sm:px-6 sm:py-20 lg:px-8 lg:py-28"
+>
   <div class="mx-auto max-w-7xl">
-    <!-- Header -->
-    <header class="mx-auto mb-20 max-w-[720px] text-center max-[960px]:mb-12">
-      <div class="mb-5 inline-flex items-center gap-3 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">
-        <span class="h-px w-8 bg-brand-primary"></span>
-        <span>{programFeature.category}</span>
+    <header
+      class="mb-10 grid gap-5 border-b border-brand-border pb-10 sm:mb-12 sm:gap-6 sm:pb-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:gap-14 lg:pb-16"
+    >
+      <div>
+        <div
+          class="mb-4 inline-flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.22em] text-brand-primary sm:text-[11px]"
+        >
+          <span class="h-px w-7 bg-brand-primary sm:w-8"></span>
+          <span>{programFeature.category}</span>
+        </div>
+        <h2
+          id="sosial-title"
+          class="m-0 max-w-[13ch] font-serif text-[clamp(34px,9vw,72px)] font-normal leading-[0.98] tracking-[-0.03em] text-brand-ink [&_em]:font-light [&_em]:italic [&_em]:text-brand-primary"
+        >
+          <Fragment set:html={sectionTitle} />
+        </h2>
       </div>
-      <h2 id="sosial-title" class="m-0 mb-6 font-serif text-[clamp(40px,5vw,64px)] font-normal leading-[1.05] tracking-[-0.025em] text-brand-ink [&_em]:italic [&_em]:text-brand-primary">
-        Program Sosial <em>Journal Ocean</em>.
-      </h2>
-      <p class="mx-auto m-0 max-w-[56ch] text-[17px] leading-[1.6] text-brand-ink-soft">Program-program sosial yang bertujuan untuk membantu dan memberdayakan masyarakat yang membutuhkan.</p>
-    </header>
-
-    <!-- Feature row (2-col image+text) -->
-    <div class="mb-24 grid grid-cols-[1.1fr_1fr] items-center gap-20 border-b border-brand-border pb-24 max-[960px]:mb-16 max-[960px]:grid-cols-1 max-[960px]:gap-12 max-[960px]:pb-16">
-      <div class="relative aspect-[4/3]">
-        <img src={programFeature.image} alt={programFeature.title} class="h-full w-full rounded object-cover saturate-[0.85]" loading="lazy" />
-        <div class="absolute -bottom-6 -right-6 rounded bg-brand-primary px-7 py-6 text-brand-background shadow-[0_8px_24px_rgba(42,46,37,0.15)] max-[960px]:bottom-[-16px] max-[960px]:right-0">
-          <div class="font-serif text-4xl font-normal leading-none">{programFeature.stat.num}</div>
-          <div class="mt-1.5 text-[10.5px] font-medium uppercase tracking-[0.15em] text-brand-primary-lighter">{programFeature.stat.label}</div>
+      <div class="grid gap-4 sm:gap-5">
+        <p
+          class="m-0 max-w-[60ch] text-[14px] leading-6 text-brand-ink-soft sm:text-[15px] sm:leading-7 lg:text-[16px]"
+        >
+          {sectionSubtitle}
+        </p>
+        <div
+          class="flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-brand-primary/75 sm:text-[11px]"
+        >
+          <span
+            class="rounded-full border border-brand-border bg-brand-surface px-3 py-1.5"
+          >
+            {programFeature.eyebrow}
+          </span>
+          <span
+            class="rounded-full border border-brand-border bg-brand-surface px-3 py-1.5"
+          >
+            {programCards.length} program aktif
+          </span>
         </div>
       </div>
+    </header>
 
-      <div class="max-w-[52ch]">
-        <div class="mb-5 text-[11.5px] font-medium uppercase tracking-[0.2em] text-brand-primary">{programFeature.eyebrow}</div>
-        <h3 class="m-0 mb-5 font-serif text-[clamp(32px,3.6vw,48px)] font-normal leading-[1.1] tracking-[-0.02em] text-brand-ink">{programFeature.title}</h3>
-        <p class="m-0 mb-6 text-base leading-[1.7] text-brand-ink-soft">{programFeature.desc}</p>
-        <ul class="m-0 flex list-none flex-col gap-3 p-0">
-          {
-            programFeature.bullets.map((bullet) => (
-              <li class="flex items-start gap-3 text-[14.5px] leading-[1.5] text-brand-ink">
-                <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-primary"></span>
-                <span>{bullet}</span>
-              </li>
-            ))
-          }
-        </ul>
+    <div class="grid gap-6 lg:grid-cols-[1.18fr_0.82fr] lg:items-stretch">
+      <article
+        class="overflow-hidden rounded-[28px] border border-brand-border bg-brand-surface shadow-[0_22px_60px_rgba(42,46,37,0.08)]"
+      >
+        <div class="grid lg:min-h-170 lg:grid-cols-[1.06fr_0.94fr]">
+          <div class="relative min-h-75 sm:min-h-95 lg:min-h-full">
+            <img
+              src={programFeature.image}
+              alt={programFeature.imageAlt}
+              class="absolute inset-0 h-full w-full object-cover saturate-[0.86]"
+              loading="lazy"
+            />
+            <div
+              class="absolute inset-0 bg-linear-to-t from-black/60 via-black/18 to-transparent"
+            >
+            </div>
+            <div
+              class="absolute inset-x-4 top-4 flex items-start justify-between gap-3 sm:inset-x-7 sm:top-7 sm:gap-4"
+            >
+              <div
+                class="rounded-full border border-white/30 bg-black/20 px-3 py-1.5 text-[9px] font-medium uppercase tracking-[0.18em] text-white backdrop-blur-sm sm:px-4 sm:py-2 sm:text-[10px]"
+              >
+                {programFeature.eyebrow}
+              </div>
+              <div
+                class="rounded-[18px] border border-white/20 bg-white/12 px-3 py-2.5 text-right text-white backdrop-blur-md sm:rounded-[20px] sm:px-5 sm:py-3"
+              >
+                <div class="font-serif text-[24px] leading-none sm:text-[38px]">
+                  {programFeature.stat.num}
+                </div>
+                <div
+                  class="mt-1 max-w-[12ch] text-[9px] uppercase tracking-[0.16em] text-white/80 sm:text-[10.5px]"
+                >
+                  {programFeature.stat.label}
+                </div>
+              </div>
+            </div>
+            <div class="absolute inset-x-4 bottom-4 sm:inset-x-7 sm:bottom-7">
+              <div
+                class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[9px] uppercase tracking-[0.18em] text-white backdrop-blur-sm sm:text-[10px]"
+              >
+                <span class="h-1.5 w-1.5 rounded-full bg-brand-primary-lighter"
+                ></span>
+                <span>Fokus utama</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="flex h-full flex-col justify-between px-5 py-6 sm:px-8 sm:py-9"
+          >
+            <div>
+              <div
+                class="mb-3 text-[10px] font-medium uppercase tracking-[0.2em] text-brand-primary sm:text-[11px]"
+              >
+                Program Fokus
+              </div>
+              <h3
+                class="m-0 max-w-[14ch] font-serif text-[clamp(28px,6vw,46px)] font-normal leading-[1.02] tracking-[-0.02em] text-brand-ink"
+              >
+                {programFeature.title}
+              </h3>
+              <p
+                class="mt-4 text-[14px] leading-6 text-brand-ink-soft sm:mt-5 sm:text-base sm:leading-7"
+              >
+                {programFeature.desc}
+              </p>
+            </div>
+
+            <div
+              class="mt-7 grid gap-4 border-t border-brand-border pt-5 sm:mt-8 sm:gap-5 sm:pt-6"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div
+                  class="text-[10px] font-medium uppercase tracking-[0.18em] text-brand-primary sm:text-[11px]"
+                >
+                  Garis Program
+                </div>
+                <div
+                  class="font-mono text-[10px] uppercase tracking-[0.16em] text-brand-primary/70"
+                >
+                  01-{String(programFeature.bullets.length).padStart(2, '0')}
+                </div>
+              </div>
+              <ul class="m-0 grid list-none gap-2.5 p-0 sm:gap-3">
+                {
+                  programFeature.bullets.map((bullet, idx) => (
+                    <li class="grid grid-cols-[auto_1fr] items-start gap-3 rounded-[18px] bg-brand-background/80 px-3.5 py-3 sm:rounded-2xl sm:px-4">
+                      <span class="pt-0.5 font-mono text-[10px] tracking-[0.14em] text-brand-primary sm:text-[11px]">
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+                      <span class="text-[13.5px] leading-6 text-brand-ink sm:text-[14.5px]">
+                        {bullet}
+                      </span>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <div class="grid gap-5 sm:gap-6">
+        {
+          spotlightCards.map((program, idx) => (
+            <article class="group grid overflow-hidden rounded-3xl border border-brand-border bg-brand-surface shadow-[0_16px_42px_rgba(42,46,37,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_46px_rgba(42,46,37,0.08)] sm:grid-cols-[0.95fr_1.05fr]">
+              <div class="relative min-h-55 overflow-hidden sm:min-h-0">
+                <img
+                  src={program.image}
+                  alt={program.imageAlt}
+                  class="absolute inset-0 h-full w-full object-cover saturate-[0.84] transition duration-700 group-hover:scale-[1.04]"
+                  loading="lazy"
+                />
+                <div class="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
+                <div class="absolute inset-x-3 top-3 flex items-center justify-between gap-3 sm:inset-x-4 sm:top-4">
+                  <span class="rounded-full bg-brand-background px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-brand-primary">
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
+                  <span class="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/20 font-serif text-lg italic text-white backdrop-blur-sm">
+                    {program.icon}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex flex-col justify-between px-4 py-4 sm:px-5 sm:py-5">
+                <div>
+                  <div class="mb-2 text-[10px] uppercase tracking-[0.18em] text-brand-primary/75">
+                    Sorotan Program
+                  </div>
+                  <h4 class="m-0 font-serif text-[22px] leading-[1.06] tracking-[-0.02em] text-brand-ink sm:text-[24px]">
+                    {program.title}
+                  </h4>
+                  <p class="mt-3 text-[13.5px] leading-6 text-brand-ink-soft sm:text-[14px]">
+                    {program.desc}
+                  </p>
+                </div>
+                <div class="mt-5 border-t border-brand-border pt-4 font-mono text-[10px] uppercase tracking-[0.16em] text-brand-primary/70">
+                  {String(program.index).padStart(2, '0')}
+                </div>
+              </div>
+            </article>
+          ))
+        }
       </div>
     </div>
 
-    <!-- Card grid (3-col) -->
-    <div class="grid grid-cols-3 gap-6 max-[960px]:grid-cols-1">
-      {
-        programCards.map((program, idx) => (
-          <article class="group overflow-hidden rounded bg-brand-surface transition duration-400 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(42,46,37,0.08)]">
-            <div class="relative aspect-[4/3] overflow-hidden">
-              <img src={program.image} alt={program.title} class="h-full w-full object-cover saturate-[0.85] transition duration-600 group-hover:scale-[1.04]" loading="lazy" />
-              <div class="absolute left-4 top-4 rounded bg-brand-background px-2.5 py-1.5 font-mono text-[11px] font-medium tracking-[0.1em] text-brand-primary">0{idx + 1}</div>
+    {
+      hasArchiveCards && (
+        <div class="mt-6 rounded-[28px] border border-brand-border bg-brand-surface/82 p-4 shadow-[0_16px_42px_rgba(42,46,37,0.05)] sm:mt-8 sm:p-5 lg:p-6">
+          <div class="grid gap-4 lg:grid-cols-2">
+            <div class="grid gap-4">
+              {archiveCards.slice(0, 2).map((program, idx) => (
+                <article class="group grid overflow-hidden rounded-3xl border border-brand-border bg-brand-background/74 transition duration-300 hover:border-brand-primary/30 hover:bg-brand-surface sm:grid-cols-[240px_1fr]">
+                  <div class="relative aspect-4/3 overflow-hidden sm:aspect-auto sm:h-full">
+                    <img
+                      src={program.image}
+                      alt={program.imageAlt}
+                      class="absolute inset-0 h-full w-full object-cover saturate-[0.84] transition duration-700 group-hover:scale-[1.04]"
+                      loading="lazy"
+                    />
+                    <div class="absolute left-3 top-3 rounded-full bg-brand-surface px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-brand-primary sm:left-4 sm:top-4">
+                      {String(program.index).padStart(2, '0')}
+                    </div>
+                  </div>
+                  <div class="flex flex-col justify-center px-4 py-4 sm:px-5 sm:py-5">
+                    <div class="mb-3 flex items-center gap-3">
+                      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary/12 font-serif text-lg italic text-brand-primary">
+                        {program.icon}
+                      </span>
+                      <h4 class="m-0 font-serif text-[20px] leading-[1.08] tracking-[-0.02em] text-brand-ink sm:text-[22px]">
+                        {program.title}
+                      </h4>
+                    </div>
+                    <p class="m-0 text-[13.5px] leading-6 text-brand-ink-soft sm:text-[14px]">
+                      {program.desc}
+                    </p>
+                  </div>
+                </article>
+              ))}
             </div>
-            <div class="px-7 pb-8 pt-7">
-              <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary font-serif text-lg italic text-brand-background">{program.icon}</div>
-              <h4 class="m-0 mb-2.5 font-serif text-xl font-medium leading-[1.2] tracking-[-0.015em] text-brand-ink">{program.title}</h4>
-              <p class="m-0 text-sm leading-[1.6] text-brand-ink-soft">{program.desc}</p>
+
+            <div class="grid gap-3.5 sm:gap-4">
+              {archiveCards.slice(2).map((program) => (
+                <article class="group grid overflow-hidden rounded-3xl border border-brand-border bg-brand-background/74 transition duration-300 hover:border-brand-primary/30 hover:bg-brand-surface sm:grid-cols-[240px_1fr]">
+                  <div class="relative aspect-4/3 overflow-hidden sm:aspect-auto sm:h-full">
+                    <img
+                      src={program.image}
+                      alt={program.imageAlt}
+                      class="absolute inset-0 h-full w-full object-cover saturate-[0.84] transition duration-700 group-hover:scale-[1.04]"
+                      loading="lazy"
+                    />
+                    <div class="absolute left-3 top-3 rounded-full bg-brand-surface px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-brand-primary sm:left-3.5 sm:top-3.5">
+                      {String(program.index).padStart(2, '0')}
+                    </div>
+                  </div>
+                  <div class="flex flex-col justify-center px-4 py-4 sm:px-5 sm:py-4">
+                    <div class="mb-2.5 flex items-center gap-3">
+                      <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-primary/12 font-serif text-base italic text-brand-primary sm:h-10 sm:w-10 sm:text-lg">
+                        {program.icon}
+                      </span>
+                      <h4 class="m-0 font-serif text-[18px] leading-[1.08] tracking-[-0.02em] text-brand-ink sm:text-[19px]">
+                        {program.title}
+                      </h4>
+                    </div>
+                    <p class="m-0 text-[13px] leading-6 text-brand-ink-soft sm:text-[13.5px]">
+                      {program.desc}
+                    </p>
+                  </div>
+                </article>
+              ))}
             </div>
-          </article>
-        ))
-      }
-    </div>
+          </div>
+        </div>
+      )
+    }
   </div>
 </section>

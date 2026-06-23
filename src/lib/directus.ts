@@ -318,6 +318,72 @@ export interface OrganizationStructureItem extends OrganizationStructureItemTran
   translations?: OrganizationStructureItemTranslation[];
 }
 
+export interface SocialProgramTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  title?: string;
+  Title?: string;
+  subtitle?: string;
+  Subtitle?: string;
+  image_alt?: string;
+  Image_Alt?: string;
+  category?: string;
+  Category?: string;
+  program_eyebrow?: string;
+  Program_Eyebrow?: string;
+  program_title?: string;
+  Program_Title?: string;
+  program_desc?: string;
+  Program_Desc?: string;
+  stat_label?: string;
+  Stat_Label?: string;
+  [key: string]: unknown;
+}
+
+export interface SocialProgramBulletTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  text?: string;
+  Text?: string;
+  [key: string]: unknown;
+}
+
+export interface SocialProgramBullet extends SocialProgramBulletTranslation {
+  id?: number | string;
+  sort?: number | null;
+  translations?: SocialProgramBulletTranslation[];
+}
+
+export interface SocialProgramItemTranslation {
+  languages_code?: string | { code?: string; name?: string };
+  icon?: string;
+  Icon?: string;
+  title?: string;
+  Title?: string;
+  desc?: string;
+  Desc?: string;
+  image_alt?: string;
+  Image_Alt?: string;
+  [key: string]: unknown;
+}
+
+export interface SocialProgramItem extends SocialProgramItemTranslation {
+  id?: number | string;
+  sort?: number | null;
+  image?: string | null;
+  Image?: string | null;
+  translations?: SocialProgramItemTranslation[];
+}
+
+export interface SocialProgramContent extends SocialProgramTranslation {
+  id?: number | string;
+  image?: string | null;
+  Image?: string | null;
+  stat_num?: string;
+  Stat_Num?: string;
+  program_bullets?: SocialProgramBullet[];
+  list_program?: SocialProgramItem[];
+  translations?: SocialProgramTranslation[];
+}
+
 export interface AboutPillarItemTranslation {
   languages_code?: string | { code?: string; name?: string };
   name?: string;
@@ -474,19 +540,9 @@ function getTranslationLanguageCodes(language: SiteLanguage): string[] {
     : ['id', 'id-ID', 'id_ID'];
 }
 
-function getTranslationCode(
-  translation:
-    | HeroSlideTranslation
-    | NavbarContentTranslation
-    | LandingProfileTranslation
-    | FooterContentTranslation
-    | AnnouncementContentTranslation
-    | PreloaderContentTranslation
-    | AboutProfileTranslation
-    | AboutPillarsTranslation
-    | AboutPillarItemTranslation
-    | NewsItemTranslation
-): string {
+function getTranslationCode(translation: {
+  languages_code?: string | { code?: string; name?: string };
+}): string {
   const raw = translation.languages_code;
   if (!raw) return '';
   return typeof raw === 'string' ? raw : (raw.code ?? '');
@@ -1091,6 +1147,319 @@ export async function getAboutProfileContentWithFallback(
     image_2: directusAssetUrl(
       fromCms?.image_2 ?? FALLBACK_ABOUT_PROFILE_CONTENT.image_2
     ),
+  };
+}
+
+function normalizeSocialProgramContent(
+  content: SocialProgramContent
+): SocialProgramContent {
+  return {
+    ...content,
+    title: getStringField(content, ['title', 'Title']),
+    subtitle: getStringField(content, ['subtitle', 'Subtitle']),
+    image: (content.image ?? content.Image ?? null) as string | null,
+    image_alt: getStringField(content, ['image_alt', 'Image_Alt']),
+    category: getStringField(content, ['category', 'Category']),
+    program_eyebrow: getStringField(content, [
+      'program_eyebrow',
+      'Program_Eyebrow',
+    ]),
+    program_title: getStringField(content, ['program_title', 'Program_Title']),
+    program_desc: getStringField(content, ['program_desc', 'Program_Desc']),
+    stat_num: getStringField(content, ['stat_num', 'Stat_Num']),
+    stat_label: getStringField(content, ['stat_label', 'Stat_Label']),
+    program_bullets: Array.isArray(content.program_bullets)
+      ? content.program_bullets
+      : [],
+    list_program: Array.isArray(content.list_program)
+      ? content.list_program
+      : [],
+  };
+}
+
+function normalizeSocialProgramBullet(
+  item: SocialProgramBullet
+): SocialProgramBullet {
+  return {
+    ...item,
+    text: getStringField(item, ['text', 'Text']),
+  };
+}
+
+function normalizeSocialProgramItem(
+  item: SocialProgramItem
+): SocialProgramItem {
+  return {
+    ...item,
+    icon: getStringField(item, ['icon', 'Icon']),
+    title: getStringField(item, ['title', 'Title']),
+    desc: getStringField(item, ['desc', 'Desc']),
+    image: (item.image ?? item.Image ?? null) as string | null,
+    image_alt: getStringField(item, ['image_alt', 'Image_Alt']),
+  };
+}
+
+function applySocialProgramBulletTranslation(
+  item: SocialProgramBullet,
+  language: SiteLanguage
+): SocialProgramBullet {
+  const base = normalizeSocialProgramBullet(item);
+  if (language === 'id' || !Array.isArray(item.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = item.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeSocialProgramBullet(
+    translation as SocialProgramBullet
+  );
+  return {
+    ...base,
+    text: translated.text || base.text,
+  };
+}
+
+function applySocialProgramItemTranslation(
+  item: SocialProgramItem,
+  language: SiteLanguage
+): SocialProgramItem {
+  const base = normalizeSocialProgramItem(item);
+  if (language === 'id' || !Array.isArray(item.translations)) return base;
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = item.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+  if (!translation) return base;
+
+  const translated = normalizeSocialProgramItem(
+    translation as SocialProgramItem
+  );
+  return {
+    ...base,
+    icon: translated.icon || base.icon,
+    title: translated.title || base.title,
+    desc: translated.desc || base.desc,
+    image_alt: translated.image_alt || base.image_alt,
+  };
+}
+
+function applySocialProgramTranslation(
+  content: SocialProgramContent,
+  language: SiteLanguage
+): SocialProgramContent {
+  const base = normalizeSocialProgramContent(content);
+  if (language === 'id' || !Array.isArray(content.translations)) {
+    return {
+      ...base,
+      program_bullets: (base.program_bullets ?? []).map((item) =>
+        normalizeSocialProgramBullet(item)
+      ),
+      list_program: (base.list_program ?? []).map((item) =>
+        normalizeSocialProgramItem(item)
+      ),
+    };
+  }
+
+  const languageCodes = getTranslationLanguageCodes(language);
+  const translation = content.translations.find((t) =>
+    languageCodes.includes(getTranslationCode(t))
+  );
+
+  const translated = translation
+    ? normalizeSocialProgramContent(translation as SocialProgramContent)
+    : null;
+
+  return {
+    ...base,
+    title: translated?.title || base.title,
+    subtitle: translated?.subtitle || base.subtitle,
+    image_alt: translated?.image_alt || base.image_alt,
+    category: translated?.category || base.category,
+    program_eyebrow: translated?.program_eyebrow || base.program_eyebrow,
+    program_title: translated?.program_title || base.program_title,
+    program_desc: translated?.program_desc || base.program_desc,
+    stat_label: translated?.stat_label || base.stat_label,
+    program_bullets: (base.program_bullets ?? [])
+      .map((item) => applySocialProgramBulletTranslation(item, language))
+      .filter((item) => item.text),
+    list_program: (base.list_program ?? [])
+      .map((item) => applySocialProgramItemTranslation(item, language))
+      .filter((item) => item.title && item.desc),
+  };
+}
+
+export const FALLBACK_SOCIAL_PROGRAM_CONTENT: SocialProgramContent = {
+  id: 1,
+  title: 'Program Sosial <em>Journal Ocean</em>.',
+  subtitle:
+    'Program-program sosial yang bertujuan untuk membantu dan memberdayakan masyarakat yang membutuhkan.',
+  image:
+    'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&h=800&fit=crop',
+  image_alt: 'Program Beasiswa Journal Ocean',
+  category: 'Program Sosial',
+  program_eyebrow: 'Program Unggulan',
+  program_title: 'Program Beasiswa',
+  program_desc:
+    'Memberikan beasiswa untuk siswa berprestasi dan keluarga kurang mampu untuk melanjutkan pendidikan ke jenjang yang lebih tinggi. Program ini bertujuan untuk memberikan kesempatan pendidikan yang lebih baik bagi generasi penerus bangsa.',
+  stat_num: '150+',
+  stat_label: 'Penerima Beasiswa',
+  program_bullets: [
+    {
+      id: 1,
+      sort: 1,
+      text: 'Beasiswa untuk SD, SMP, SMA, dan Perguruan Tinggi',
+    },
+    {
+      id: 2,
+      sort: 2,
+      text: 'Bantuan biaya pendidikan dan kebutuhan sekolah',
+    },
+    {
+      id: 3,
+      sort: 3,
+      text: 'Pendampingan dan mentoring untuk penerima beasiswa',
+    },
+  ],
+  list_program: [
+    {
+      id: 1,
+      sort: 1,
+      icon: 'H',
+      title: 'Bantuan Sosial',
+      desc: 'Penyaluran bantuan sosial berupa sembako, pakaian, dan kebutuhan pokok lainnya untuk keluarga yang membutuhkan.',
+      image:
+        'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&h=600&fit=crop',
+      image_alt: 'Bantuan Sosial',
+    },
+    {
+      id: 2,
+      sort: 2,
+      icon: 'P',
+      title: 'Pelatihan Keterampilan',
+      desc: 'Program pelatihan keterampilan untuk meningkatkan kemampuan dan peluang ekonomi masyarakat, termasuk kerajinan, pertanian, dan wirausaha.',
+      image:
+        'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop',
+      image_alt: 'Pelatihan Keterampilan',
+    },
+    {
+      id: 3,
+      sort: 3,
+      icon: 'K',
+      title: 'Bantuan Kesehatan',
+      desc: 'Program bantuan kesehatan gratis berupa pemeriksaan kesehatan, pengobatan, dan penyuluhan kesehatan untuk masyarakat.',
+      image:
+        'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=600&fit=crop',
+      image_alt: 'Bantuan Kesehatan',
+    },
+    {
+      id: 4,
+      sort: 4,
+      icon: 'E',
+      title: 'Pemberdayaan Perempuan',
+      desc: 'Program khusus untuk memberdayakan perempuan melalui pelatihan, pendampingan, dan dukungan untuk meningkatkan kualitas hidup.',
+      image:
+        'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop',
+      image_alt: 'Pemberdayaan Perempuan',
+    },
+    {
+      id: 5,
+      sort: 5,
+      icon: 'L',
+      title: 'Bantuan Lansia',
+      desc: 'Program bantuan khusus untuk lansia berupa kebutuhan pokok, kesehatan, dan kegiatan sosial untuk meningkatkan kesejahteraan mereka.',
+      image:
+        'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&h=600&fit=crop',
+      image_alt: 'Bantuan Lansia',
+    },
+    {
+      id: 6,
+      sort: 6,
+      icon: 'M',
+      title: 'Pemberdayaan Masyarakat',
+      desc: 'Program komprehensif untuk memberdayakan masyarakat melalui berbagai kegiatan sosial, ekonomi, dan pendidikan yang terintegrasi.',
+      image:
+        'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop',
+      image_alt: 'Pemberdayaan Masyarakat',
+    },
+  ],
+};
+
+export async function getSocialProgramContent(
+  language: SiteLanguage = 'id'
+): Promise<SocialProgramContent | null> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const cacheKey = `social-program:v1:${normalizedLanguage}`;
+  const cached = cacheGet<SocialProgramContent>(cacheKey);
+  if (cached) return cached;
+
+  const client = getClient();
+  if (!client) return null;
+
+  try {
+    const item = await client.request(
+      (readItems as any)('social_program', {
+        fields: [
+          '*',
+          'translations.*',
+          'program_bullets.*',
+          'program_bullets.translations.*',
+          'list_program.*',
+          'list_program.translations.*',
+        ],
+        limit: 1,
+      })
+    );
+
+    const content = Array.isArray(item) ? item[0] : item;
+    if (!content) return null;
+
+    const result = applySocialProgramTranslation(
+      content as SocialProgramContent,
+      normalizedLanguage
+    );
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.error(
+      `[directus] getSocialProgramContent failed (${normalizedLanguage}):`,
+      e instanceof Error ? e.message : e
+    );
+    return null;
+  }
+}
+
+export async function getSocialProgramContentWithFallback(
+  language: SiteLanguage = 'id'
+): Promise<SocialProgramContent> {
+  const normalizedLanguage = normalizeSiteLanguage(language);
+  const fromCms = await getSocialProgramContent(normalizedLanguage);
+  const merged = {
+    ...FALLBACK_SOCIAL_PROGRAM_CONTENT,
+    ...fromCms,
+  } as SocialProgramContent;
+
+  return {
+    ...merged,
+    image: directusAssetUrl(
+      merged.image ?? FALLBACK_SOCIAL_PROGRAM_CONTENT.image
+    ),
+    program_bullets:
+      merged.program_bullets && merged.program_bullets.length > 0
+        ? merged.program_bullets
+        : FALLBACK_SOCIAL_PROGRAM_CONTENT.program_bullets,
+    list_program:
+      merged.list_program && merged.list_program.length > 0
+        ? merged.list_program.map((item) => ({
+            ...item,
+            image: directusAssetUrl(item.image),
+          }))
+        : (FALLBACK_SOCIAL_PROGRAM_CONTENT.list_program ?? []).map((item) => ({
+            ...item,
+            image: directusAssetUrl(item.image),
+          })),
   };
 }
 
